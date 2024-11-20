@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-const resultFolder = 'src'
+const resultFolder = 'source'
 
 const htmlString = await fetch("https://starblast.io").then(a => a.text())
 console.log("Fetch done.")
@@ -25,7 +25,6 @@ const beautifulJS = js_beautify.js_beautify(data.querySelectorAll("script").pop(
   space_after_anon_function: true,
   space_before_conditional: true,
   jslint_happy: true,
-  wrap_line_length: 40,
 })
 console.log("Format code done.")
 
