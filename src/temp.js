@@ -199,16 +199,19 @@
 
       return t.prototype.init = function (t) {
         if (this.value = t, this.lO100 = 0, null == this.value && (this.value = this.OI0lO), this.next.length > 0) return this.next = []
-      }, t.prototype.push = function (t, e, i, l) {
+      },
+        t.prototype.push = function (t, e, i, l) {
         return null == i && (i = this.k), null == l && (l = this.f), this.lO100 <= 0 ? this.set(t, e, i, l) : this.next.push({
           target: t,
           lO100: e,
           k: i,
           f: l
         })
-      }, t.prototype.set = function (t, e, i, l, s) {
+      },
+        t.prototype.set = function (t, e, i, l, s) {
         if (this.target = t, this.lO100 = e, this.k = null != i ? i : this.k, this.f = null != l ? l : this.f, null == s && (s = !0), null == this.target && (this.target = this.OI0lO), s && this.next.length > 0) return this.next = []
-      }, t.prototype.IlIl1 = function (t) {
+      },
+        t.prototype.IlIl1 = function (t) {
         var e, i;
         if (!(this.lO100 <= 0)) {
           for (; ;) {
@@ -221,7 +224,8 @@
             if ("number" == typeof this.target && (this.value = this.target), null != this.OllOO) return this.OllOO(), this.OllOO = null
           }
         }
-      }, t
+      },
+        t
     }(),
     this.IOlIO = function () {
       function t(t) {
@@ -230,42 +234,55 @@
 
       return t.prototype.l100O = function (t) {
         return this.lIIOl.OllOO = t
-      }, t.prototype.isRunning = function () {
-        return this.lIIOl.lO100 > 0
-      }, t.prototype.IlIl1 = function () {
-        var t, e;
-        return null == this.OO0O0 && (this.OO0O0 = Date.now()), e = Date.now(), t = Math.max(1, Math.min(30, Math.round((e - this.OO0O0) / 1e3 * 60))), this.OO0O0 = e, this.lIIOl.IlIl1(t), this.OIlO1.IlIl1(t), this.rotation.IlIl1(t), this.O1IlI.IlIl1(t), this.lI001.IlIl1(t), this.opacity.IlIl1(t)
-      }, t.prototype.title = function (t, e, i, l) {
-        return t = (t - (this.component.x + this.component.width / 2)) / this.component.width, e = (e - (this.component.y + this.component.height / 2)) / this.component.height, this.lIIOl.init(.1), this.OIlO1.init(.1), this.opacity.init(0), this.O1IlI.init(t), this.lI001.init(e), this.rotation.init(l / 2), this.lIIOl.push(i, 2, .01, .1), this.OIlO1.push(i, 2, .01, .1), this.O1IlI.push(t, 2, .01, .1), this.lI001.push(e, 2, .01, .1), this.rotation.push(l, 2, .01, .1), this.opacity.push(1, 2, .1, .5), this.lIIOl.push(1, 2, .05, .4), this.OIlO1.push(1, 2, .05, .4), this.O1IlI.push(0, 2, .05, .4), this.lI001.push(0, 2, .05, .4), this.rotation.push(0, 2, .05, .4)
-      }, t.prototype.init = function (t) {
-        if (null != t.lIIOl && this.lIIOl.init(t.lIIOl), null != t.OIlO1 && this.OIlO1.init(t.OIlO1), null != t.O1IlI && this.O1IlI.init(t.O1IlI), null != t.lI001 && this.lI001.init(t.lI001), null != t.rotation && this.rotation.init(t.rotation), null != t.opacity) return this.opacity.init(t.opacity)
-      }, t.prototype.set = function (t, e, i, l) {
-        return null == t && (t = {}), null == e && (e = 1), null == i && (i = .02), null == l && (l = .2), e = null != t.d ? t.d : e, i = null != t.k ? t.k : i, l = null != t.f ? t.f : l, this.lIIOl.set(null != t.lIIOl ? t.lIIOl : 1, e, i, l), this.OIlO1.set(null != t.OIlO1 ? t.OIlO1 : 1, e, i, l), this.O1IlI.set(null != t.O1IlI ? t.O1IlI : 0, e, i, l), this.lI001.set(null != t.lI001 ? t.lI001 : 0, e, i, l), this.rotation.set(null != t.rotation ? t.rotation : 0, e, i, l), this.opacity.set(null != t.opacity ? t.opacity : 1, e, i, l)
-      }, t.prototype.push = function (t, e, i, l) {
-        return null == e && (e = 1), null == i && (i = .02), null == l && (l = .2), e = null != t.d ? t.d : e, i = null != t.k ? t.k : i, l = null != t.f ? t.f : l, this.lIIOl.push(null != t.lIIOl ? t.lIIOl : 1, e, i, l), this.OIlO1.push(null != t.OIlO1 ? t.OIlO1 : 1, e, i, l), this.O1IlI.push(null != t.O1IlI ? t.O1IlI : 0, e, i, l), this.lI001.push(null != t.lI001 ? t.lI001 : 0, e, i, l), this.rotation.push(null != t.rotation ? t.rotation : 0, e, i, l), this.opacity.push(null != t.opacity ? t.opacity : 1, e, i, l)
-      }, t.prototype.O1l1O = function (e) {
-        return this.init(t.llOO0), null != e && this.pause(e), this.push(t.normal, 1, .05, .3)
-      }, t.prototype.pause = function (t) {
+      },
+        t.prototype.isRunning = function () {
+          return this.lIIOl.lO100 > 0
+        },
+        t.prototype.IlIl1 = function () {
+          var t, e;
+          return null == this.OO0O0 && (this.OO0O0 = Date.now()), e = Date.now(), t = Math.max(1, Math.min(30, Math.round((e - this.OO0O0) / 1e3 * 60))), this.OO0O0 = e, this.lIIOl.IlIl1(t), this.OIlO1.IlIl1(t), this.rotation.IlIl1(t), this.O1IlI.IlIl1(t), this.lI001.IlIl1(t), this.opacity.IlIl1(t)
+        },
+        t.prototype.title = function (t, e, i, l) {
+          return t = (t - (this.component.x + this.component.width / 2)) / this.component.width, e = (e - (this.component.y + this.component.height / 2)) / this.component.height, this.lIIOl.init(.1), this.OIlO1.init(.1), this.opacity.init(0), this.O1IlI.init(t), this.lI001.init(e), this.rotation.init(l / 2), this.lIIOl.push(i, 2, .01, .1), this.OIlO1.push(i, 2, .01, .1), this.O1IlI.push(t, 2, .01, .1), this.lI001.push(e, 2, .01, .1), this.rotation.push(l, 2, .01, .1), this.opacity.push(1, 2, .1, .5), this.lIIOl.push(1, 2, .05, .4), this.OIlO1.push(1, 2, .05, .4), this.O1IlI.push(0, 2, .05, .4), this.lI001.push(0, 2, .05, .4), this.rotation.push(0, 2, .05, .4)
+        },
+        t.prototype.init = function (t) {
+          if (null != t.lIIOl && this.lIIOl.init(t.lIIOl), null != t.OIlO1 && this.OIlO1.init(t.OIlO1), null != t.O1IlI && this.O1IlI.init(t.O1IlI), null != t.lI001 && this.lI001.init(t.lI001), null != t.rotation && this.rotation.init(t.rotation), null != t.opacity) return this.opacity.init(t.opacity)
+        },
+        t.prototype.set = function (t, e, i, l) {
+          return null == t && (t = {}), null == e && (e = 1), null == i && (i = .02), null == l && (l = .2), e = null != t.d ? t.d : e, i = null != t.k ? t.k : i, l = null != t.f ? t.f : l, this.lIIOl.set(null != t.lIIOl ? t.lIIOl : 1, e, i, l), this.OIlO1.set(null != t.OIlO1 ? t.OIlO1 : 1, e, i, l), this.O1IlI.set(null != t.O1IlI ? t.O1IlI : 0, e, i, l), this.lI001.set(null != t.lI001 ? t.lI001 : 0, e, i, l), this.rotation.set(null != t.rotation ? t.rotation : 0, e, i, l), this.opacity.set(null != t.opacity ? t.opacity : 1, e, i, l)
+        },
+        t.prototype.push = function (t, e, i, l) {
+          return null == e && (e = 1), null == i && (i = .02), null == l && (l = .2), e = null != t.d ? t.d : e, i = null != t.k ? t.k : i, l = null != t.f ? t.f : l, this.lIIOl.push(null != t.lIIOl ? t.lIIOl : 1, e, i, l), this.OIlO1.push(null != t.OIlO1 ? t.OIlO1 : 1, e, i, l), this.O1IlI.push(null != t.O1IlI ? t.O1IlI : 0, e, i, l), this.lI001.push(null != t.lI001 ? t.lI001 : 0, e, i, l), this.rotation.push(null != t.rotation ? t.rotation : 0, e, i, l), this.opacity.push(null != t.opacity ? t.opacity : 1, e, i, l)
+        },
+        t.prototype.O1l1O = function (e) {
+          return this.init(t.llOO0), null != e && this.pause(e), this.push(t.normal, 1, .05, .3)
+        },
+        t.prototype.pause = function (t) {
         return this.lIIOl.push(this.lIIOl.value, t, .1, .1), this.OIlO1.push(this.OIlO1.value, t, .1, .1), this.O1IlI.push(this.O1IlI.value, t, .1, .1), this.lI001.push(this.lI001.value, t, .1, .1), this.rotation.push(this.rotation.value, t, .1, .1), this.opacity.push(this.opacity.value, t, .1, .1)
-      }, t.llOO0 = {
+      },
+        t.llOO0 = {
         lIIOl: .1,
         OIlO1: .1,
         opacity: 0
-      }, t.normal = {}, t.pressed = {
+      },
+        t.normal = {},
+        t.pressed = {
         lIIOl: .9,
         OIlO1: .9,
         rotation: 0,
         O1IlI: 0,
         lI001: 0,
         opacity: .8
-      }, t.IIOlI = {
+      },
+        t.IIOlI = {
         lIIOl: 2,
         OIlO1: 2,
         rotation: 0,
         O1IlI: 0,
         lI001: 0,
         opacity: 0
-      }, t
+      },
+        t
     }(),
     this.OOlOO = function () {
       function t(t, e, i, l) {
@@ -275,79 +292,97 @@
       return t.prototype.O101I = function (t, e, i, l, s) {
         var n, a, o;
         if (this.px = t, this.I0010 = e, this.Il1lI = i, this.llI0I = l, this.level = s, this.level += this.levelmod, null != this.force_ratio) return o = this.force_ratio, n = 1, a = Math.min(this.Il1lI / o, this.llI0I / n), o *= a, n *= a, this.px += (this.Il1lI - o) / 2, this.align_top || (this.I0010 += (this.llI0I - n) / 2), this.Il1lI = o, this.llI0I = n
-      }, t.prototype.getAbsolutePosition = function () {
-        var t;
-        return null != this.parent && null != this.parent.getAbsolutePosition ? (t = this.parent.getAbsolutePosition(), {
-          x: t.x + this.x * t.width,
-          y: t.y + this.y * t.height,
-          width: t.width * this.width,
-          height: t.height * this.height
-        }) : {
-          x: this.x,
-          y: this.y,
-          width: this.width,
-          height: this.height
-        }
-      }, t.prototype.l1OO1 = function () {
-        var t, e, i;
-        return i = this.lO1I0(this.Il1lI), e = this.lO1I0(this.llI0I), null == this.image || this.image.width !== i || this.image.height !== e ? (this.image = document.createElement("canvas"), this.image.width = this.lO1I0(this.Il1lI), this.image.height = this.lO1I0(this.llI0I)) : this.image.getContext("2d").clearRect(0, 0, i, e), t = this.image.getContext("2d"), t.save(), t.scale(this.image.width / this.Il1lI, this.image.height / this.llI0I), t.translate(-this.px, -this.I0010), this.l0O1O(t), t.restore(), this.rendered_width = this.Il1lI, this.rendered_height = this.llI0I, this.image
-      }, t.prototype.lO1I0 = function (t) {
-        return Math.pow(2, Math.ceil(Math.log(t) / Math.LN2))
-      }, t.prototype.needsUpdate = function () {
-        return this.O0l10 || null == this.image || this.rendered_width !== this.Il1lI || this.rendered_height !== this.llI0I
-      }, t.prototype.l0I0I = function () {
-        var t;
-        return t = this.O0l1O.opacity.value, null != this.parent && (t *= this.parent.l0I0I()), t
-      }, t.prototype.Il1OI = function () {
-        var t, e, i, l;
-        if (this.O0l1O.IlIl1(), null != this.object) {
-          switch (this.object.position.x = this.px + this.Il1lI / 2 + this.O0l1O.O1IlI.value * this.Il1lI, this.object.position.y = this.I0010 + this.llI0I / 2 + this.O0l1O.lI001.value * this.llI0I, this.object.position.z = -1e3 - this.level, this.fit) {
-            case "fit":
-              l = Math.min(this.Il1lI / this.image.width, this.llI0I / this.image.height), this.object.scale.x = -l * this.image.width * this.O0l1O.lIIOl.value, this.object.scale.y = l * this.image.height * this.O0l1O.OIlO1.value;
-              break;
-            default:
-              this.object.scale.x = -this.Il1lI * this.O0l1O.lIIOl.value, this.object.scale.y = this.llI0I * this.O0l1O.OIlO1.value
+      },
+        t.prototype.getAbsolutePosition = function () {
+          var t;
+          return null != this.parent && null != this.parent.getAbsolutePosition ? (t = this.parent.getAbsolutePosition(), {
+            x: t.x + this.x * t.width,
+            y: t.y + this.y * t.height,
+            width: t.width * this.width,
+            height: t.height * this.height
+          }) : {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height
           }
-          for (this.material.opacity = this.l0I0I(), this.material.rotation = this.O0l1O.rotation.value - 180 * THREE.Math.DEG2RAD, i = this.parent, t = 0, e = 0; ;) {
-            if (null == i) break;
-            t -= i.OIlII, e -= i.I1OlO, i = i.parent
+        },
+        t.prototype.l1OO1 = function () {
+          var t, e, i;
+          return i = this.lO1I0(this.Il1lI), e = this.lO1I0(this.llI0I), null == this.image || this.image.width !== i || this.image.height !== e ? (this.image = document.createElement("canvas"), this.image.width = this.lO1I0(this.Il1lI), this.image.height = this.lO1I0(this.llI0I)) : this.image.getContext("2d").clearRect(0, 0, i, e), t = this.image.getContext("2d"), t.save(), t.scale(this.image.width / this.Il1lI, this.image.height / this.llI0I), t.translate(-this.px, -this.I0010), this.l0O1O(t), t.restore(), this.rendered_width = this.Il1lI, this.rendered_height = this.llI0I, this.image
+        },
+        t.prototype.lO1I0 = function (t) {
+          return Math.pow(2, Math.ceil(Math.log(t) / Math.LN2))
+        },
+        t.prototype.needsUpdate = function () {
+          return this.O0l10 || null == this.image || this.rendered_width !== this.Il1lI || this.rendered_height !== this.llI0I
+        },
+        t.prototype.l0I0I = function () {
+          var t;
+          return t = this.O0l1O.opacity.value, null != this.parent && (t *= this.parent.l0I0I()), t
+        },
+        t.prototype.Il1OI = function () {
+          var t, e, i, l;
+          if (this.O0l1O.IlIl1(), null != this.object) {
+            switch (this.object.position.x = this.px + this.Il1lI / 2 + this.O0l1O.O1IlI.value * this.Il1lI, this.object.position.y = this.I0010 + this.llI0I / 2 + this.O0l1O.lI001.value * this.llI0I, this.object.position.z = -1e3 - this.level, this.fit) {
+              case "fit":
+                l = Math.min(this.Il1lI / this.image.width, this.llI0I / this.image.height), this.object.scale.x = -l * this.image.width * this.O0l1O.lIIOl.value, this.object.scale.y = l * this.image.height * this.O0l1O.OIlO1.value;
+                break;
+              default:
+                this.object.scale.x = -this.Il1lI * this.O0l1O.lIIOl.value, this.object.scale.y = this.llI0I * this.O0l1O.OIlO1.value
+            }
+            for (this.material.opacity = this.l0I0I(), this.material.rotation = this.O0l1O.rotation.value - 180 * THREE.Math.DEG2RAD, i = this.parent, t = 0, e = 0; ;) {
+              if (null == i) break;
+              t -= i.OIlII, e -= i.I1OlO, i = i.parent
+            }
+            return this.object.position.x += t, this.object.position.y += e
           }
-          return this.object.position.x += t, this.object.position.y += e
-        }
-      }, t.prototype.OlOO1 = function () {
-        var t;
-        if (this.needsUpdate()) {
-          if (t = this.image, this.l1OO1(), null == this.image) return;
-          if (this.image instanceof Image && !this.image.complete) return;
-          if (null == this.parent || null == this.parent.object) return;
-          this.O0l10 = !1, null == this.texture || t !== this.image ? (this.texture = new THREE.Texture(this.image), this.texture.minFilter = this.filter, this.texture.needsUpdate = !0, this.material = new THREE.SpriteMaterial({
-            map: this.texture,
-            transparent: !0,
-            blending: this.blending
-          }), null != this.object && this.parent.object.remove(this.object), this.object = new THREE.Sprite(this.material), this.parent.object.add(this.object)) : this.texture.needsUpdate = !0
-        }
-        if (null != this.object) return this.object.visible = this.visible
-      }, t.prototype.l0O1O = function (t) {
-        return t.fillStyle = "rgba(255,255,255,.2)", t.fillRoundRect(0, 0, this.Il1lI, this.llI0I, 10)
-      }, t.prototype.l0100 = function (t, e, i) {
-        return !1
-      }, t.prototype.O11O1 = function (t, e, i) {
-        return !1
-      }, t.prototype.l0lO1 = function (t, e, i) {
-        return !1
-      }, t.prototype.Ol001 = function (t) {
-        return !1
-      }, t.prototype.mouseMove = function (t, e, i) {
-        return !1
-      }, t.prototype.IO0l0 = function (t) {
-        return this.OlOO1(), this.Il1OI()
-      }, t.prototype.refresh = function () {
-        if (this.I010O = !1, null != this.parent) return this.parent.refresh()
-      }, t.prototype.lIOOI = function () {
-      }, t.prototype.dispose = function () {
-        if (null != this.object && null != this.object.dispose && this.object.dispose(), null != this.texture) return this.texture.dispose()
-      }, t.prototype.l10II = function (t) {
-      }, t
+        },
+        t.prototype.OlOO1 = function () {
+          var t;
+          if (this.needsUpdate()) {
+            if (t = this.image, this.l1OO1(), null == this.image) return;
+            if (this.image instanceof Image && !this.image.complete) return;
+            if (null == this.parent || null == this.parent.object) return;
+            this.O0l10 = !1, null == this.texture || t !== this.image ? (this.texture = new THREE.Texture(this.image), this.texture.minFilter = this.filter, this.texture.needsUpdate = !0, this.material = new THREE.SpriteMaterial({
+              map: this.texture,
+              transparent: !0,
+              blending: this.blending
+            }), null != this.object && this.parent.object.remove(this.object), this.object = new THREE.Sprite(this.material), this.parent.object.add(this.object)) : this.texture.needsUpdate = !0
+          }
+          if (null != this.object) return this.object.visible = this.visible
+        },
+        t.prototype.l0O1O = function (t) {
+          return t.fillStyle = "rgba(255,255,255,.2)", t.fillRoundRect(0, 0, this.Il1lI, this.llI0I, 10)
+        },
+        t.prototype.l0100 = function (t, e, i) {
+          return !1
+        },
+        t.prototype.O11O1 = function (t, e, i) {
+          return !1
+        },
+        t.prototype.l0lO1 = function (t, e, i) {
+          return !1
+        },
+        t.prototype.Ol001 = function (t) {
+          return !1
+        },
+        t.prototype.mouseMove = function (t, e, i) {
+          return !1
+        },
+        t.prototype.IO0l0 = function (t) {
+          return this.OlOO1(), this.Il1OI()
+        },
+        t.prototype.refresh = function () {
+          if (this.I010O = !1, null != this.parent) return this.parent.refresh()
+        },
+        t.prototype.lIOOI = function () {
+        },
+        t.prototype.dispose = function () {
+          if (null != this.object && null != this.object.dispose && this.object.dispose(), null != this.texture) return this.texture.dispose()
+        },
+        t.prototype.l10II = function (t) {
+        }, t
     }(),
 
     extend = function (t, e) {
@@ -361,16 +396,26 @@
     this.lO11O = function (t) {
       function e(t) {
         var i;
-        this.IO0l1 = t, e.O11O0.constructor.call(this), "string" == typeof this.IO0l1 && (i = this.IO0l1, this.IO0l1 = new Image, this.IO0l1.crossOrigin = "anonymous", this.IO0l1.src = i, this.IO0l1.onload = function (t) {
-          return function () {
-            return t.IO0l1.width > 0 && t.IO0l1.height > 0 && (t.force_ratio = t.IO0l1.width / t.IO0l1.height), t.O0l10 = !0
-          }
-        }(this)), this.IO0l1.width > 0 && this.IO0l1.height > 0 && (this.force_ratio = this.IO0l1.width / this.IO0l1.height)
+        this.IO0l1 = t,
+          e.O11O0.constructor.call(this),
+        "string" == typeof this.IO0l1 && (
+          i = this.IO0l1,
+            this.IO0l1 = new Image,
+            this.IO0l1.crossOrigin = "anonymous",
+            this.IO0l1.src = i,
+            this.IO0l1.onload = function (t) {
+              return function () {
+                return t.IO0l1.width > 0 && t.IO0l1.height > 0 && (t.force_ratio = t.IO0l1.width / t.IO0l1.height), t.O0l10 = !0
+              }
+            }(this)),
+        this.IO0l1.width > 0 && this.IO0l1.height > 0 && (this.force_ratio = this.IO0l1.width / this.IO0l1.height)
       }
 
-      return extend(e, t), e.prototype.l0O1O = function (t) {
-        if (null != this.IO0l1 && this.IO0l1.width > 0 && this.IO0l1.height > 0) return t.drawImage(this.IO0l1, this.px, this.I0010, this.Il1lI, this.llI0I)
-      }, e
+      return extend(e, t),
+        e.prototype.l0O1O = function (t) {
+          if (null != this.IO0l1 && this.IO0l1.width > 0 && this.IO0l1.height > 0) return t.drawImage(this.IO0l1, this.px, this.I0010, this.Il1lI, this.llI0I)
+        },
+        e
     }(OOlOO),
 
     extend = function (t, e) {
@@ -2755,11 +2800,13 @@
       this.icon = t, this.name = i, this.value = l, e.O11O0.constructor.call(this)
     }
 
-    return extend(e, t), e.prototype.setValue = function (t) {
-      if (t !== this.value) return this.value = t, this.O0l10 = !0
-    }, e.prototype.l0O1O = function (t) {
-      return this.color = "rgba(255,255,255,.7)", t.save(), t.translate(this.px, this.I0010), t.clearRect(0, 0, this.Il1lI, this.llI0I), t.fillStyle = this.color, t.textAlign = "left", t.textBaseline = "middle", t.font = Math.round(this.llI0I / 2) + "pt SBGlyphs", t.fillText(this.icon, 0, this.llI0I / 2), t.font = Math.round(this.llI0I / 2) + "pt Play", t.fillText(this.name, this.llI0I, this.llI0I / 2), t.textAlign = "right", t.fillText(this.value, this.Il1lI, this.llI0I / 2), t.restore()
-    }, e
+    return extend(e, t),
+      e.prototype.setValue = function (t) {
+        if (t !== this.value) return this.value = t, this.O0l10 = !0
+      },
+      e.prototype.l0O1O = function (t) {
+        return this.color = "rgba(255,255,255,.7)", t.save(), t.translate(this.px, this.I0010), t.clearRect(0, 0, this.Il1lI, this.llI0I), t.fillStyle = this.color, t.textAlign = "left", t.textBaseline = "middle", t.font = Math.round(this.llI0I / 2) + "pt SBGlyphs", t.fillText(this.icon, 0, this.llI0I / 2), t.font = Math.round(this.llI0I / 2) + "pt Play", t.fillText(this.name, this.llI0I, this.llI0I / 2), t.textAlign = "right", t.fillText(this.value, this.Il1lI, this.llI0I / 2), t.restore()
+      }, e
   }(OOlOO),
 
   extend = function (t, e) {
