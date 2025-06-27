@@ -1,10 +1,11 @@
-import { ChevronLeft, Eye, EyeOff, Lock, Mail, Phone, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, Eye, EyeOff, Lock } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 
-import GoogleIcon from '@/components/GoogleIcon';
 
 function OnlineExamChangePassword() {
+  const navigate = useNavigate()
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -29,8 +30,7 @@ function OnlineExamChangePassword() {
               type={showPassword ? "text" : "password"}
               value={registerData.password}
               onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11 pr-11"
-            />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11 pr-11" />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <button type="button"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
@@ -75,11 +75,11 @@ function OnlineExamChangePassword() {
         </button>
 
         {/* Back to Login */}
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 font-medium transition-colors duration-200">
-            <ChevronLeft className="w-4 h-4" />
-            Quay lại đăng nhập
-          </Link>
+        <div className="">
+          <Button variant="link" className='flex items-center justify-center gap-2' onClick={() => navigate(-1)}>
+            <ChevronLeft />
+            Quay lại
+          </Button>
         </div>
       </div>
     </div>
