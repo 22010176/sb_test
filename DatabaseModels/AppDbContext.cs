@@ -1,6 +1,14 @@
-﻿namespace DatabaseModels;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
-public class Class1
+namespace DatabaseModels;
+
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
+  public string ConnectionString { get; } = options.Extensions.OfType<RelationalOptionsExtension>().FirstOrDefault()?.ConnectionString!;
 
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    base.OnModelCreating(modelBuilder);
+  }
 }
