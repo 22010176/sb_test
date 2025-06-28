@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using DatabaseModels;
 using DatabaseModels.Models;
 using Utilities;
+using MailServices;
 
 namespace Controllers;
 
@@ -30,10 +31,11 @@ public record LoginInput
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(AppDbContext context, IConfiguration configuration) : ControllerBase
+public class AuthController(AppDbContext context, IConfiguration configuration, IEmailSender emailSender) : ControllerBase
 {
   readonly AppDbContext context = context;
   readonly IConfiguration configuration = configuration;
+  readonly IEmailSender emailSender = emailSender;
 
   async Task<NguoiDung> CheckLoginInput(LoginInput input, LoaiNguoiDung loaiNguoiDung)
   {
@@ -92,6 +94,8 @@ public class AuthController(AppDbContext context, IConfiguration configuration) 
       ThoiGianTao = DateTime.UtcNow
     };
 
+    await emailSender.SendEmailAsync(nguoiDung.Email!, "Verify your email",
+        $"<p>Please confirm your email by <a href=''>clicking here</a>.</p>");
     try
     {
       await context.NguoiDung.AddAsync(nguoiDung);

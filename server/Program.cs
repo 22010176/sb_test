@@ -7,6 +7,7 @@ using Controllers;
 using DatabaseModels;
 using Microsoft.Extensions.FileProviders;
 using Utilities;
+using MailServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,8 @@ builder.Services.AddSwaggerGen(options =>
     }
   });
 });
+
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

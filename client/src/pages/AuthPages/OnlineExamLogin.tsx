@@ -4,30 +4,25 @@ import { Button, Checkbox, Form, Input, message, Select } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-
-
-export default function LoginForm() {
+function LoginForm() {
   const [form] = Form.useForm();
   const [rememberPassword, setRememberPassword] = useState(false);
 
   const onFinish = async (values: { loaiNguoiDung: number, email: string, matKhau: string }) => {
-    console.log('Login form values:', values);
     const input: DangNhapInput = {
       loaiNguoiDung: values.loaiNguoiDung,
       email: values.email,
       soDienThoai: values.email, // Assuming email is used as phone number
       matKhau: values.matKhau,
     }
-    const result = await DangNhapNguoiDung(input);
-    if (result) {
-      console.log('Login successful:', result);
-      // Handle successful login, e.g., redirect to dashboard
+    await DangNhapNguoiDung(input).then(res => {
       message.success('Đăng nhập thành công!');
-      localStorage.setItem('token', JSON.stringify(result.data));
+      localStorage.setItem('token', JSON.stringify(res.data));
       form.resetFields();
-    } else {
-      console.error('Login failed');
-    }
+    }).catch(() => {
+      message.error('Đăng nhập không thành công. Vui lòng thử lại sau!');
+      return;
+    });
   };
 
   return (
@@ -93,3 +88,5 @@ export default function LoginForm() {
     </>
   );
 }
+
+export default LoginForm
