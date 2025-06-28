@@ -1,142 +1,145 @@
-import { ChevronLeft, Eye, EyeOff, Lock, Mail, Phone, User } from 'lucide-react';
+import { DangKyNguoiDung } from '@/api/TaiKhoan';
+import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, DatePicker, Form, Input, message, Radio, Select } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-import GoogleIcon from '@/components/GoogleIcon';
+interface RegisterForm {
+  loaiNguoiDung: number,
+  hoTen: string,
+  gioiTinh: number,
+  ngaySinh: string,
+  email: string,
+  soDienThoai: string,
+  matKhau: string,
+  confirmMatKhau: string
+}
 
 function OnlineExamRegister() {
-  const [isHovered, setIsHovered] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
-  // Register form states
-  const [registerData, setRegisterData] = useState({ fullName: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const onFinish = async (values: RegisterForm) => {
+    if (values.matKhau !== values.confirmMatKhau) return message.error('Mật khẩu xác nhận không khớp!');
+    try {
+      setLoading(true);
+      await DangKyNguoiDung({
+        loaiNguoiDung: values.loaiNguoiDung,
+        hoTen: values.hoTen,
+        gioiTinh: values.gioiTinh,
+        email: values.email,
+        soDienThoai: values.soDienThoai,
+        matKhau: values.matKhau,
+        ngaySinh: values.ngaySinh
+      });
+      setLoading(false);
+      message.success('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
+      form.resetFields();
+    } catch {
+      setLoading(false);
+      message.error('Đăng ký không thành công. Vui lòng thử lại sau!');
+      return;
+    }
+  };
 
   return (
-    <div className="max-w-md mx-auto w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">ĐĂNG KÝ TÀI KHOẢN</h2>
+    <>
+      <div className="text-center mb-5">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">ĐĂNG KÝ TÀI KHOẢN</h2>
       </div>
 
-      <div className="space-y-3">
-        {/* Full Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-0.5">
-            Họ và tên*
-          </label>
-          <div className="relative">
-            <input type="text"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11"
-              value={registerData.fullName}
-              onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })} />
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          </div>
-        </div>
+      <Form form={form} name="login" onFinish={onFinish} layout="vertical" >
+        <Form.Item label="Chọn vai trò của bạn" name="loaiNguoiDung" rules={[
+          { required: true, message: 'Vui lòng chọn vai trò!' }
+        ]}>
+          <Select placeholder="Chọn vai trò" suffixIcon={<UserOutlined />} options={[
+            { value: 0, label: 'Học sinh' },
+            { value: 1, label: 'Giáo viên' },
+            { value: 2, label: 'Quản trị viên' }]} />
+        </Form.Item>
 
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-0.5">
-            Email*
-          </label>
-          <div className="relative">
-            <input type="email" placeholder="e.g: username@gmail.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11"
-              value={registerData.email}
-              onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })} />
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          </div>
-        </div>
+        <Form.Item label="Họ và tên" name="hoTen"
+          rules={[
+            { required: true, message: 'Vui lòng nhập họ và tên!' },
+            { min: 3, message: 'Họ và tên phải có ít nhất 3 ký tự!' }
+          ]}>
+          <Input prefix={<MailOutlined className="text-gray-400" />} placeholder="Nhập họ và tên của bạn" />
+        </Form.Item>
 
-        {/* Phone */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-0.5">
-            SĐT*
-          </label>
-          <div className="relative">
-            <input type="tel"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11"
-              value={registerData.phone}
-              onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })} />
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          </div>
-        </div>
+        <Form.Item label="Giới tính" name="gioiTinh" rules={[
+          { required: true, message: 'Vui lòng chọn giới tính!' }
+        ]}>
+          <Radio.Group options={[
+            { value: 0, label: 'Nam' },
+            { value: 1, label: 'Nữ' },
+            { value: 2, label: 'Khác' }]} />
+        </Form.Item>
 
-        {/* Password */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-0.5">
-            Mật khẩu*
-          </label>
-          <div className="relative">
-            <input className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11 pr-11"
-              type={showPassword ? "text" : "password"}
-              value={registerData.password}
-              onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })} />
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <button type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
-              onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <EyeOff /> : <Eye />}
-            </button>
-          </div>
-        </div>
+        <Form.Item label="Ngày sinh" name="ngaySinh"
+          rules={[
+            { required: true, message: 'Vui lòng nhập ngày sinh!' },
+            { type: 'date', message: 'Ngày sinh không hợp lệ!' }
+          ]}>
+          <DatePicker className='w-full' prefix={<MailOutlined className="text-gray-400" />} placeholder="Nhập ngày sinh của bạn" />
+        </Form.Item>
 
-        {/* Confirm Password */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-0.5">
-            Nhập lại mật khẩu*
-          </label>
-          <div className="relative">
-            <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 pl-11 pr-11"
-              type={showConfirmPassword ? "text" : "password"}
-              value={registerData.confirmPassword}
-              onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })} />
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-              {showConfirmPassword ? <EyeOff /> : <Eye />}
-            </button>
-          </div>
-        </div>
+        <Form.Item label="Email" name="email"
+          rules={[
+            { required: true, message: 'Vui lòng nhập email!' },
+            { type: 'email', message: 'Email không hợp lệ!' }
+          ]}>
+          <Input prefix={<MailOutlined className="text-gray-400" />} placeholder="Nhập email của bạn" />
+        </Form.Item>
 
-        {/* Register Button */}
-        <button
-          type="button"
-          onClick={() => alert('Đăng ký thành công!')}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-300 transform ${isHovered
-            ? 'bg-gradient-to-r from-purple-600 to-indigo-700 scale-105 shadow-lg'
-            : 'bg-gradient-to-r from-purple-500 to-indigo-600'
-            }`}>
-          Đăng ký
-        </button>
+        <Form.Item label="Số điện thoại" name="soDienThoai"
+          rules={[
+            { required: true, message: 'Vui lòng nhập số điện thoại!' },
+            { pattern: /^\+?[0-9]{1,4}?[-. (]?[0-9]{2,4}?[-. )]?[0-9]{3,4}?[-. ]?[0-9]{3,4}$/, message: 'Số điện thoại không hợp lệ!' }
+          ]}>
+          <Input prefix={<PhoneOutlined className="text-gray-400" />} placeholder="Nhập số điện thoại của bạn" />
+        </Form.Item>
 
-        {/* Back to Login */}
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 font-medium transition-colors duration-200">
-            <ChevronLeft className="w-4 h-4" />
+        <Form.Item label="Mật khẩu" name="matKhau"
+          rules={[
+            { required: true, message: 'Vui lòng nhập mật khẩu!' }
+          ]}>
+          <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="Nhập mật khẩu" />
+        </Form.Item>
+
+        <Form.Item label="Xác nhận mật khẩu" name="confirmMatKhau" rules={[
+          { required: true, message: 'Vui lòng nhập mật khẩu!' },
+          ({ getFieldValue }) => ({
+            warningOnly: true,
+            validator(_, value) {
+              if (!value || getFieldValue('matKhau') === value) return Promise.resolve();
+              return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+            },
+          }),
+        ]}>
+          <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="Nhập mật khẩu" />
+        </Form.Item>
+
+        <Form.Item>
+          <Button loading={loading} type="primary" htmlType="submit" className="w-full border-0 text-lg font-semibold rounded-lg">
+            Đăng ký
+          </Button>
+        </Form.Item>
+
+        <Form.Item className="text-left">
+          <Link to="/" className='font-semibold flex items-center gap-2'>
+            <FontAwesomeIcon icon={faArrowLeft} />
             Quay lại đăng nhập
           </Link>
-        </div>
+        </Form.Item>
 
-        {/* Or divider */}
-        <div className="text-center text-gray-500 text-sm">
-          Hoặc:
-        </div>
+        <Button className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+          Tiếp tục với Google
+        </Button>
+      </Form>
 
-        {/* Google Sign Up */}
-        <button
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-          type="button"
-          onClick={() => alert('Đăng ký với Google')}>
-          <GoogleIcon className="w-5 h-5 mr-2" />
-          <span className="text-gray-700 font-medium">Tiếp tục với Google</span>
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 

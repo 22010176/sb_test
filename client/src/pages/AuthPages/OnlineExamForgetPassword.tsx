@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronLeft, Mail, Clock, Search, MapPin, Lock, CheckCircle, Book, User } from 'lucide-react';
+import { ChevronLeft, Mail } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 export default function OnlineExamForgetPassword() {

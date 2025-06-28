@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 
 import IllustrationContainer from './IllustrationContainer';
+import { ConfigProvider } from 'antd';
 
 function AuthLayout() {
   return (
@@ -13,19 +14,21 @@ function AuthLayout() {
           <IllustrationContainer />
 
           {/* Right side - Login Form */}
-          <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-            <Outlet />
+          <div className="lg:w-1/2 px-10 py-5  flex flex-col justify-center">
+            <ConfigProvider theme={{
+              components: {
+                Form: {
+                  verticalLabelPadding: 2,
+                  itemMarginBottom: 12,
+
+                },
+              },
+            }}>
+              <Outlet />
+            </ConfigProvider>
           </div>
         </div>
       </div>
-      {/* <div className='size-full absolute ' >
-        <Iridescence
-          color={[1, 1.1, 1.2]}
-          mouseReact={false}
-          amplitude={0}
-          speed={1.5}
-        />
-      </div> */}
     </div>
   );
 }

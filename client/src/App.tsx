@@ -12,7 +12,7 @@ import OnlineExamChangePassword from "@/pages/AuthPages/OnlineExamChangePassword
 import QuanLyMonHoc from '@/pages/TeacherPages/QuanLyMonHoc';
 import QuanLyLopHoc from '@/pages/TeacherPages/QuanLyLopHoc';
 import UserProfileForm from '@/pages/AuthPages/UserProfileForm';
-import ClassDetailsLayout from './layouts/ClassDetailsLayout';
+import ClassDetailsLayout from '@/layouts/ClassDetailsLayout';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
           <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
           <Route path='/giang-vien/lop-hoc' element={<QuanLyLopHoc />} />
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
-            <Route path='/giang-vien/lop-hoc/danh-sach-lop' element={""} />
+            <Route path='/giang-vien/lop-hoc/:lopId' element={""} />
           </Route>
           <Route path='/giang-vien/mon-hoc' element={<QuanLyMonHoc />} />
           <Route path='/giang-vien/ki-thi' element={<QuanLyMonHoc />} />
