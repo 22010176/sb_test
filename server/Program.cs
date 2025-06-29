@@ -43,8 +43,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder
 builder.Services
 .AddControllers()
 .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
-.AddApplicationPart(typeof(WeatherController).Assembly)
-.AddApplicationPart(typeof(AuthController).Assembly);
+.AddApplicationPart(typeof(AuthController).Assembly)
+.AddApplicationPart(typeof(LopHocController).Assembly);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
