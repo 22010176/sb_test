@@ -74,14 +74,14 @@ function Element() {
     {
       key: 'index', width: 60, align: 'center',
       title: <span className="font-semibold text-gray-700">STT</span>,
-      render: (_, __, index) => (
+      render: (_: unknown, __: unknown, index: number) => (
         <span className="font-medium text-gray-600">{index + 1}</span>
       ),
     },
     {
       dataIndex: 'courseCode', key: 'courseCode', width: 150, align: 'center',
       title: <span className="font-semibold text-gray-700">Mã lớp</span>,
-      render: (text) => (
+      render: (text: string) => (
         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-mono text-sm">
           {text}
         </span>
@@ -91,7 +91,7 @@ function Element() {
       title: <span className="font-semibold text-gray-700">Tên lớp</span>,
       dataIndex: 'courseName',
       key: 'courseName',
-      render: (text) => (
+      render: (text: string) => (
         <span className="font-medium text-gray-800">{text}</span>
       ),
     },
@@ -101,7 +101,7 @@ function Element() {
       key: 'questionCount',
       width: 150,
       align: 'center',
-      render: (count) => (
+      render: (count: number) => (
         <div className="flex items-center justify-center">
           <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold">
             {count}
@@ -157,7 +157,7 @@ function Element() {
 
             <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-0 rounded-lg px-6 py-2 h-auto font-semibold shadow-md hover:shadow-lg transition-all duration-200">
-              Thêm môn học
+              Thêm lớp học
             </Button>
           </div>
         </div>
@@ -172,75 +172,39 @@ function Element() {
 
       {/* Modal */}
       <Modal
-        title={
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${editingCourse ? 'bg-blue-500' : 'bg-green-500'}`}></div>
-            <span className="text-lg font-semibold text-gray-800">
-              {editingCourse ? 'Chỉnh sửa môn học' : 'Thêm môn học mới'}
-            </span>
-          </div>
-        }
+        okText={editingCourse ? 'Cập nhật' : 'Thêm'}
+        cancelText="Hủy"
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText={editingCourse ? 'Cập nhật' : 'Thêm'}
-        cancelText="Hủy"
-        width={500}
-        okButtonProps={{
-          className: "bg-purple-600 hover:bg-purple-700 border-purple-600 rounded-lg font-semibold"
-        }}
-        cancelButtonProps={{
-          className: "rounded-lg font-semibold"
-        }}
-        className="rounded-xl overflow-hidden"
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          className="mt-6"
-        >
+        title={
+          <span className="text-lg font-semibold text-gray-800">
+            {editingCourse ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}
+          </span>
+        }>
+        <Form form={form} layout="vertical" className="mt-6">
           <Form.Item
-            label={<span className="font-semibold text-gray-700">Mã môn học</span>}
-            name="courseCode"
-            rules={[
-              { required: true, message: 'Vui lòng nhập mã môn học!' },
-              { pattern: /^MH\d{3}$/, message: 'Mã môn học phải có định dạng MH + 3 số!' }
-            ]}
-          >
-            <Input
-              placeholder="Ví dụ: MH001"
-              className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<span className="font-semibold text-gray-700">Tên môn học</span>}
+            label={<span className="font-semibold text-gray-700">Tên lớp học</span>}
             name="courseName"
             rules={[
-              { required: true, message: 'Vui lòng nhập tên môn học!' },
-              { min: 3, message: 'Tên môn học phải có ít nhất 3 ký tự!' }
-            ]}
-          >
+              { required: true, message: 'Vui lòng nhập tên lớp học!' },
+              { min: 3, message: 'Tên lớp học phải có ít nhất 3 ký tự!' }
+            ]}>
             <Input
-              placeholder="Nhập tên môn học"
-              className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
+              placeholder="Nhập tên lớp học"
+              className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" />
           </Form.Item>
 
           <Form.Item
-            label={<span className="font-semibold text-gray-700">Số lượng câu hỏi</span>}
+            label={<span className="font-semibold text-gray-700">Mô tả</span>}
             name="questionCount"
             rules={[
               { required: true, message: 'Vui lòng nhập số lượng câu hỏi!' },
-              { type: 'number', min: 1, message: 'Số lượng câu hỏi phải lớn hơn 0!' }
-            ]}
-          >
-            <InputNumber
-              min={1}
-              max={1000}
-              placeholder="Nhập số lượng câu hỏi"
-              className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
+              { type: 'string', message: 'Vui lòng nhập mô tả!' }
+            ]}>
+            <Input.TextArea
+              autoSize={{ maxRows: 5, minRows: 5 }}
+              placeholder="Nhập mô tả" />
           </Form.Item>
         </Form>
       </Modal>

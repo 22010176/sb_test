@@ -1,4 +1,4 @@
-import type { AppData } from "@/App";
+import type { AppData } from "@/App.types";
 import { createContext } from "react";
 
 const PageContext = createContext<AppData>({

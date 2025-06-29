@@ -17,21 +17,8 @@ import QuanLyMonHoc from '@/pages/TeacherPages/QuanLyMonHoc';
 
 import PageContext from '@/contexts/PageContext';
 import { GetNguoiDung } from '@/api/TaiKhoan';
+import type { AppData, UserData } from './App.types';
 
-export type UserData = {
-  id: number
-  hoTen: string
-  gioiTinh: number
-  ngaySinh: string
-  soDienThoai: string
-  email: string
-  loaiNguoiDung: number
-  thoiGianTao: string
-}
-
-export type AppData = {
-  user: UserData | null | string
-}
 
 function App() {
   const [pageData, setPageData] = useState<AppData>({ user: 'loading' })

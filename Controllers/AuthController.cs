@@ -66,7 +66,7 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
     {
       return BadRequest(new
       {
-        Message = err.Message,
+        err.Message,
         Success = false,
         Data = ""
       });
