@@ -22,12 +22,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     nguoiDung.HasIndex(t => t.Email).IsUnique(true);
     nguoiDung.HasIndex(t => t.SoDienThoai).IsUnique(true);
-    nguoiDung.Property(t => t.ThoiGianTao).HasDefaultValue("CURRENT_TIMESTAMP");
+    nguoiDung
+    .Property(t => t.ThoiGianTao)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAdd();
 
     lopHoc_NguoiDung.HasIndex(t => new { t.IdLopHoc, t.IdNguoiDung }).IsUnique(true);
-    lopHoc_NguoiDung.Property(t => t.ThoiGianYeuCau).HasDefaultValue("CURRENT_TIMESTAMP");
+    lopHoc_NguoiDung
+    .Property(t => t.ThoiGianYeuCau)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAdd();
 
     lopHoc.HasIndex(t => t.MaLop).IsUnique(true);
-    lopHoc.Property(t => t.ThoiGianTao).HasDefaultValue("CURRENT_TIMESTAMP");
+    lopHoc
+    .Property(t => t.ThoiGianTao)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAdd();
   }
 }
