@@ -7,6 +7,8 @@ using DatabaseModels;
 using DatabaseModels.Models;
 using Utilities;
 using MailServices;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Controllers;
 
@@ -54,14 +56,30 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
   [HttpPost("dang-nhap")]
   public async Task<IActionResult> LoginAsync(LoginInput input)
   {
-    NguoiDung nguoiDung = await CheckLoginInput(input, input.LoaiNguoiDung);
-    if (!AuthUtilities.CheckingPassword(nguoiDung.MatKhau!, input.MatKhau!)) return Unauthorized(new
+    NguoiDung nguoiDung;
+    try
     {
-      Message = "Không hợp lệ!",
-      Success = false,
-      Data = "",
-    });
-    Console.WriteLine($"{configuration["Jwt:Key"]}");
+
+      nguoiDung = await CheckLoginInput(input, input.LoaiNguoiDung);
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new
+      {
+        Message = err.Message,
+        Success = false,
+        Data = ""
+      });
+    }
+
+    if (!AuthUtilities.CheckingPassword(nguoiDung.MatKhau!, input.MatKhau!))
+      return Unauthorized(new
+      {
+        Message = "Không hợp lệ!",
+        Success = false,
+        Data = "",
+      });
+
     return Ok(new
     {
       Message = "Đăng nhập thành công!",
@@ -94,8 +112,8 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
       ThoiGianTao = DateTime.UtcNow
     };
 
-    await emailSender.SendEmailAsync(nguoiDung.Email!, "Verify your email",
-        $"<p>Please confirm your email by <a href=''>clicking here</a>.</p>");
+    // await emailSender.SendEmailAsync(nguoiDung.Email!, "Verify your email",
+    //     $"<p>Please confirm your email by <a href=''>clicking here</a>.</p>");
     try
     {
       await context.NguoiDung.AddAsync(nguoiDung);
@@ -109,6 +127,44 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
     {
       Message = "Tạo tài khoản thành công!",
       Success = true
+    });
+  }
+
+  [HttpGet("thong-tin-nguoi-dung")]
+  [Authorize]
+  public async Task<IActionResult> GetProfile()
+  {
+    string? userId = User.FindFirst(ClaimTypes.UserData)?.Value;
+    if (string.IsNullOrEmpty(userId)) return Unauthorized(new
+    {
+      Message = "Không hợp lệ!",
+      Success = false,
+      Data = ""
+    });
+
+    NguoiDung? nguoiDung = await context.NguoiDung.FirstOrDefaultAsync(i => i.Id.ToString() == userId);
+    if (nguoiDung == null) return NotFound(new
+    {
+      Message = "Không tìm thấy người dùng!",
+      Success = false,
+      Data = ""
+    });
+
+    return Ok(new
+    {
+      Message = "Lấy thông tin người dùng thành công!",
+      Success = true,
+      Data = new
+      {
+        nguoiDung.Id,
+        nguoiDung.HoTen,
+        nguoiDung.GioiTinh,
+        nguoiDung.NgaySinh,
+        nguoiDung.SoDienThoai,
+        nguoiDung.Email,
+        nguoiDung.LoaiNguoiDung,
+        nguoiDung.ThoiGianTao
+      }
     });
   }
 }

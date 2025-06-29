@@ -20,7 +20,11 @@ export interface DangKyInput {
 }
 
 export async function GetNguoiDung() {
-  const result = await axios.get(url)
+  const result = await axios.get(`${url}/thong-tin-nguoi-dung`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
   return result.data
 }
 

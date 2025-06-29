@@ -1,10 +1,11 @@
+import { withGiangVienRole } from '@/hoc/auth';
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, InputNumber, message, Modal, Popconfirm, Select, Space, Table } from 'antd';
 import { useState } from 'react';
 
 const { Search } = Input;
 
-export default function QuanLyLopHoc() {
+function Element() {
   const [courses, setCourses] = useState([
     { id: 1, courseCode: 'MH-001', courseName: 'Tiếng Nhật cơ bản', questionCount: 150, },
     { id: 2, courseCode: 'MH-002', courseName: 'Tiếng Nhật chuyên ngành', questionCount: 100, },
@@ -247,3 +248,7 @@ export default function QuanLyLopHoc() {
     </div>
   );
 }
+
+const QuanLyLopHoc = withGiangVienRole(Element)
+
+export default QuanLyLopHoc

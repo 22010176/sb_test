@@ -1,4 +1,5 @@
 import { DangKyNguoiDung } from '@/api/TaiKhoan';
+import { withNoAccount } from '@/hoc/auth';
 import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,7 +18,7 @@ interface RegisterForm {
   confirmMatKhau: string
 }
 
-function OnlineExamRegister() {
+function Element() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -55,9 +56,8 @@ function OnlineExamRegister() {
           { required: true, message: 'Vui lòng chọn vai trò!' }
         ]}>
           <Select placeholder="Chọn vai trò" suffixIcon={<UserOutlined />} options={[
-            { value: 0, label: 'Học sinh' },
-            { value: 1, label: 'Giáo viên' },
-            { value: 2, label: 'Quản trị viên' }]} />
+            { value: 1, label: 'Học sinh' },
+            { value: 0, label: 'Giáo viên' }]} />
         </Form.Item>
 
         <Form.Item label="Họ và tên" name="hoTen"
@@ -142,5 +142,7 @@ function OnlineExamRegister() {
     </>
   );
 }
+
+const OnlineExamRegister = withNoAccount(Element)
 
 export default OnlineExamRegister

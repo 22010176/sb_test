@@ -1,10 +1,12 @@
-import { DangNhapNguoiDung, type DangNhapInput } from '@/api/TaiKhoan';
 import { GoogleOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Select } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-function LoginForm() {
+import { DangNhapNguoiDung, type DangNhapInput } from '@/api/TaiKhoan';
+import { withNoAccount } from '@/hoc/auth';
+
+function Element() {
   const [form] = Form.useForm();
   const [rememberPassword, setRememberPassword] = useState(false);
 
@@ -17,8 +19,9 @@ function LoginForm() {
     }
     await DangNhapNguoiDung(input).then(res => {
       message.success('Đăng nhập thành công!');
-      localStorage.setItem('token', JSON.stringify(res.data));
+      localStorage.setItem('token', res.data);
       form.resetFields();
+      window.location.replace('/giang-vien');
     }).catch(() => {
       message.error('Đăng nhập không thành công. Vui lòng thử lại sau!');
       return;
@@ -36,9 +39,8 @@ function LoginForm() {
           { required: true, message: 'Vui lòng chọn vai trò!' }
         ]}>
           <Select placeholder="Chọn vai trò" suffixIcon={<UserOutlined />} options={[
-            { value: 0, label: 'Học sinh' },
-            { value: 1, label: 'Giáo viên' },
-            { value: 2, label: 'Quản trị viên' }]} />
+            { value: 1, label: 'Học sinh' },
+            { value: 0, label: 'Giáo viên' }]} />
         </Form.Item>
 
         <Form.Item label="SĐT hoặc Gmail đăng nhập" name="email"
@@ -89,4 +91,6 @@ function LoginForm() {
   );
 }
 
-export default LoginForm
+const OnlineExamLogin = withNoAccount(Element)
+
+export default OnlineExamLogin
