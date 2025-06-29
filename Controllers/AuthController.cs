@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Controllers;
 
-public class RegisterInput
+public record RegisterInput
 {
   public string? HoTen { get; set; }
   public GioiTinh? GioiTinh { get; set; }
@@ -21,6 +21,15 @@ public class RegisterInput
   public string? Email { get; set; }
   public string? MatKhau { get; set; }
   public LoaiNguoiDung? LoaiNguoiDung { get; set; }
+}
+
+public record UpdateProfileInput
+{
+  public string? HoTen { get; set; }
+  public GioiTinh? GioiTinh { get; set; }
+  public DateTime NgaySinh { get; set; }
+  public string? SoDienThoai { get; set; }
+  public string? Email { get; set; }
 }
 
 public record LoginInput
@@ -97,6 +106,53 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
     });
   }
 
+  [HttpPut("sua-tai-khoan")]
+  [Authorize]
+  public async Task<IActionResult> UpdateProfileAsync([FromBody] UpdateProfileInput input)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      NguoiDung? nguoiDung = await context.NguoiDung.FirstOrDefaultAsync(i => i.Id == userId);
+
+      if (nguoiDung == null) throw new Exception("Không tìm thấy người dùng!");
+
+      nguoiDung.HoTen = input.HoTen;
+      nguoiDung.GioiTinh = input.GioiTinh;
+      nguoiDung.NgaySinh = TimeZoneInfo.ConvertTimeToUtc(input.NgaySinh);
+      nguoiDung.SoDienThoai = input.SoDienThoai;
+      nguoiDung.Email = input.Email;
+
+      await context.SaveChangesAsync();
+      return Ok(new
+      {
+        Message = "Cập nhật thông tin thành công!",
+        Success = true,
+        Data = new
+        {
+          nguoiDung.Id,
+          nguoiDung.HoTen,
+          nguoiDung.GioiTinh,
+          nguoiDung.NgaySinh,
+          nguoiDung.SoDienThoai,
+          nguoiDung.Email,
+          nguoiDung.LoaiNguoiDung,
+          nguoiDung.ThoiGianTao
+        }
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new
+      {
+        err.Message,
+        Success = false,
+        Data = ""
+      });
+    }
+
+  }
+
   [HttpPost("dang-ky")]
   public async Task<IActionResult> RegisterAsync([FromBody] RegisterInput input)
   {
@@ -119,9 +175,14 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
       await context.NguoiDung.AddAsync(nguoiDung);
       await context.SaveChangesAsync();
     }
-    catch (Exception)
+    catch (Exception err)
     {
-      throw;
+      return BadRequest(new
+      {
+        Message = err,
+        Success = false,
+        Data = ""
+      });
     }
     return Ok(new
     {

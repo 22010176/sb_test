@@ -12,3 +12,13 @@ export type UserData = {
 export type AppData = {
   user: UserData | null | string
 }
+
+export type PageAction = {
+  type: 'SET_USER',
+  payload: unknown
+}
+
+export type PageContextData = [
+  AppData,
+  React.Dispatch<PageAction>
+]

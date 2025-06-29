@@ -1,5 +1,5 @@
 import '@ant-design/v5-patch-for-react-19';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import AuthLayout from "@/layouts/AuthLayout";
@@ -15,31 +15,25 @@ import UserProfileForm from '@/pages/AuthPages/UserProfileForm';
 import QuanLyLopHoc from '@/pages/TeacherPages/QuanLyLopHoc';
 import QuanLyMonHoc from '@/pages/TeacherPages/QuanLyMonHoc';
 
-import PageContext from '@/contexts/PageContext';
 import { GetNguoiDung } from '@/api/TaiKhoan';
-import type { AppData, UserData } from './App.types';
+import PageContext, { PageReducer } from '@/contexts/PageContext';
+import type { UserData } from './App.types';
 
 
 function App() {
-  const [pageData, setPageData] = useState<AppData>({ user: 'loading' })
-  console.log(pageData)
+  const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
+
   useEffect(function () {
     GetNguoiDung().then(res => {
-      setPageData(state => ({
-        ...state,
-        user: res.data as UserData
-      }))
+      dispatch({ type: 'SET_USER', payload: res.data as UserData })
     }).catch(err => {
       console.log(err)
-      setPageData(state => ({
-        ...state,
-        user: null
-      }))
+      dispatch({ type: 'SET_USER', payload: null })
     })
   }, [])
 
   return (
-    <PageContext.Provider value={pageData}>
+    <PageContext.Provider value={[state, dispatch]}>
       <BrowserRouter>
         <Routes>
           <Route element={<AuthLayout />}>
