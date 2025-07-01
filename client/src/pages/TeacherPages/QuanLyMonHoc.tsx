@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { Table, Button, Input, Space, Select, Modal, Form, InputNumber, message, Popconfirm } from 'antd';
-import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table } from 'antd';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const { Search } = Input;
 const { Option } = Select;
 
 export default function QuanLyMonHoc() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([
     { id: 1, courseCode: 'MH-001', courseName: 'Tiếng Nhật cơ bản', questionCount: 150, },
     { id: 2, courseCode: 'MH-002', courseName: 'Tiếng Nhật chuyên ngành', questionCount: 100, },
@@ -132,7 +134,7 @@ export default function QuanLyMonHoc() {
             <Button size='small' variant='outlined' color='red' icon={<DeleteOutlined />} />
           </Popconfirm>
           <Button size='small' variant='outlined' color='green' icon={<ArrowRightOutlined />}
-            className="text-green-500 hover:text-green-600 hover:bg-green-50 border-0 rounded-lg transition-all duration-200" />
+            onClick={() => navigate(`/giang-vien/mon-hoc/${record.id}`)} />
         </Space>
       ),
     },
@@ -143,39 +145,25 @@ export default function QuanLyMonHoc() {
       {/* <div className="max-w-7xl mx-auto"> */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
 
-
         {/* Toolbar */}
         <div className="p-6 bg-gray-50 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              <Search
+              <Search allowClear className="max-w-md"
                 placeholder="Tìm kiếm theo mã môn học hoặc tên môn học"
-                allowClear
-                enterButton={
-                  <Button icon={<SearchOutlined />} className="bg-gray-600 hover:bg-gray-700 border-gray-600" />
-                }
-                size="middle"
-                className="max-w-md"
+                enterButton={<Button icon={<SearchOutlined />} />}
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-              />
-              <Select
-                placeholder="Sắp xếp..."
-                className="w-40"
-                size="middle"
-              >
-                <Option value="name">Theo tên</Option>
-                <Option value="code">Theo mã</Option>
-                <Option value="questions">Theo số câu hỏi</Option>
-              </Select>
+                onChange={(e) => setSearchText(e.target.value)} />
+              <Select placeholder="Sắp xếp..." className="w-40" options={[
+                { value: 'name', label: 'Theo tên' },
+                { value: 'code', label: 'Theo mã' },
+                { value: 'questions', label: 'Theo số câu hỏi' },
+              ]} />
             </div>
 
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
+            <Button type="primary" icon={<PlusOutlined />}
               onClick={() => showModal()}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-0 rounded-lg px-6 py-2 h-auto font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-              size="middle"
             >
               Thêm môn học
             </Button>
@@ -200,7 +188,6 @@ export default function QuanLyMonHoc() {
       <Modal
         title={
           <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${editingCourse ? 'bg-blue-500' : 'bg-green-500'}`}></div>
             <span className="text-lg font-semibold text-gray-800">
               {editingCourse ? 'Chỉnh sửa môn học' : 'Thêm môn học mới'}
             </span>
@@ -212,65 +199,20 @@ export default function QuanLyMonHoc() {
         okText={editingCourse ? 'Cập nhật' : 'Thêm'}
         cancelText="Hủy"
         width={500}
-        okButtonProps={{
-          className: "bg-purple-600 hover:bg-purple-700 border-purple-600 rounded-lg font-semibold"
-        }}
-        cancelButtonProps={{
-          className: "rounded-lg font-semibold"
-        }}
-        className="rounded-xl overflow-hidden"
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          className="mt-6"
-        >
-          <Form.Item
-            label={<span className="font-semibold text-gray-700">Mã môn học</span>}
-            name="courseCode"
-            rules={[
-              { required: true, message: 'Vui lòng nhập mã môn học!' },
-              { pattern: /^MH\d{3}$/, message: 'Mã môn học phải có định dạng MH + 3 số!' }
-            ]}
-          >
-            <Input
-              placeholder="Ví dụ: MH001"
-              className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
-          </Form.Item>
+        className="rounded-xl overflow-hidden">
+        <Form form={form} layout="vertical" className="mt-6">
 
-          <Form.Item
+          <Form.Item name="courseName"
             label={<span className="font-semibold text-gray-700">Tên môn học</span>}
-            name="courseName"
             rules={[
               { required: true, message: 'Vui lòng nhập tên môn học!' },
               { min: 3, message: 'Tên môn học phải có ít nhất 3 ký tự!' }
-            ]}
-          >
-            <Input
-              placeholder="Nhập tên môn học"
-              className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<span className="font-semibold text-gray-700">Số lượng câu hỏi</span>}
-            name="questionCount"
-            rules={[
-              { required: true, message: 'Vui lòng nhập số lượng câu hỏi!' },
-              { type: 'number', min: 1, message: 'Số lượng câu hỏi phải lớn hơn 0!' }
-            ]}
-          >
-            <InputNumber
-              min={1}
-              max={1000}
-              placeholder="Nhập số lượng câu hỏi"
-              className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-            />
+            ]}>
+            <Input placeholder="Nhập tên môn học" />
           </Form.Item>
         </Form>
       </Modal>
       {/* </div> */}
-    </div>
+    </div >
   );
 }

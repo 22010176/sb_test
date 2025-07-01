@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { CapNhatLopHoc, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/LopHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 import type { LopHoc } from './types';
+import { useNavigate } from 'react-router';
 
 const { Search } = Input;
 
@@ -36,6 +37,7 @@ function LopHocForm({ form }: { form: FormInstance<unknown> }) {
 }
 
 function Element() {
+  const navigate = useNavigate();
   const [lopHoc, setLopHoc] = useState<LopHoc[]>([]);
 
   const [isModalVisible, setIsModalVisible] = useState<"add" | "update" | "">('');
@@ -121,7 +123,7 @@ function Element() {
             <Button size='small' variant='outlined' color='red' icon={<DeleteOutlined />} />
           </Popconfirm>
           <Button size='small' variant='outlined' color='green' icon={<ArrowRightOutlined />}
-            className="text-green-500 hover:text-green-600 hover:bg-green-50 border-0 rounded-lg transition-all duration-200" />
+            onClick={() => navigate(`/giang-vien/lop-hoc/${record.id}`)} />
         </Space>
       ),
     },

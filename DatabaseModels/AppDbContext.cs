@@ -12,6 +12,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<LopHoc> LopHoc { get; set; }
   public DbSet<LopHoc_NguoiDung> LopHoc_NguoiDung { get; set; }
 
+  public DbSet<MonHoc> MonHoc { get; set; }
+  public DbSet<BoCauHoi> BoCauHoi { get; set; }
+  public DbSet<CauHoi> CauHoi { get; set; }
+  public DbSet<DapAnCauHoi> DapAnCauHoi { get; set; }
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
@@ -19,6 +24,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     var nguoiDung = modelBuilder.Entity<NguoiDung>();
     var lopHoc = modelBuilder.Entity<LopHoc>();
     var lopHoc_NguoiDung = modelBuilder.Entity<LopHoc_NguoiDung>();
+
+    var monHoc = modelBuilder.Entity<MonHoc>();
+    var boCauHoi = modelBuilder.Entity<BoCauHoi>();
+    var cauHoi = modelBuilder.Entity<CauHoi>();
+    var dapAnCauHoi = modelBuilder.Entity<DapAnCauHoi>();
 
     nguoiDung.HasIndex(t => t.Email).IsUnique(true);
     nguoiDung.HasIndex(t => t.SoDienThoai).IsUnique(true);
@@ -38,5 +48,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     .Property(t => t.ThoiGianTao)
     .HasDefaultValueSql("CURRENT_TIMESTAMP")
     .ValueGeneratedOnAdd();
+
+    monHoc.HasIndex(t => t.MaMon).IsUnique(true);
+    monHoc
+    .Property(t => t.ThoiGianCapNhatCuoi)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAddOrUpdate();
+
+    boCauHoi
+    .Property(t => t.ThoiGianCapNhatCuoi)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAddOrUpdate();
+
+    cauHoi
+    .Property(t => t.ThoiGianCapNhatCuoi)
+    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+    .ValueGeneratedOnAddOrUpdate();
   }
 }

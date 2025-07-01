@@ -26,6 +26,7 @@ public class NguoiDung
 
   public List<LopHoc_NguoiDung>? LopHoc_NguoiDung { get; set; }
   public List<LopHoc>? LopHoc { get; set; }
+  public List<MonHoc>? CauHoi { get; set; }
 }
 
 public class LopHoc
