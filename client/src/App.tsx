@@ -19,6 +19,12 @@ import { GetNguoiDung } from '@/api/TaiKhoan';
 import PageContext, { PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
+import CreateExamInterface from './pages/ExamPage/CreateExamInterface';
+import ExamListInterface from './pages/ExamPage/ExamListInterface';
+
+import QuestionBankInterface from './pages/SubjectPages/QuestionBankInterface';
+import QuestionDetailInterface from './pages/SubjectPages/QuestionDetailInterface';
+
 
 function App() {
   const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
@@ -51,7 +57,11 @@ function App() {
               <Route path='/giang-vien/lop-hoc/:lopId' element={""} />
             </Route>
             <Route path='/giang-vien/mon-hoc' element={<QuanLyMonHoc />} />
-            <Route path='/giang-vien/ki-thi' element={<QuanLyMonHoc />} />
+            <Route path='/giang-vien/mon-hoc/cau-hoi/:cauHoiId' element={<QuestionDetailInterface />} />
+            <Route path='/giang-vien/mon-hoc/:monHocId' element={<QuestionBankInterface />} />
+
+            <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
+            <Route path='/giang-vien/ki-thi/:kiThiId' element={<CreateExamInterface />} />
           </Route>
         </Routes>
       </BrowserRouter>
