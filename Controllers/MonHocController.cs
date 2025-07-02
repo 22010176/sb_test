@@ -56,6 +56,38 @@ public class MonHocController(AppDbContext context) : ControllerBase
     }
   }
 
+  [HttpGet("{id}")]
+  public async Task<IActionResult> GetMonHocByIdAsync(int id)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      MonHoc? monHoc = await context.MonHoc.FirstOrDefaultAsync(i => i.Id == id);
+
+      if (monHoc == null) throw new Exception("Lớp học không tồn tại!");
+      if (monHoc.IdGiangVien != userId) throw new Exception("Người dùng không hợp lệ!");
+
+      return Ok(new
+      {
+        Message = "Lấy môn học thành công!",
+        Success = true,
+        Data = new List<MonHoc>()
+        {
+          monHoc
+        }
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new
+      {
+        Message = err,
+        Success = false,
+        Data = new List<object>()
+      });
+    }
+  }
+
   [HttpPost]
   public async Task<IActionResult> PostMonHocAsync(MonHocInput input)
   {

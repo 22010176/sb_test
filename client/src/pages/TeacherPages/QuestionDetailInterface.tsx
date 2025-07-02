@@ -130,12 +130,13 @@ export default function QuestionDetailInterface() {
               defaultValue="newest"
               className="w-full"
               placeholder="Tất cả mức độ"
-              onChange={(value) => setSortBy(value)}>
-              <Option value="newest">Tất cả mức độ</Option>
-              <Option value="easy">Dễ</Option>
-              <Option value="medium">Trung bình</Option>
-              <Option value="hard">Khó</Option>
-            </Select>
+              onChange={(value) => setSortBy(value)}
+              options={[
+                { value: 'newest', label: 'Mới nhất' },
+                { value: 'easy', label: 'Dễ' },
+                { value: 'medium', label: 'Trung bình' },
+                { value: 'hard', label: 'Khó' }
+              ]} />
           </Col>
         </Row>
 

@@ -1,36 +1,32 @@
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+
+import { GetMonHoc, XoaMonHoc, CapNhatMonHoc, ThemMoc } from '@/api/MonHoc';
+
 
 const { Search } = Input;
 const { Option } = Select;
 
 export default function QuanLyMonHoc() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([
-    { id: 1, courseCode: 'MH-001', courseName: 'Tiếng Nhật cơ bản', questionCount: 150, },
-    { id: 2, courseCode: 'MH-002', courseName: 'Tiếng Nhật chuyên ngành', questionCount: 100, },
-    { id: 3, courseCode: 'MH-003', courseName: 'Tài chính ngân hàng', questionCount: 90, },
-    { id: 4, courseCode: 'MH-004', courseName: 'Tổ hợp xác suất', questionCount: 100, },
-    { id: 5, courseCode: 'MH-005', courseName: 'Toán rời rạc', questionCount: 120, },
-    { id: 6, courseCode: 'MH-006', courseName: 'An toàn và bảo mật thông tin', questionCount: 180, },
-    { id: 7, courseCode: 'MH-007', courseName: 'Cơ sở dữ liệu', questionCount: 200, },
-    { id: 8, courseCode: 'MH-007', courseName: 'Cơ sở dữ liệu', questionCount: 200, },
-    { id: 9, courseCode: 'MH-007', courseName: 'Cơ sở dữ liệu', questionCount: 200, },
-    { id: 10, courseCode: 'MH-007', courseName: 'Cơ sở dữ liệu', questionCount: 200, },
-    { id: 11, courseCode: 'MH-007', courseName: 'Cơ sở dữ liệu', questionCount: 200, },
-  ]);
+  const [courses, setCourses] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [form] = Form.useForm();
+  console.log(courses)
 
-  const filteredCourses = courses.filter(course =>
-    course.courseName.toLowerCase().includes(searchText.toLowerCase()) ||
-    course.courseCode.toLowerCase().includes(searchText.toLowerCase())
-  );
+  useEffect(() => {
+    GetMonHoc().then(result => {
+      // console.log(result)
+      setCourses(result.data)
+    }).catch(err => {
+      message.error(err.message)
+    })
+  }, [])
 
   const showModal = (course = null) => {
     setEditingCourse(course);
@@ -42,20 +38,30 @@ export default function QuanLyMonHoc() {
     }
   };
 
-  const handleOk = () => {
-    form.validateFields().then(values => {
+  const handleOk = async () => {
+    form.validateFields().then(async values => {
       if (editingCourse) {
-        setCourses(courses.map(course =>
-          course.id === editingCourse.id ? { ...course, ...values } : course
-        ));
-        message.success('Cập nhật môn học thành công!');
+        // setCourses(courses.map(course =>
+        //   course.id === editingCourse.id ? { ...course, ...values } : course
+        // ));
+        console.log(values)
+        await CapNhatMonHoc(values).then(result => {
+          setCourses(result.data)
+          console.log(result)
+          message.success('Cập nhật môn học thành công!');
+        }).catch(err => {
+          message.error(err.message)
+        })
       } else {
-        const newCourse = {
-          id: Math.max(...courses.map(c => c.id)) + 1,
-          ...values
-        };
-        setCourses([...courses, newCourse]);
-        message.success('Thêm môn học thành công!');
+        await ThemMoc(values).then(result => {
+          setCourses(result.data)
+          console.log(result)
+          message.success('Thêm môn học thành công!');
+          // message.success('Cập nhật môn học thành công!');
+        }).catch(err => {
+          message.error(err.message)
+        })
+        console.log(values)
       }
       setIsModalVisible(false);
       setEditingCourse(null);
@@ -67,9 +73,14 @@ export default function QuanLyMonHoc() {
     setEditingCourse(null);
   };
 
-  const deleteCourse = (id) => {
-    setCourses(courses.filter(course => course.id !== id));
-    message.success('Xóa môn học thành công!');
+  const deleteCourse = (id: number) => {
+    XoaMonHoc(id).then(result => {
+      setCourses(result.data)
+      message.success('Xóa môn học thành công!');
+    }).catch(err => {
+      message.error(err.message)
+    });
+
   };
 
   const columns = [
@@ -83,11 +94,8 @@ export default function QuanLyMonHoc() {
       ),
     },
     {
+      dataIndex: 'maMon', key: 'maMon', width: 150, align: 'center',
       title: <span className="font-semibold text-gray-700">Mã môn học</span>,
-      dataIndex: 'courseCode',
-      key: 'courseCode',
-      width: 150,
-      align: 'center',
       render: (text) => (
         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-mono text-sm">
           {text}
@@ -95,9 +103,8 @@ export default function QuanLyMonHoc() {
       ),
     },
     {
+      dataIndex: 'tenMon', key: 'tenMon',
       title: <span className="font-semibold text-gray-700">Tên môn học</span>,
-      dataIndex: 'courseName',
-      key: 'courseName',
       render: (text) => (
         <span className="font-medium text-gray-800">{text}</span>
       ),
@@ -111,7 +118,7 @@ export default function QuanLyMonHoc() {
       render: (count) => (
         <div className="flex items-center justify-center">
           <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold">
-            {count}
+            {count ?? 0}
           </span>
         </div>
       ),
@@ -149,9 +156,7 @@ export default function QuanLyMonHoc() {
         <div className="p-6 bg-gray-50 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              <Search allowClear className="max-w-md"
-                placeholder="Tìm kiếm theo mã môn học hoặc tên môn học"
-                enterButton={<Button icon={<SearchOutlined />} />}
+              <Search allowClear className="max-w-md" placeholder="Tìm kiếm theo mã môn học hoặc tên môn học" enterButton={<Button icon={<SearchOutlined />} />}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)} />
               <Select placeholder="Sắp xếp..." className="w-40" options={[
@@ -162,9 +167,8 @@ export default function QuanLyMonHoc() {
             </div>
 
             <Button type="primary" icon={<PlusOutlined />}
-              onClick={() => showModal()}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-0 rounded-lg px-6 py-2 h-auto font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-            >
+              onClick={() => showModal()}>
               Thêm môn học
             </Button>
           </div>
@@ -175,7 +179,7 @@ export default function QuanLyMonHoc() {
           <Table
             size='small'
             columns={columns}
-            dataSource={filteredCourses}
+            dataSource={courses}
             rowKey="id"
             pagination={{ pageSize: 10, }}
             className="bg-white rounded-lg overflow-hidden"
@@ -202,7 +206,9 @@ export default function QuanLyMonHoc() {
         className="rounded-xl overflow-hidden">
         <Form form={form} layout="vertical" className="mt-6">
 
-          <Form.Item name="courseName"
+          <Form.Item name="id" hidden />
+
+          <Form.Item name="tenMon"
             label={<span className="font-semibold text-gray-700">Tên môn học</span>}
             rules={[
               { required: true, message: 'Vui lòng nhập tên môn học!' },
