@@ -10,7 +10,7 @@ namespace Controllers;
 [ApiController]
 [Authorize(Roles = "GIANG_VIEN")]
 [Route("api/[controller]")]
-public class BoCauHoiController(AppDbContext context) : ControllerBase
+public partial class BoCauHoiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
 
@@ -52,7 +52,7 @@ public class BoCauHoiController(AppDbContext context) : ControllerBase
       {
         Message = "Lấy danh sách bộ câu hỏi thành công!",
         Success = true,
-        Data = await GetBoCauHoi(userId)
+        Data = await GetBoCauHoi(monHocId)
       });
     }
     catch (Exception err)

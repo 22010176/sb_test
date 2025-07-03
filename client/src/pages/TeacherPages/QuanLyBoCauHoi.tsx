@@ -1,10 +1,11 @@
-import { CapNhatBoCauHoi, GetBoCauHoi, ThemBoCauHoi, XoaBoCauHoi } from '@/api/BoCauHoi';
-import { GetMonHocById } from '@/api/MonHoc';
 import { CalendarOutlined, ClockCircleOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Card, Col, Form, Input, message, Modal, Row, Space, Statistic, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
+
+import { CapNhatBoCauHoi, GetBoCauHoi, ThemBoCauHoi, XoaBoCauHoi } from '@/api/BoCauHoi';
+import { GetMonHocById } from '@/api/MonHoc';
 
 const { Title, Text } = Typography;
 
@@ -19,50 +20,30 @@ type MonHoc = {
 }
 
 export default function QuanLyBoCauHoi() {
+  const navigate = useNavigate();
+
   const { monHocId }: { monHocId: string } = useParams() as { monHocId: string; }
   const [form] = Form.useForm();
 
   const [formModal, setFormModal] = useState<"add" | "update" | "">("")
   const [monHoc, setMonHoc]: [MonHoc | object, object] = useState<MonHoc | object>({})
-  const [boCauHoi, setBoCauHoi] = useState([
-    {
-      id: 1,
-      title: "I. Lý thuyết tổ hợp",
-      questionCount: 70,
-      details: "30 Dễ, 30 Trung bình, 10 Khó",
-      lastUpdated: "21/06/2025"
-    },
-    {
-      id: 2,
-      title: "II. Lý thuyết đồ thị",
-      questionCount: 86,
-      details: "34 Dễ, 38 Trung bình, 14 Khó",
-      lastUpdated: "21/06/2025"
-    },
-    {
-      id: 3,
-      title: "III. Suy luận toán học",
-      questionCount: 40,
-      details: "20 Dễ, 10 Trung bình, 10 Khó",
-      lastUpdated: "21/06/2025"
-    }
-  ]);
+  const [boCauHoi, setBoCauHoi] = useState([]);
 
   useEffect(function () {
     GetMonHocById(+monHocId).then(result => {
       setMonHoc(result.data[0] as MonHoc)
     }).catch(err => {
-      console.log(err)
+      throw err
     })
 
     GetBoCauHoi(+monHocId).then(result => {
       setBoCauHoi(result.data)
     }).catch(err => {
-      console.log(err)
+      throw err
     })
   }, [monHocId])
 
-  console.log(monHoc, boCauHoi)
+  // console.log(monHoc, boCauHoi)
   const handleOk = async () => {
     form.validateFields().then(async values => {
       if (formModal === 'update') {
@@ -78,11 +59,7 @@ export default function QuanLyBoCauHoi() {
         await ThemBoCauHoi({ ...values, idMonHoc: +monHocId }).then(result => {
           setBoCauHoi(result.data)
           message.success('Thêm bộ câu hỏi thành công!');
-
-        }).catch(err => {
-          message.error(err.message)
-        })
-        console.log(values)
+        }).catch(err => message.error(err.message))
       }
 
       form.resetFields()
@@ -91,7 +68,7 @@ export default function QuanLyBoCauHoi() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="xl:px-60 px-10 pt-6 bg-gray-50 grow">
       {/* Header */}
       <div className="mb-6">
         <div className="bg-purple-100 rounded-lg p-4 mb-4">
@@ -156,7 +133,8 @@ export default function QuanLyBoCauHoi() {
                   {item.tenBoCauHoi}
                 </Title>
                 <div className="flex justify-end">
-                  <Button type="text" variant='text' icon={<EyeOutlined />} />
+                  <Button type="text" variant='text' icon={<EyeOutlined />}
+                    onClick={() => navigate(`/giang-vien/mon-hoc/${monHocId}/${item.id}`)} />
                   <Button color='blue' variant='text' type="text" icon={<EditOutlined />}
                     onClick={() => {
                       setFormModal('update')

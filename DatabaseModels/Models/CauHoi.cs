@@ -35,6 +35,7 @@ public class CauHoi
   [Key]
   public int Id { get; set; }
   public string? NoiDung { get; set; }
+  public double? DoKho { get; set; }
   public DateTime? ThoiGianCapNhatCuoi { get; set; }
 
   public int IdBoCauHoi { get; set; }

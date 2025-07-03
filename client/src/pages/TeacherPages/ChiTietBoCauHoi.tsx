@@ -1,11 +1,18 @@
 import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Input, Row, Select, Statistic, Tag, Typography } from 'antd';
+import { Breadcrumb, Button, Card, Col, Input, Row, Select, Statistic, Tag, Typography } from 'antd';
 import { useState } from 'react';
+import { Link, useParams } from 'react-router';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-export default function QuestionDetailInterface() {
+type PageParam = {
+  monHocId: string,
+  boCauHoiId: string
+}
+export default function ChiTietBoCauHoi() {
+  const { monHocId, boCauHoiId }: PageParam = useParams() as PageParam
+  console.log(monHocId, boCauHoiId)
   const [searchText, setSearchText] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
@@ -69,9 +76,13 @@ export default function QuestionDetailInterface() {
       {/* Header */}
       <div className="mb-6">
         <div className="bg-purple-100 rounded-lg p-4 mb-4">
-          <Title level={4} className="!mb-1 text-purple-800">
-            Môn học - Toán rời rạc - I. Lý thuyết tổ hợp
-          </Title>
+          <Breadcrumb className='text-lg font-bold'
+            separator={<p className='text-xl'>&gt;</p>}
+            items={[
+              { title: <Link className='text-xl' to="/giang-vien/mon-hoc">Môn học</Link>, },
+              { title: <Link to={"/giang-vien/mon-hoc/" + monHocId} className='text-xl'>{"ddd"}</Link>, },
+              { title: <p className='text-xl'>{"dddd"}</p>, },
+            ]} />
           <Text className="text-gray-600">
             Cập nhật lần cuối: 21/06/2025
           </Text>

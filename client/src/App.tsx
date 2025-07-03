@@ -23,7 +23,7 @@ import CreateExamInterface from './pages/ExamPage/CreateExamInterface';
 import ExamListInterface from './pages/ExamPage/ExamListInterface';
 
 import QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
-import QuestionDetailInterface from './pages/TeacherPages/QuestionDetailInterface';
+import ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 
 
 function App() {
@@ -56,8 +56,9 @@ function App() {
             <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
               <Route path='/giang-vien/lop-hoc/:lopId' element={""} />
             </Route>
+
             <Route path='/giang-vien/mon-hoc' element={<QuanLyMonHoc />} />
-            <Route path='/giang-vien/mon-hoc/cau-hoi/:cauHoiId' element={<QuestionDetailInterface />} />
+            <Route path='/giang-vien/mon-hoc/:monHocId/:boCauHoiId' element={<ChiTietBoCauHoi />} />
             <Route path='/giang-vien/mon-hoc/:monHocId' element={<QuanLyBoCauHoi />} />
 
             <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />

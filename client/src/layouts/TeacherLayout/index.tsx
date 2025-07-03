@@ -6,7 +6,7 @@ function TeacherLayout() {
     <div className='w-screen h-screen overflow-hidden flex flex-col'>
       <Header />
 
-      <div className='grow overflow-auto'>
+      <div className='flex flex-col grow overflow-auto'>
         <Outlet />
       </div>
     </div>

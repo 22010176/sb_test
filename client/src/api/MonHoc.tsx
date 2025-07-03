@@ -8,7 +8,7 @@ export async function GetMonHoc() {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }
   });
-  console.log('dddd', { result: result.data })
+  // console.log('dddd', { result: result.data })
   return result.data;
 }
 

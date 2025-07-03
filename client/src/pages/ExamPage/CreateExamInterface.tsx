@@ -12,7 +12,7 @@ export default function CreateExamInterface() {
   const [collapsed, setCollapsed] = useState(false);
 
   const onFinish = (values) => {
-    console.log('Form values:', values);
+    // console.log('Form values:', values);
   };
 
   const menuItems = [
