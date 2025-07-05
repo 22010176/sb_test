@@ -1,13 +1,16 @@
 using System.Security.Claims;
 using DatabaseModels;
 using DatabaseModels.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Controllers;
 
+[ApiController]
+[Authorize(Roles = "GIANG_VIEN")]
 [Route("api/[controller]")]
-public partial class CauHoiController(AppDbContext context) : ControllerBase
+public class CauHoiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
 
@@ -29,9 +32,9 @@ public partial class CauHoiController(AppDbContext context) : ControllerBase
     return [.. await query.ToListAsync()];
   }
 
-  async Task<CauHoi?> CheckInput(int boCauHoiId, int? cauHoiId = null)
+  async Task<CauHoi?> CheckInput(int boCauHoiId, int userId, int? cauHoiId = null)
   {
-    int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+
     BoCauHoi? boCauHoi = await context.BoCauHoi.FirstOrDefaultAsync(i => i.Id == boCauHoiId);
     if (boCauHoi == null) throw new Exception("Bộ câu hỏi không tồn tại!");
 
@@ -51,7 +54,8 @@ public partial class CauHoiController(AppDbContext context) : ControllerBase
   {
     try
     {
-      await CheckInput(boCauHoiId);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      await CheckInput(boCauHoiId, userId);
 
       return Ok(new
       {
@@ -77,7 +81,8 @@ public partial class CauHoiController(AppDbContext context) : ControllerBase
 
     try
     {
-      await CheckInput(boCauHoiId);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      await CheckInput(boCauHoiId, userId);
 
       List<CauHoi> cauHoi = [];
       List<DapAnCauHoi> dapAn = [];
@@ -131,7 +136,8 @@ public partial class CauHoiController(AppDbContext context) : ControllerBase
   {
     try
     {
-      var cauHoi = await CheckInput(boCauHoiId, cauHoiId);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      var cauHoi = await CheckInput(boCauHoiId, userId, cauHoiId);
 
       cauHoi!.NoiDung = input.NoiDung;
       cauHoi!.DoKho = input.DoKho;
@@ -161,7 +167,8 @@ public partial class CauHoiController(AppDbContext context) : ControllerBase
   {
     try
     {
-      var cauHoi = await CheckInput(boCauHoiId);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      var cauHoi = await CheckInput(boCauHoiId, userId);
       var dapAn = await context.DapAnCauHoi.Where(i => i.IdCauHoi == cauHoiId).ToListAsync();
 
       context.CauHoi.Remove(cauHoi!);

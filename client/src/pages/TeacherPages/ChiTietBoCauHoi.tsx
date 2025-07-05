@@ -1,8 +1,12 @@
+import { GetBoCauHoi, GetBoCauHoiById } from '@/api/BoCauHoi';
+import { GetCauHoi, ThemCauHoi } from '@/api/CauHoi';
+import { GetMonHoc, GetMonHocById } from '@/api/MonHoc';
+import { withGiangVienRole } from '@/hoc/auth';
 import { CopyOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Checkbox, Col, Input, Modal, Row, Select, Statistic, Tag, Typography } from 'antd';
-import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Breadcrumb, Button, Card, Checkbox, Col, Input, message, Modal, Radio, Row, Select, Statistic, Tag, Typography } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
 const { Text } = Typography;
 
@@ -10,15 +14,79 @@ type PageParam = {
   monHocId: string,
   boCauHoiId: string
 }
-function ChiTietBoCauHoi() {
+type DapAn = {
+  id: number | null,
+  noiDung: string,
+  dungSai: boolean
+}
+type CauHoi = {
+  id: number | null,
+  noiDung: string,
+  doKho: number,
+  dapAn: DapAn[]
+}
+type MonHoc = {
+  id: number | null,
+  maMon: string | null,
+  tenMon: string | null,
+  thoiGianCapNhatCuoi: string | null,
+  idGiangVien: number | null,
+  nguoiTao: unknown | null,
+  boCauHoi: unknown | null
+}
+type BoCauHoi = {
+  id: number | null,
+  tenBoCauHoi: string | null,
+  thoiGianCapNhatCuoi: string | null,
+  idMonHoc: number | null,
+  tenMon: string | null,
+  maMon: string | null,
+}
+
+const defaultFormValue: CauHoi = {
+  id: null,
+  noiDung: '',
+  doKho: 0,
+  dapAn: [
+    { id: null, noiDung: '', dungSai: false },
+    { id: null, noiDung: '', dungSai: false }
+  ]
+}
+
+function Element() {
   const { monHocId, boCauHoiId }: PageParam = useParams() as PageParam
 
+  const [monHoc, setMonHoc] = useState<MonHoc>()
+  const [boCauHoi, setBoCauHoi] = useState<BoCauHoi>()
+
   const [modal, setModal] = useState(false)
-  const [formValue, setFormValue] = useState({})
+  const [formValue, setFormValue] = useState<CauHoi>({ ...defaultFormValue })
+  const [questionType, setQuestionType] = useState<'multiple' | 'single'>('single')
 
   const [searchText, setSearchText] = useState('');
-  const [filterType, setFilterType] = useState('all');
+
   const [sortBy, setSortBy] = useState('newest');
+
+  useEffect(function () {
+    GetMonHocById(+monHocId).then(result => {
+      console.log(result.data)
+      setMonHoc(result.data[0])
+    }).catch(err => {
+      throw err
+    })
+    GetBoCauHoiById(+monHocId, +boCauHoiId).then(result => {
+
+      setBoCauHoi(result.data[0])
+    }).catch(err => {
+      throw err
+    })
+
+    GetCauHoi(+boCauHoiId).then(result => {
+      console.log(result.data)
+    }).catch(err => {
+      throw err
+    })
+  }, [boCauHoiId, monHocId])
 
   const questions = [
     {
@@ -56,7 +124,7 @@ function ChiTietBoCauHoi() {
     }
   ];
 
-  const getDifficultyColor = (difficulty) => {
+  const getDifficultyColor = (difficulty: 'DỄ' | 'TRUNG BÌNH' | 'KHÓ') => {
     switch (difficulty) {
       case 'DỄ': return 'green';
       case 'TRUNG BÌNH': return 'orange';
@@ -75,11 +143,11 @@ function ChiTietBoCauHoi() {
               separator={<p className='text-xl'>&gt;</p>}
               items={[
                 { title: <Link className='text-xl' to="/giang-vien/mon-hoc">Môn học</Link>, },
-                { title: <Link to={"/giang-vien/mon-hoc/" + monHocId} className='text-xl'>{"ddd"}</Link>, },
-                { title: <p className='text-xl'>{"dddd"}</p>, },
+                { title: <Link to={"/giang-vien/mon-hoc/" + monHocId} className='text-xl'>{monHoc?.tenMon}</Link>, },
+                { title: <p className='text-xl'>{boCauHoi?.tenBoCauHoi}</p>, },
               ]} />
             <Text className="text-gray-600">
-              Cập nhật lần cuối: 21/06/2025
+              Cập nhật lần cuối: {new Date(boCauHoi?.thoiGianCapNhatCuoi as string).toLocaleDateString('vi-VN')}
             </Text>
           </div>
 
@@ -117,8 +185,9 @@ function ChiTietBoCauHoi() {
                 onChange={(e) => setSearchText(e.target.value)} />
             </Col>
             <Col span={8}>
-              <Select defaultValue="single" className="w-full" placeholder="Tất cả loại câu hỏi"
-                onChange={(value) => setFilterType(value)}
+              <Select className="w-full" placeholder="Tất cả loại câu hỏi"
+                value={questionType}
+                onChange={(value) => setQuestionType(value)}
                 options={[
                   { value: 'multiple', label: 'Chọn nhiều đáp án' },
                   { value: 'single', label: 'Chọn đáp án đúng nhất' },
@@ -179,8 +248,8 @@ function ChiTietBoCauHoi() {
                 {question.options.map((option) => (
                   <div key={option.key}
                     className={`p-3 rounded-lg border ${option.isCorrect
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-gray-50 border-gray-200'
+                      ? 'bg-green-50 border-green-400'
+                      : 'bg-gray-50 border-gray-400'
                       }`}>
                     <p>
                       <span className="font-medium mr-2">{option.key}.</span>
@@ -203,7 +272,7 @@ function ChiTietBoCauHoi() {
               Bộ câu hỏi <span className="text-red-500">*</span>
             </Text>
             <div className="bg-gray-100 px-3 py-2 rounded text-sm text-gray-600">
-              I. Lý thuyết tổ hợp
+              {boCauHoi?.tenBoCauHoi}
             </div>
           </div>
 
@@ -214,10 +283,12 @@ function ChiTietBoCauHoi() {
                 Chọn mức độ câu hỏi <span className="text-red-500">*</span>
               </Text>
               <Select placeholder="Dễ" className="w-full"
+                value={formValue.doKho}
+                onChange={(value) => setFormValue(val => ({ ...val, doKho: value }))}
                 options={[
-                  { value: 'easy', label: 'Dễ' },
-                  { value: 'medium', label: 'Trung bình' },
-                  { value: 'hard', label: 'Khó' }
+                  { value: 0, label: 'Dễ' },
+                  { value: 1, label: 'Trung bình' },
+                  { value: 2, label: 'Khó' }
                 ]} />
             </div>
             <div>
@@ -225,11 +296,18 @@ function ChiTietBoCauHoi() {
                 Chọn loại câu hỏi <span className="text-red-500">*</span>
               </Text>
               <Select placeholder="Chọn đáp án đúng nhất" className="w-full"
+                value={questionType}
+                onChange={value => {
+                  setQuestionType(value)
+                  setFormValue(val => ({
+                    ...val,
+                    dapAn: val.dapAn.map(item => ({ ...item, dungSai: false }))
+                  }))
+                }}
                 options={[
                   { value: 'single', label: 'Chọn đáp án đúng nhất' },
                   { value: 'multiple', label: 'Chọn nhiều đáp án' },
-                ]}
-              />
+                ]} />
             </div>
           </div>
 
@@ -238,7 +316,9 @@ function ChiTietBoCauHoi() {
             <Text className="block mb-2 text-sm font-medium text-gray-700">
               Nội dung câu hỏi <span className="text-red-500">*</span>
             </Text>
-            <TextArea placeholder="Nhập nội dung câu hỏi..." rows={4} className="w-full" />
+            <TextArea placeholder="Nhập nội dung câu hỏi..." rows={4} className="w-full"
+              value={formValue.noiDung}
+              onChange={(e) => setFormValue(val => ({ ...val, noiDung: e.target.value }))} />
           </div>
 
           {/* Đáp án */}
@@ -246,27 +326,97 @@ function ChiTietBoCauHoi() {
             <Text className="text-sm font-medium text-gray-700">
               Đáp án <span className="text-red-500">*</span>
             </Text>
-            <Button variant='solid' color='green' icon={<PlusOutlined />}>
+            <Button variant='solid' color='green' icon={<PlusOutlined />}
+              disabled={formValue.dapAn.length >= 5}
+              onClick={() => setFormValue(val => ({
+                ...val,
+                dapAn: [
+                  ...val.dapAn,
+                  { id: null, noiDung: '', dungSai: false }
+                ]
+              }))}>
               Thêm đáp án
             </Button>
           </div>
 
           <div className="space-y-3">
-            {[1, 2].map((answer, index) => (
-              <div key={index} className="flex items-center space-x-3 gap-5">
-                {/* <Radio value={index} /> */}
-                <Checkbox value={index} />
-                <Input placeholder={`Đáp án ${index + 1}`} value={answer} />
+            {formValue.dapAn.map((answer, index) => (
+              <div key={index} className="flex items-center gap-5">
+                {questionType === 'single'
+                  ? <Radio
+                    checked={answer.dungSai}
+                    onChange={() => {
+                      setFormValue(val => ({
+                        ...val,
+                        dapAn: val.dapAn
+                          .map((item, idx) => ({ ...item, dungSai: idx === index ? true : false }))
+                      }))
+                    }} />
+                  : <Checkbox
+                    checked={answer.dungSai}
+                    onChange={() => {
+                      setFormValue(val => ({
+                        ...val,
+                        dapAn: val.dapAn.map((item, idx) => ({ ...item, dungSai: idx === index ? !item.dungSai : item.dungSai }))
+                      }))
+                    }} />}
+                <Input placeholder={`Đáp án ${index + 1}`}
+                  value={answer.noiDung}
+                  onChange={(e) => setFormValue(val => ({
+                    ...val,
+                    dapAn: val.dapAn.map((item, idx) => idx === index ? { ...item, noiDung: e.target.value } : item)
+                  }))} />
+
+                <Button variant='text' color='red' icon={<DeleteOutlined />}
+                  disabled={formValue.dapAn.length === 2}
+                  onClick={() => setFormValue(val => ({
+                    ...val,
+                    dapAn: val.dapAn.filter((_, idx) => idx !== index)
+                  }))} />
               </div>
             ))}
           </div>
 
           {/* Footer buttons */}
           <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Button size="large" >
+            <Button
+              onClick={() => {
+                setModal(false)
+                setFormValue({ ...defaultFormValue })
+              }}>
               Hủy
             </Button>
-            <Button variant='solid' color='purple' size="large" >
+            <Button variant='solid' color='purple'
+              onClick={() => {
+                if (questionType === 'single' && formValue.dapAn.filter(item => item.dungSai).length != 1) return message.error('Vui lòng chọn đúng 1 đáp án!')
+                if (questionType === 'multiple' && formValue.dapAn.filter(item => item.dungSai).length == 0) return message.error('Vui lòng chọn ít nhất 1 đáp án!')
+                if (formValue.noiDung.length == 0) return message.error('Vui lòng nhập nội dung câu hỏi!')
+                if (formValue.dapAn.filter(item => item.noiDung.length == 0).length > 0) return message.error('Vui lòng nhập nội dung đáp án!')
+
+                const input: object = {
+                  doKho: formValue.doKho,
+                  noiDung: formValue.noiDung,
+                  dapAn: formValue.dapAn.map(item => ({
+                    dungSai: item.dungSai,
+                    noiDung: item.noiDung
+                  }))
+                }
+
+                ThemCauHoi(+boCauHoiId, [input]).then(result => {
+                  console.log(result.data)
+                  message.success('Thêm câu hỏi thành công!')
+                  setModal(false)
+                  setFormValue({ ...defaultFormValue })
+                }).catch(err => {
+                  console.log(input)
+                  console.log(err)
+                  message.error(err.message)
+                })
+
+
+                console.log(JSON.stringify(formValue))
+
+              }}>
               Thêm
             </Button>
           </div>
@@ -275,5 +425,8 @@ function ChiTietBoCauHoi() {
     </>
   );
 }
+
+
+const ChiTietBoCauHoi = withGiangVienRole(Element)
 
 export default ChiTietBoCauHoi

@@ -42,9 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder
 
 builder.Services
 .AddControllers()
-.AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
-.AddApplicationPart(typeof(AuthController).Assembly)
-.AddApplicationPart(typeof(LopHocController).Assembly);
+.AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();

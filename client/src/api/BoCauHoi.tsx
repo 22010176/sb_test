@@ -2,13 +2,22 @@ import axios from "axios";
 
 const url = import.meta.env.VITE_BOCAUHOI_URL;
 
-export async function GetBoCauHoi(idHocPhan: number) {
-  const result = await axios.get(`${url}/${idHocPhan}`, {
+export async function GetBoCauHoi(idMonHoc: number) {
+  const result = await axios.get(`${url}/${idMonHoc}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }
   });
 
+  return result.data;
+}
+
+export async function GetBoCauHoiById(idMonHoc: number, idBoCauHoi: number) {
+  const result = await axios.get(`${url}/${idMonHoc}/${idBoCauHoi}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  });
   return result.data;
 }
 

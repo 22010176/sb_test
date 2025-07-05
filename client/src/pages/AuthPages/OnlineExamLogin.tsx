@@ -82,7 +82,7 @@ function Element() {
 
         <div className="text-center mt-6">
           <span className="text-gray-600">Chưa có tài khoản? </span>
-          <Link to="/dang-ki" className="text-blue-600 hover:text-blue-800 font-semibold">
+          <Link to="/dang-ky" className="text-blue-600 hover:text-blue-800 font-semibold">
             Đăng ký ngay
           </Link>
         </div>
