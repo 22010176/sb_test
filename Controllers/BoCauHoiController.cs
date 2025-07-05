@@ -14,11 +14,11 @@ public partial class BoCauHoiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
 
-  async Task<List<object>> GetBoCauHoi(int boCauHoi)
+  async Task<List<object>> GetBoCauHoi(int idMonHoc)
   {
     var query =
       from lh in context.BoCauHoi
-      where lh.IdMonHoc == boCauHoi
+      where lh.IdMonHoc == idMonHoc
       orderby lh.ThoiGianCapNhatCuoi descending
       select new
       {
@@ -38,6 +38,48 @@ public partial class BoCauHoiController(AppDbContext context) : ControllerBase
     if (monHoc == null) throw new Exception("Môn học không tồn tại!");
     if (monHoc.IdGiangVien != userId) throw new Exception("Người dùng không hợp lệ!");
     return monHoc;
+  }
+
+  [HttpGet("{monHocId}/{boCauHoiId}")]
+  public async Task<IActionResult> GetBoCauHoiAsync(int monHocId, int boCauHoiId)
+  {
+    try
+    {
+      MonHoc? monHoc = await CheckInput(monHocId);
+
+      var query = (
+        from bch in context.BoCauHoi
+        join mh in context.MonHoc on bch.IdMonHoc equals mh.Id
+        where bch.IdMonHoc == monHocId && bch.Id == boCauHoiId
+        orderby bch.ThoiGianCapNhatCuoi descending
+        select new
+        {
+          bch.Id,
+          bch.TenBoCauHoi,
+          bch.ThoiGianCapNhatCuoi,
+          bch.IdMonHoc,
+          mh.TenMon,
+          mh.MaMon,
+        }
+      );
+      return Ok(new
+      {
+        Message = "Lấy bộ câu hỏi thành công",
+        Success = true,
+        Data = await query.ToListAsync()
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new
+      {
+        Message = err,
+        Success = false,
+        Data = new List<object>()
+      });
+    }
+
+    return Ok();
   }
 
   [HttpGet("{monHocId}")]
