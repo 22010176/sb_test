@@ -78,8 +78,6 @@ public partial class BoCauHoiController(AppDbContext context) : ControllerBase
         Data = new List<object>()
       });
     }
-
-    return Ok();
   }
 
   [HttpGet("{monHocId}")]

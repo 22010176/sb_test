@@ -30,12 +30,18 @@ public class BoCauHoi
   public List<CauHoi>? CauHoi { get; set; }
 }
 
+
+public enum LoaiCauHoi
+{
+  MOT_DAP_AN, NHIEU_DAP_AN
+}
 public class CauHoi
 {
   [Key]
   public int Id { get; set; }
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
+  public LoaiCauHoi LoaiCauHoi{ get; set; }
   public DateTime? ThoiGianCapNhatCuoi { get; set; }
 
   public int IdBoCauHoi { get; set; }

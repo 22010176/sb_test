@@ -27,6 +27,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
         ch.Id,
         ch.DoKho,
         ch.NoiDung,
+        ch.LoaiCauHoi,
         ch.ThoiGianCapNhatCuoi,
         DapAn = (
           from da in context.DapAnCauHoi
@@ -83,7 +84,6 @@ public class CauHoiController(AppDbContext context) : ControllerBase
   [HttpPost("{boCauHoiId}")]
   public async Task<IActionResult> PostCauHoiAsync(int boCauHoiId, [FromBody] CauHoiInput input)
   {
-
     try
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
@@ -96,6 +96,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
         NoiDung = input.NoiDung,
         ThoiGianCapNhatCuoi = DateTime.UtcNow,
         DoKho = input.DoKho,
+        LoaiCauHoi= input.LoaiCauHoi,
         IdBoCauHoi = boCauHoiId,
       };
       await context.CauHoi.AddAsync(ch);
@@ -145,6 +146,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
       cauHoi!.NoiDung = input.NoiDung;
       cauHoi!.DoKho = input.DoKho;
       cauHoi!.ThoiGianCapNhatCuoi = DateTime.UtcNow;
+      cauHoi!.LoaiCauHoi = input.LoaiCauHoi;
       await context.SaveChangesAsync();
 
       List<DapAnCauHoiPutInput> dapAn = input.DapAn;
@@ -228,6 +230,7 @@ public record CauHoiInput
 {
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
+  public LoaiCauHoi LoaiCauHoi{ get; set; }
   public List<DapAnCauHoiInput> DapAn { get; set; } = [];
 }
 
@@ -243,6 +246,7 @@ public record CauHoiPutInput
   public int Id { get; set; }
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
+  public LoaiCauHoi LoaiCauHoi{ get;  set; }
   public List<DapAnCauHoiPutInput> DapAn { get; set; } = [];
 }
 

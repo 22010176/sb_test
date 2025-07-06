@@ -89,11 +89,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-app.UseStaticFiles(new StaticFileOptions
-{
-  FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "public")),
-  RequestPath = "/public"
-});
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//   FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "public")),
+//   RequestPath = "/public"
+// });
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

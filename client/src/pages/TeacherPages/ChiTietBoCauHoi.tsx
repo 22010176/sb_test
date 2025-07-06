@@ -24,6 +24,7 @@ type DapAn = {
 type CauHoi = {
   id: number | null,
   noiDung: string,
+  loaiCauHoi: number,
   doKho: number,
   dapAn: DapAn[]
 }
@@ -49,6 +50,7 @@ const defaultFormValue: CauHoi = {
   id: null,
   noiDung: '',
   doKho: 0,
+  loaiCauHoi: 0,
   dapAn: [
     // id < 0 = câu hỏi không trong csdl, id > 0 = câu hỏi trong csdl, 
     { id: -1, noiDung: '', dungSai: false, xoa: false },
@@ -64,7 +66,7 @@ type CauHoiFormProps = {
   onCancel: () => void | undefined
 }
 function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }: CauHoiFormProps) {
-  const [questionType, setQuestionType] = useState<'multiple' | 'single'>('single')
+  // const [questionType, setQuestionType] = useState<'multiple' | 'single'>('single')
 
   // useEffect(function () {
   //   if (formValue == null) return;
@@ -105,17 +107,17 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
             Chọn loại câu hỏi <span className="text-red-500">*</span>
           </Text>
           <Select placeholder="Chọn đáp án đúng nhất" className="w-full"
-            value={questionType}
+            value={formValue?.loaiCauHoi}
             onChange={value => {
-              setQuestionType(value)
               setFormValue(val => ({
                 ...val,
+                loaiCauHoi: value,
                 dapAn: val.dapAn.map(item => ({ ...item, dungSai: false }))
               }))
             }}
             options={[
-              { value: 'single', label: 'Chọn đáp án đúng nhất' },
-              { value: 'multiple', label: 'Chọn nhiều đáp án' },
+              { value: 0, label: 'Chọn đáp án đúng nhất' },
+              { value: 1, label: 'Chọn nhiều đáp án' },
             ]} />
         </div>
       </div>
@@ -136,7 +138,7 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
           Đáp án <span className="text-red-500">*</span>
         </Text>
         <Button variant='solid' color='green' icon={<PlusOutlined />}
-          disabled={formValue?.dapAn?.length >= 5}
+          disabled={formValue != null && formValue?.dapAn?.length >= 5}
           onClick={() => setFormValue(val => ({
             ...val,
             dapAn: [
@@ -151,7 +153,7 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
       <div className="space-y-3">
         {formValue?.dapAn?.map((answer, index) => (
           (!answer.xoa) && <div key={index} className="flex items-center gap-5">
-            {questionType === 'single'
+            {formValue.loaiCauHoi === 0
               ? <Radio
                 checked={answer.dungSai}
                 onChange={() => {
@@ -178,7 +180,7 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
               onClick={() => setFormValue(val => ({
                 ...val,
                 dapAn: val.dapAn
-                  .filter((_: DapAn, idx: number) => _.id > 0 || (_.id < 0 && idx !== index))
+                  .filter((_: DapAn, idx: number) => _.id && (_.id > 0 || (_.id < 0 && idx !== index)))
                   .map((_, idx) => idx !== index ? _ : { ..._, xoa: true })
               }))} />
           </div>
@@ -193,8 +195,8 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
         </Button>
         <Button variant='solid' color='purple' onClick={async () => {
           if (formValue == null) return message.error('Vui lòng nhập thông tin câu hỏi!')
-          if (questionType === 'single' && formValue.dapAn.filter(item => item.dungSai).length != 1) return message.error('Vui lòng chọn đúng 1 đáp án!')
-          if (questionType === 'multiple' && formValue.dapAn.filter(item => item.dungSai).length == 0) return message.error('Vui lòng chọn ít nhất 1 đáp án!')
+          if (formValue.loaiCauHoi === 0 && formValue.dapAn.filter(item => item.dungSai).length != 1) return message.error('Vui lòng chọn đúng 1 đáp án!')
+          if (formValue.loaiCauHoi === 1 && formValue.dapAn.filter(item => item.dungSai).length == 0) return message.error('Vui lòng chọn ít nhất 1 đáp án!')
           if (formValue.noiDung.length == 0) return message.error('Vui lòng nhập nội dung câu hỏi!')
           if (formValue.dapAn.filter(item => item.noiDung.length == 0).length > 0) return message.error('Vui lòng nhập nội dung đáp án!')
 
@@ -329,16 +331,19 @@ function Element() {
                   <Tag color={getDifficultyColor(question.doKho)}>
                     {question.doKho === 0 ? 'Dễ' : question.doKho === 1 ? 'Trung bình' : 'Khó'}
                   </Tag>
+                  <Tag color={question.loaiCauHoi === 0 ? "blue" : "gold"}>
+                    {question.loaiCauHoi === 0 ? "Chọn đáp án đúng nhất" : "Chọn nhiều đáp án"}
+                  </Tag>
                 </div>
                 <div className="flex space-x-1">
                   <Button type="text" icon={<EditOutlined />} size="small"
                     onClick={() => {
-                      console.log(question)
                       setEditForm({
                         id: question.id,
                         noiDung: question.noiDung,
                         doKho: question.doKho,
-                        dapAn: question.dapAn
+                        dapAn: question.dapAn,
+                        loaiCauHoi: question.loaiCauHoi
                       })
                       setModal('update')
                     }} />
@@ -390,6 +395,7 @@ function Element() {
             const input: object = {
               doKho: addForm.doKho,
               noiDung: addForm.noiDung,
+              loaiCauHoi: addForm.loaiCauHoi,
               dapAn: addForm.dapAn.map(item => ({
                 dungSai: item.dungSai,
                 noiDung: item.noiDung
@@ -420,6 +426,7 @@ function Element() {
               id: editForm.id,
               doKho: editForm.doKho,
               noiDung: editForm.noiDung,
+              loaiCauHoi: editForm.loaiCauHoi,
               dapAn: editForm.dapAn.map(item => ({
                 id: item.id,
                 dungSai: item.dungSai,
