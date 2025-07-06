@@ -24,5 +24,10 @@ export async function CapNhatCauHoi(boCauHoiId: number, cauHoi: object) {
 }
 
 export async function XoaCauHoi(boCauHoiId: number, cauHoiId: number) {
-
+  const result = await axios.delete(`${url}/${boCauHoiId}/${cauHoiId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return result.data;
 }

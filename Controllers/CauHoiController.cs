@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Security.Claims;
 using DatabaseModels;
 using DatabaseModels.Models;
@@ -14,13 +16,15 @@ public class CauHoiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
 
-  async Task<List<object>> GetDanhSachCauHoi(int boCauHoi)
+  async Task<IList> GetDanhSachCauHoi(int boCauHoi)
   {
     var query =
       from ch in context.CauHoi
       where ch.IdBoCauHoi == boCauHoi
       select new
       {
+        ch.Id,
+        ch.DoKho,
         ch.NoiDung,
         ch.ThoiGianCapNhatCuoi,
         DapAn = (
@@ -29,7 +33,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
           select new { da.Id, da.NoiDung, da.DungSai }
         ).ToList()
       };
-    return [.. await query.ToListAsync()];
+    return await query.ToListAsync();
   }
 
   async Task<CauHoi?> CheckInput(int boCauHoiId, int userId, int? cauHoiId = null)
@@ -59,7 +63,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
 
       return Ok(new
       {
-        Message = "",
+        Message = "Lấy danh sách câu hỏi thành công!",
         Success = true,
         Data = await GetDanhSachCauHoi(boCauHoiId)
       });
@@ -76,7 +80,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
   }
 
   [HttpPost("{boCauHoiId}")]
-  public async Task<IActionResult> PostCauHoiAsync(int boCauHoiId, [FromBody] List<CauHoiInput> input)
+  public async Task<IActionResult> PostCauHoiAsync(int boCauHoiId, [FromBody] CauHoiInput input)
   {
 
     try
@@ -84,40 +88,38 @@ public class CauHoiController(AppDbContext context) : ControllerBase
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
       await CheckInput(boCauHoiId, userId);
 
-      List<CauHoi> cauHoi = [];
       List<DapAnCauHoi> dapAn = [];
-      for (int i = 0; i < input.Count; i++)
-      {
-        CauHoiInput _ch = input[i];
-        CauHoi ch = new()
-        {
-          NoiDung = _ch.NoiDung,
-          ThoiGianCapNhatCuoi = DateTime.UtcNow,
-          DoKho = _ch.DoKho,
-          IdBoCauHoi = boCauHoiId,
-        };
 
-        for (int j = 0; j < _ch.DapAn.Count; j++)
+      CauHoi ch = new()
+      {
+        NoiDung = input.NoiDung,
+        ThoiGianCapNhatCuoi = DateTime.UtcNow,
+        DoKho = input.DoKho,
+        IdBoCauHoi = boCauHoiId,
+      };
+      await context.CauHoi.AddAsync(ch);
+      await context.SaveChangesAsync();
+
+      ch = await context.CauHoi.FirstAsync(i => i.Id == ch.Id);
+
+      for (int j = 0; j < input.DapAn.Count; j++)
+      {
+        DapAnCauHoiInput _da = input.DapAn[j];
+        DapAnCauHoi da = new()
         {
-          DapAnCauHoiInput _da = _ch.DapAn[j];
-          DapAnCauHoi da = new()
-          {
-            NoiDung = _da.NoiDung,
-            DungSai = _da.DungSai,
-            IdCauHoi = ch.Id
-          };
-          dapAn.Add(da);
-        }
+          NoiDung = _da.NoiDung,
+          DungSai = _da.DungSai,
+          IdCauHoi = ch.Id
+        };
+        await context.DapAnCauHoi.AddAsync(da);
       }
-      await context.CauHoi.AddRangeAsync(cauHoi);
-      await context.DapAnCauHoi.AddRangeAsync(dapAn);
       await context.SaveChangesAsync();
 
       return Ok(new
       {
         Message = "Thêm câu hỏi thành công!",
         Success = true,
-        Data = input
+        Data = await GetDanhSachCauHoi(boCauHoiId)
       });
     }
     catch (Exception err)
@@ -168,18 +170,18 @@ public class CauHoiController(AppDbContext context) : ControllerBase
     try
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
-      var cauHoi = await CheckInput(boCauHoiId, userId);
+      var cauHoi = await CheckInput(boCauHoiId, userId, cauHoiId);
       var dapAn = await context.DapAnCauHoi.Where(i => i.IdCauHoi == cauHoiId).ToListAsync();
 
-      context.CauHoi.Remove(cauHoi!);
-      context.DapAnCauHoi.RemoveRange(dapAn);
+      if (cauHoi != null) context.CauHoi.Remove(cauHoi);
+      if (dapAn.Count > 0) context.DapAnCauHoi.RemoveRange(dapAn);
       await context.SaveChangesAsync();
 
       return Ok(new
       {
         Message = "Xóa câu hỏi thành công",
         Success = true,
-        Data = new List<object>()
+        Data = await GetDanhSachCauHoi(boCauHoiId)
       });
     }
     catch (Exception err)
@@ -202,6 +204,7 @@ public record CauHoiInput
 
 public record DapAnCauHoiInput
 {
+  public int Id { get; set; }
   public string? NoiDung { get; set; }
   public bool? DungSai { get; set; }
 

@@ -127,50 +127,52 @@ export default function QuanLyBoCauHoi() {
       <Row gutter={[16, 16]}>
         {boCauHoi.map((item) => (
           <Col span={12} key={item.id}>
-            <Card className="hover:shadow-lg transition-shadow duration-300 border-gray-200">
-              <div className="flex justify-between items-center mb-4">
-                <Title level={5} className="!mb-0 text-gray-800">
-                  {item.tenBoCauHoi}
-                </Title>
-                <div className="flex justify-end">
-                  <Button type="text" variant='text' icon={<EyeOutlined />}
-                    onClick={() => navigate(`/giang-vien/mon-hoc/${monHocId}/${item.id}`)} />
-                  <Button color='blue' variant='text' type="text" icon={<EditOutlined />}
-                    onClick={() => {
-                      setFormModal('update')
-                      form.setFieldsValue(item)
-                    }} />
-                  <Button color='red' variant='text' type="text" icon={<DeleteOutlined />}
-                    onClick={async () => {
-                      XoaBoCauHoi({ idMonHoc: +monHocId, id: item.id }).then(result => {
-                        setBoCauHoi(result.data)
-                        message.success('Xóa bộ câu hỏi thành công!');
-                      }).catch(err => {
-                        message.error(err.message)
-                      })
-                    }} />
-                </div>
-              </div>
-
-              <Space direction="vertical" className="w-full" size="small">
-                <div className="flex items-center text-gray-600">
-                  <FileTextOutlined className="mr-2" />
-                  <Text>{item.questionCount ?? 70} Câu hỏi</Text>
+            <Link to={`/giang-vien/mon-hoc/${monHocId}/${item.id}`}>
+              <Card className="hover:shadow-lg transition-shadow duration-300 border-gray-200">
+                <div className="flex justify-between items-center mb-4">
+                  <Title level={5} className="!mb-0 text-gray-800">
+                    {item.tenBoCauHoi}
+                  </Title>
+                  <div className="flex justify-end">
+                    <Button type="text" variant='text' icon={<EyeOutlined />}
+                      onClick={() => navigate(`/giang-vien/mon-hoc/${monHocId}/${item.id}`)} />
+                    <Button color='blue' variant='text' type="text" icon={<EditOutlined />}
+                      onClick={() => {
+                        setFormModal('update')
+                        form.setFieldsValue(item)
+                      }} />
+                    <Button color='red' variant='text' type="text" icon={<DeleteOutlined />}
+                      onClick={async () => {
+                        XoaBoCauHoi({ idMonHoc: +monHocId, id: item.id }).then(result => {
+                          setBoCauHoi(result.data)
+                          message.success('Xóa bộ câu hỏi thành công!');
+                        }).catch(err => {
+                          message.error(err.message)
+                        })
+                      }} />
+                  </div>
                 </div>
 
-                <div className="flex items-center text-gray-600">
-                  <ClockCircleOutlined className="mr-2" />
-                  <Text>{item.details ?? '20 Dễ, 10 Trung bình, 10 Khó'}</Text>
-                </div>
+                <Space direction="vertical" className="w-full" size="small">
+                  <div className="flex items-center text-gray-600">
+                    <FileTextOutlined className="mr-2" />
+                    <Text>{item.questionCount ?? 70} Câu hỏi</Text>
+                  </div>
 
-                <div className="flex items-center text-gray-600">
-                  <CalendarOutlined className="mr-2" />
-                  <Text>Cập nhật lần cuối: {dayjs(item.thoiGianCapNhatCuoi).toDate().toLocaleDateString('vi-VN')}</Text>
-                </div>
-              </Space>
+                  <div className="flex items-center text-gray-600">
+                    <ClockCircleOutlined className="mr-2" />
+                    <Text>{item.details ?? '20 Dễ, 10 Trung bình, 10 Khó'}</Text>
+                  </div>
+
+                  <div className="flex items-center text-gray-600">
+                    <CalendarOutlined className="mr-2" />
+                    <Text>Cập nhật lần cuối: {dayjs(item.thoiGianCapNhatCuoi).toDate().toLocaleDateString('vi-VN')}</Text>
+                  </div>
+                </Space>
 
 
-            </Card>
+              </Card>
+            </Link>
           </Col>
         ))}
       </Row>
@@ -183,8 +185,6 @@ export default function QuanLyBoCauHoi() {
         }
         open={formModal.length > 0}
         onOk={handleOk}
-        // onCancel={handleCancel}
-        // okText={editingCourse ? 'Cập nhật' : 'Thêm'}
         cancelText="Hủy"
         width={500}
         className="rounded-xl overflow-hidden">
