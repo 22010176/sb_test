@@ -134,7 +134,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
   }
 
   [HttpPut("{boCauHoiId}/{cauHoiId}")]
-  public async Task<IActionResult> PutCauHoiAsync(int boCauHoiId, int cauHoiId, [FromBody] CauHoiInput input)
+  public async Task<IActionResult> PutCauHoiAsync(int boCauHoiId, int cauHoiId, [FromBody] CauHoiPutInput input)
   {
     try
     {
@@ -146,11 +146,39 @@ public class CauHoiController(AppDbContext context) : ControllerBase
       cauHoi!.ThoiGianCapNhatCuoi = DateTime.UtcNow;
       await context.SaveChangesAsync();
 
+      List<DapAnCauHoiPutInput> dapAn = input.DapAn;
+      for (int i = 0; i < dapAn.Count; i++)
+      {
+        DapAnCauHoiPutInput _da = dapAn[i];
+        if (_da.Id < 0)
+        {
+          DapAnCauHoi dapAnCauHoi = new()
+          {
+            NoiDung = _da.NoiDung,
+            DungSai = _da.DungSai,
+            IdCauHoi = cauHoi.Id,
+          };
+          await context.DapAnCauHoi.AddAsync(dapAnCauHoi);
+        }
+        else if (_da.Xoa == true)
+        {
+          var da = await context.DapAnCauHoi.FirstAsync(i => i.Id == _da.Id);
+          context.DapAnCauHoi.Remove(da);
+        }
+        else
+        {
+          var da = await context.DapAnCauHoi.FirstAsync(i => i.Id == _da.Id);
+          da.NoiDung = _da.NoiDung;
+          da.DungSai = _da.DungSai;
+        }
+      }
+      await context.SaveChangesAsync();
+
       return Ok(new
       {
         Message = "Sửa câu hỏi thành công",
         Success = true,
-        Data = new List<object>()
+        Data = await GetDanhSachCauHoi(boCauHoiId)
       });
     }
     catch (Exception err)
@@ -204,8 +232,23 @@ public record CauHoiInput
 
 public record DapAnCauHoiInput
 {
-  public int Id { get; set; }
   public string? NoiDung { get; set; }
   public bool? DungSai { get; set; }
 
+}
+
+public record CauHoiPutInput
+{
+  public int Id { get; set; }
+  public string? NoiDung { get; set; }
+  public double? DoKho { get; set; }
+  public List<DapAnCauHoiPutInput> DapAn { get; set; } = [];
+}
+
+public record DapAnCauHoiPutInput
+{
+  public int Id { get; set; }
+  public string? NoiDung { get; set; }
+  public bool? DungSai { get; set; }
+  public bool? Xoa { get; set; }
 }

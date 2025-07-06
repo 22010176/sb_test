@@ -21,6 +21,12 @@ export async function ThemCauHoi(boCauHoiId: number, cauHoi: object) {
 }
 
 export async function CapNhatCauHoi(boCauHoiId: number, cauHoi: object) {
+  const result = await axios.put(`${url}/${boCauHoiId}/${cauHoi.id}`, cauHoi, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return result.data;
 }
 
 export async function XoaCauHoi(boCauHoiId: number, cauHoiId: number) {

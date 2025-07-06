@@ -1,5 +1,5 @@
 import { GetBoCauHoiById } from '@/api/BoCauHoi';
-import { GetCauHoi, ThemCauHoi, XoaCauHoi } from '@/api/CauHoi';
+import { CapNhatCauHoi, GetCauHoi, ThemCauHoi, XoaCauHoi } from '@/api/CauHoi';
 import { GetMonHocById } from '@/api/MonHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 
@@ -8,6 +8,7 @@ import { Breadcrumb, Button, Card, Checkbox, Col, Input, message, Modal, Radio, 
 import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { diff } from 'util';
 
 const { Text } = Typography;
 
@@ -18,7 +19,8 @@ type PageParam = {
 type DapAn = {
   id: number | null,
   noiDung: string,
-  dungSai: boolean
+  dungSai: boolean,
+  xoa: boolean
 }
 type CauHoi = {
   id: number | null,
@@ -49,8 +51,9 @@ const defaultFormValue: CauHoi = {
   noiDung: '',
   doKho: 0,
   dapAn: [
-    { id: null, noiDung: '', dungSai: false },
-    { id: null, noiDung: '', dungSai: false }
+    // id < 0 = câu hỏi không trong csdl, id > 0 = câu hỏi trong csdl, 
+    { id: -1, noiDung: '', dungSai: false, xoa: false },
+    { id: -1, noiDung: '', dungSai: false, xoa: false }
   ]
 }
 
@@ -63,6 +66,13 @@ type CauHoiFormProps = {
 }
 function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }: CauHoiFormProps) {
   const [questionType, setQuestionType] = useState<'multiple' | 'single'>('single')
+
+  // useEffect(function () {
+  //   if (formValue == null) return;
+
+  //   if (formValue?.dapAn.reduce((acc, i) => i.dungSai ? acc + 1 : acc, 0) > 1) setQuestionType('multiple')
+  //   else setQuestionType('single')
+  // }, [formValue])
 
   return (
     <div className="space-y-4">
@@ -132,7 +142,7 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
             ...val,
             dapAn: [
               ...val.dapAn,
-              { id: null, noiDung: '', dungSai: false }
+              { id: -1, noiDung: '', dungSai: false, xoa: false }
             ]
           }))}>
           Thêm đáp án
@@ -141,27 +151,24 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
 
       <div className="space-y-3">
         {formValue?.dapAn?.map((answer, index) => (
-          <div key={index} className="flex items-center gap-5">
+          (!answer.xoa) && <div key={index} className="flex items-center gap-5">
             {questionType === 'single'
               ? <Radio
                 checked={answer.dungSai}
                 onChange={() => {
                   setFormValue(val => ({
                     ...val,
-                    dapAn: val.dapAn
-                      .map((item, idx) => ({ ...item, dungSai: idx === index ? true : false }))
+                    dapAn: val.dapAn.map((item, idx) => ({ ...item, dungSai: idx === index ? true : false }))
                   }))
                 }} />
-              : <Checkbox
-                checked={answer.dungSai}
+              : <Checkbox checked={answer.dungSai}
                 onChange={() => {
                   setFormValue(val => ({
                     ...val,
                     dapAn: val.dapAn.map((item, idx) => ({ ...item, dungSai: idx === index ? !item.dungSai : item.dungSai }))
                   }))
                 }} />}
-            <Input placeholder={`Đáp án ${index + 1}`}
-              value={answer.noiDung}
+            <Input placeholder={`Đáp án ${index + 1}`} value={answer.noiDung}
               onChange={(e) => setFormValue(val => ({
                 ...val,
                 dapAn: val.dapAn.map((item, idx) => idx === index ? { ...item, noiDung: e.target.value } : item)
@@ -171,18 +178,18 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
               disabled={formValue.dapAn.length === 2}
               onClick={() => setFormValue(val => ({
                 ...val,
-                dapAn: val.dapAn.filter((_, idx) => idx !== index)
+                dapAn: val.dapAn
+                  .filter((_: DapAn, idx: number) => _.id > 0 || (_.id < 0 && idx !== index))
+                  .map((_, idx) => idx !== index ? _ : { ..._, xoa: true })
               }))} />
           </div>
+
         ))}
       </div>
 
       {/* Footer buttons */}
       <div className="flex justify-end space-x-3 pt-4 border-t">
-        <Button onClick={() => {
-          onCancel()
-          setFormValue({ ...defaultFormValue })
-        }}>
+        <Button onClick={() => onCancel()}>
           Hủy
         </Button>
         <Button variant='solid' color='purple' onClick={async () => {
@@ -193,9 +200,8 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
           if (formValue.dapAn.filter(item => item.noiDung.length == 0).length > 0) return message.error('Vui lòng nhập nội dung đáp án!')
 
           await onSubmit(undefined)
-          setFormValue({ ...defaultFormValue })
         }}>
-          Thêm
+          Xác nhận
         </Button>
       </div>
     </div>
@@ -213,36 +219,26 @@ function Element() {
   const [boCauHoi, setBoCauHoi] = useState<BoCauHoi>()
   const [cauHoi, setCauHoi] = useState<CauHoi[]>([])
 
-
   const [searchText, setSearchText] = useState('');
 
   useEffect(function () {
     GetMonHocById(+monHocId).then(result => {
       setMonHoc(result.data[0])
-    }).catch(err => {
-      throw err
     })
     GetBoCauHoiById(+monHocId, +boCauHoiId).then(result => {
-
       setBoCauHoi(result.data[0])
-    }).catch(err => {
-      throw err
     })
 
     GetCauHoi(+boCauHoiId).then(result => {
       setCauHoi(result.data)
-    }).catch(err => {
-      throw err
     })
   }, [boCauHoiId, monHocId])
 
   const getDifficultyColor = (difficulty: number) => {
-    switch (difficulty) {
-      case 0: return 'green';
-      case 1: return 'orange';
-      case 2: return 'red';
-      default: return 'blue';
-    }
+    if (difficulty == 0) return 'green';
+    if (difficulty == 1) return 'orange';
+    if (difficulty == 2) return 'red';
+    return 'blue';
   };
 
   return (
@@ -306,21 +302,18 @@ function Element() {
             <Col span={8}>
               <Select className="w-full" placeholder="Tất cả mức độ"
                 options={[
-                  { value: 'easy', label: 'Dễ' },
-                  { value: 'medium', label: 'Trung bình' },
-                  { value: 'hard', label: 'Khó' }
+                  { value: 0, label: 'Dễ' },
+                  { value: 1, label: 'Trung bình' },
+                  { value: 2, label: 'Khó' }
                 ]} />
             </Col>
           </Row>
 
           <div className="flex justify-end space-x-2">
-            <Button type="primary" icon={<PlusOutlined />}
-              className="bg-red-500 hover:bg-red-600 border-red-500"
-              onClick={() => setModal('add')}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setModal('add')}>
               Thêm câu hỏi
             </Button>
-            <Button type="primary" icon={<DownloadOutlined />}
-              className="bg-blue-500 hover:bg-blue-600 border-blue-500">
+            <Button type="primary" icon={<DownloadOutlined />}>
               Nhập từ file
             </Button>
           </div>
@@ -329,37 +322,42 @@ function Element() {
         {/* Questions List */}
         <div className="space-y-4 flex flex-col gap-3">
           {cauHoi?.map((question, index) => (
-            <Card key={question.id}
-              className="shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
-              <div className="mb-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center space-x-3">
-                    <Text strong className="text-blue-600">{boCauHoi?.tenBoCauHoi}</Text>
-                    <Tag color={getDifficultyColor(question.doKho)}>
-                      {question.doKho === 0 ? 'Dễ' : question.doKho === 1 ? 'Trung bình' : 'Khó'}
-                    </Tag>
-                  </div>
-                  <div className="flex space-x-1">
-                    <Button type="text" icon={<EditOutlined />} size="small"
-                      onClick={() => {
+            <Card key={question.id} className="shadow-sm hover:shadow-md transition-shadow">
 
-                      }} />
-                    <Button type="text" icon={<DeleteOutlined />} size="small" danger
-                      onClick={async () => {
-                        await XoaCauHoi(+boCauHoiId, question.id as number).then(result => {
-                          setCauHoi(result.data)
-                          message.success('Xóa câu hỏi thành công!')
-                        }).catch(err => {
-                          message.error(err.message)
-                        })
-                      }} />
-                  </div>
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center space-x-3">
+                  <Text strong className="text-blue-600">{boCauHoi?.tenBoCauHoi}</Text>
+                  <Tag color={getDifficultyColor(question.doKho)}>
+                    {question.doKho === 0 ? 'Dễ' : question.doKho === 1 ? 'Trung bình' : 'Khó'}
+                  </Tag>
                 </div>
-
-                <p className="block mb-3 font-bold">
-                  Câu {index + 1}: {question.noiDung}
-                </p>
+                <div className="flex space-x-1">
+                  <Button type="text" icon={<EditOutlined />} size="small"
+                    onClick={() => {
+                      console.log(question)
+                      setEditForm({
+                        id: question.id,
+                        noiDung: question.noiDung,
+                        doKho: question.doKho,
+                        dapAn: question.dapAn
+                      })
+                      setModal('update')
+                    }} />
+                  <Button type="text" icon={<DeleteOutlined />} size="small" danger
+                    onClick={async () => {
+                      await XoaCauHoi(+boCauHoiId, question.id as number).then(result => {
+                        setCauHoi(result.data)
+                        message.success('Xóa câu hỏi thành công!')
+                      }).catch(err => {
+                        message.error(err.message)
+                      })
+                    }} />
+                </div>
               </div>
+
+              <p className="block mb-3 font-bold">
+                Câu {index + 1}: {question.noiDung}
+              </p>
 
               <div className="space-y-2">
                 {question.dapAn?.map((option, i) => (
@@ -379,12 +377,16 @@ function Element() {
       </div>
 
       <Modal open={modal === 'add'} footer={null} width={600}
+        onCancel={() => {
+          setModal('')
+          setAddForm({ ...defaultFormValue })
+        }}
         title={<span className="text-lg font-medium text-gray-700">THÊM CÂU HỎI</span>}>
-        <CauHoiForm
-          formValue={addForm}
-          setFormValue={setAddForm}
-          tenBoCauHoi={boCauHoi?.tenBoCauHoi as string}
-          onCancel={() => setModal('')}
+        <CauHoiForm formValue={addForm} setFormValue={setAddForm} tenBoCauHoi={boCauHoi?.tenBoCauHoi as string}
+          onCancel={() => {
+            setModal('')
+            setAddForm({ ...defaultFormValue })
+          }}
           onSubmit={async () => {
             const input: object = {
               doKho: addForm.doKho,
@@ -399,17 +401,40 @@ function Element() {
               message.success('Thêm câu hỏi thành công!')
               setModal('')
             }).catch(err => message.error(err.message))
+            setAddForm({ ...defaultFormValue })
           }} />
       </Modal >
 
-      <Modal open={modal === 'update'} footer={null} width={600}
+      <Modal open={modal === 'update'} footer={null} width={600} closable
+        onCancel={() => {
+          setModal('')
+          setAddForm({ ...defaultFormValue })
+        }}
         title={<span className="text-lg font-medium text-gray-700">SỬA CÂU HỎI</span>}>
-        <CauHoiForm
-          formValue={editForm}
-          setFormValue={setEditForm}
-          tenBoCauHoi={boCauHoi?.tenBoCauHoi as string}
-          onCancel={() => setModal('')}
+        <CauHoiForm formValue={editForm} setFormValue={setEditForm} tenBoCauHoi={boCauHoi?.tenBoCauHoi as string}
+          onCancel={() => {
+            setModal('')
+            setEditForm({ ...defaultFormValue })
+          }}
           onSubmit={async () => {
+            const input: object = {
+              id: editForm.id,
+              doKho: editForm.doKho,
+              noiDung: editForm.noiDung,
+              dapAn: editForm.dapAn.map(item => ({
+                id: item.id,
+                dungSai: item.dungSai,
+                noiDung: item.noiDung,
+                xoa: item.xoa ? true : false
+              }))
+            }
+            console.log(JSON.stringify(input, null, 2))
+            await CapNhatCauHoi(+boCauHoiId, input as object).then(result => {
+              setCauHoi(result.data)
+              message.success('Cập nhật câu hỏi thành công!')
+              setModal('')
+            }).catch(err => message.error(err.message))
+
           }} />
       </Modal >
     </>
