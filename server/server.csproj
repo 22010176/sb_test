@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Controllers\Controllers.csproj" />
+    <ProjectReference Include="..\TeacherControllers\TeacherControllers.csproj" />
     <ProjectReference Include="..\DatabaseModels\DatabaseModels.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
     <ProjectReference Include="..\MailServices\MailServices.csproj" />
