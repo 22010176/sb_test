@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Controllers;
+namespace TeacherControllers;
 
 [ApiController]
 [Authorize(Roles = "GIANG_VIEN")]
@@ -96,7 +96,7 @@ public class CauHoiController(AppDbContext context) : ControllerBase
         NoiDung = input.NoiDung,
         ThoiGianCapNhatCuoi = DateTime.UtcNow,
         DoKho = input.DoKho,
-        LoaiCauHoi= input.LoaiCauHoi,
+        LoaiCauHoi = input.LoaiCauHoi,
         IdBoCauHoi = boCauHoiId,
       };
       await context.CauHoi.AddAsync(ch);
@@ -230,7 +230,7 @@ public record CauHoiInput
 {
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
-  public LoaiCauHoi LoaiCauHoi{ get; set; }
+  public LoaiCauHoi LoaiCauHoi { get; set; }
   public List<DapAnCauHoiInput> DapAn { get; set; } = [];
 }
 
@@ -246,7 +246,7 @@ public record CauHoiPutInput
   public int Id { get; set; }
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
-  public LoaiCauHoi LoaiCauHoi{ get;  set; }
+  public LoaiCauHoi LoaiCauHoi { get; set; }
   public List<DapAnCauHoiPutInput> DapAn { get; set; } = [];
 }
 

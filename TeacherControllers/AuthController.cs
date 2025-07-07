@@ -8,9 +8,8 @@ using DatabaseModels.Models;
 using Utilities;
 using MailServices;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
 
-namespace Controllers;
+namespace TeacherControllers;
 
 public record RegisterInput
 {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Controllers;
+namespace TeacherControllers;
 
 [ApiController]
 [Authorize(Roles = "GIANG_VIEN")]

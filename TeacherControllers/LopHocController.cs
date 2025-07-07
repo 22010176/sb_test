@@ -6,10 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Controllers;
+namespace TeacherControllers;
 
 [ApiController]
-[Authorize]
 [Route("api/[controller]")]
 public class LopHocController(AppDbContext context) : ControllerBase
 {
@@ -33,9 +32,9 @@ public class LopHocController(AppDbContext context) : ControllerBase
     return await query.ToListAsync();
   }
 
-  async Task<LopHoc> CheckInput(int lopId)
+  async Task<LopHoc> CheckInput(int lopId, int userId)
   {
-    int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+
     LopHoc? lopHoc = await context.LopHoc.FirstOrDefaultAsync(i => i.Id == lopId);
 
     if (lopHoc == null) throw new Exception("Lớp học không tồn tại!");
@@ -66,6 +65,51 @@ public class LopHocController(AppDbContext context) : ControllerBase
         Message = err,
         Success = false,
         Data = new List<object>()
+      });
+    }
+  }
+
+  [HttpPost("{id}")]
+  [Authorize]
+  public async Task<IActionResult> GetInviteLink(int id)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      LopHoc? lopHoc = await CheckInput(id, userId);
+
+      MaMoiLopHoc? maMoiLopHoc = await context.MaMoiLopHoc.FirstOrDefaultAsync(i => i.IdLopHoc == id);
+      if (maMoiLopHoc != null) return Ok(new
+      {
+        Message = "Lấy mã mời thành công",
+        Success = true,
+        Data = maMoiLopHoc.MaMoi
+      });
+
+      maMoiLopHoc = new()
+      {
+        MaMoi = Guid.NewGuid(),
+        NgayTao = DateTime.UtcNow,
+        IdLopHoc = lopHoc.Id
+      };
+      await context.MaMoiLopHoc.AddAsync(maMoiLopHoc);
+      await context.SaveChangesAsync();
+
+      return Ok(new
+      {
+        Message = "Lấy mã mời thành công",
+        Success = true,
+        Data = maMoiLopHoc.MaMoi
+      });
+
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new
+      {
+        Message = "Lấy mã mời thất bại!",
+        Success = false,
+        Data = err
       });
     }
   }
@@ -117,7 +161,8 @@ public class LopHocController(AppDbContext context) : ControllerBase
   {
     try
     {
-      LopHoc? lopHoc = await CheckInput(id);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      LopHoc? lopHoc = await CheckInput(id, userId);
 
       lopHoc.TenLop = input.TenLop;
       lopHoc.MoTa = input.MoTa;
@@ -148,7 +193,8 @@ public class LopHocController(AppDbContext context) : ControllerBase
   {
     try
     {
-      LopHoc? lopHoc = await CheckInput(id);
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      LopHoc? lopHoc = await CheckInput(id, userId);
 
       context.LopHoc.Remove(lopHoc);
       await context.SaveChangesAsync();

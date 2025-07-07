@@ -1,8 +1,7 @@
 import { Outlet } from "react-router";
 import Header from './Header';
-import { withGiangVienRole } from "@/hoc/auth";
 
-function TeacherLayout() {
+function StudentLayout() {
   return (
     <div className='w-screen h-screen overflow-hidden flex flex-col'>
       <Header />
@@ -15,6 +14,4 @@ function TeacherLayout() {
 
 }
 
-// const TeacherLayout = withGiangVienRole(Element)
-
-export default TeacherLayout
+export default StudentLayout

@@ -16,6 +16,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<BoCauHoi> BoCauHoi { get; set; }
   public DbSet<CauHoi> CauHoi { get; set; }
   public DbSet<DapAnCauHoi> DapAnCauHoi { get; set; }
+  public DbSet<MaMoiLopHoc> MaMoiLopHoc { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -37,7 +38,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     .HasDefaultValueSql("CURRENT_TIMESTAMP")
     .ValueGeneratedOnAdd();
 
-    lopHoc_NguoiDung.HasIndex(t => new { t.IdLopHoc, t.IdNguoiDung }).IsUnique(true);
+    lopHoc_NguoiDung.HasIndex(t => new { t.IdMaMoi, t.IdNguoiDung }).IsUnique(true);
     lopHoc_NguoiDung
     .Property(t => t.ThoiGianYeuCau)
     .HasDefaultValueSql("CURRENT_TIMESTAMP")

@@ -16,26 +16,32 @@ import QuanLyLopHoc from '@/pages/TeacherPages/QuanLyLopHoc';
 import QuanLyMonHoc from '@/pages/TeacherPages/QuanLyMonHoc';
 
 import { GetNguoiDung } from '@/api/TaiKhoan';
-import PageContext, { PageReducer } from '@/contexts/PageContext';
+import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
 import CreateExamInterface from './pages/ExamPage/CreateExamInterface';
 import ExamListInterface from './pages/ExamPage/ExamListInterface';
 
-import QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
+import StudentLayout from './layouts/StudentLayout';
 import ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
+import QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 
 
 function App() {
   const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
 
   useEffect(function () {
-    GetNguoiDung().then(res => {
-      dispatch({ type: 'SET_USER', payload: res.data as UserData })
-    }).catch(err => {
-      console.log(err)
+    if (localStorage.getItem('token')) GetNguoiDung()
+      .then(res => {
+        dispatch({ type: 'SET_USER', payload: res.data as UserData })
+      }).catch(err => {
+        console.log(err)
+        localStorage.removeItem('token')
+        dispatch({ type: 'SET_USER', payload: null })
+      })
+    else {
       dispatch({ type: 'SET_USER', payload: null })
-    })
+    }
   }, [])
 
   return (
@@ -49,6 +55,7 @@ function App() {
             <Route path="/doi-mat-khau" element={<OnlineExamChangePassword />} />
           </Route>
 
+          {/* GiangVien Route */}
           <Route element={<TeacherLayout />}>
             <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
@@ -63,6 +70,11 @@ function App() {
 
             <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
             <Route path='/giang-vien/ki-thi/:kiThiId' element={<CreateExamInterface />} />
+          </Route>
+
+          {/* HocSinh Route */}
+          <Route element={<StudentLayout />}>
+
           </Route>
         </Routes>
       </BrowserRouter>

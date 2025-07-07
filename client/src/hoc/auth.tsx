@@ -2,12 +2,12 @@ import { useContext, type FC, type JSX } from "react";
 import { Navigate } from "react-router";
 
 import type { PageContextData, UserData } from "@/App.types";
-import PageContext from "@/contexts/PageContext";
+import { PageContext } from "@/contexts/PageContext";
 
 
 export function withGiangVienRole(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
-    const [pageData,]: PageContextData = useContext(PageContext)
+    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) return <Navigate to="/" />
@@ -21,7 +21,7 @@ export function withGiangVienRole(Component: FC | string) {
 
 export function withAccount(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
-    const [pageData,]: PageContextData = useContext(PageContext)
+    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) return <Navigate to="/" />
@@ -32,7 +32,7 @@ export function withAccount(Component: FC | string) {
 
 export function withNoAccount(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
-    const [pageData,]: PageContextData = useContext(PageContext)
+    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) return <Component {...props} />

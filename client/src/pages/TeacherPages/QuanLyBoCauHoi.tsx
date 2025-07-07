@@ -1,11 +1,12 @@
 import { CalendarOutlined, ClockCircleOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Card, Col, Form, Input, message, Modal, Row, Space, Statistic, Typography } from 'antd';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type Dispatch } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { CapNhatBoCauHoi, GetBoCauHoi, ThemBoCauHoi, XoaBoCauHoi } from '@/api/BoCauHoi';
 import { GetMonHocById } from '@/api/MonHoc';
+import { withGiangVienRole } from '@/hoc/auth';
 
 const { Title, Text } = Typography;
 
@@ -19,15 +20,21 @@ type MonHoc = {
   boCauHoi: undefined
 }
 
-export default function QuanLyBoCauHoi() {
+type BoCauHoi = {
+  id: number,
+  tenBoCauHoi: string,
+  thoiGianCapNhatCuoi: string
+}
+
+function Element() {
   const navigate = useNavigate();
 
   const { monHocId }: { monHocId: string } = useParams() as { monHocId: string; }
   const [form] = Form.useForm();
 
   const [formModal, setFormModal] = useState<"add" | "update" | "">("")
-  const [monHoc, setMonHoc]: [MonHoc | object, object] = useState<MonHoc | object>({})
-  const [boCauHoi, setBoCauHoi] = useState([]);
+  const [monHoc, setMonHoc]: [MonHoc | undefined, Dispatch<MonHoc | undefined>] = useState<MonHoc | undefined>()
+  const [boCauHoi, setBoCauHoi] = useState<BoCauHoi[]>([]);
 
   useEffect(function () {
     GetMonHocById(+monHocId).then(result => {
@@ -37,6 +44,7 @@ export default function QuanLyBoCauHoi() {
     })
 
     GetBoCauHoi(+monHocId).then(result => {
+      console.log(result)
       setBoCauHoi(result.data)
     }).catch(err => {
       throw err
@@ -76,10 +84,10 @@ export default function QuanLyBoCauHoi() {
             separator={<p className='text-xl'>&gt;</p>}
             items={[
               { title: <Link className='text-xl' to="/giang-vien/mon-hoc">Môn học</Link>, },
-              { title: <p className='text-xl'>{monHoc.tenMon}</p>, },
+              { title: <p className='text-xl'>{monHoc?.tenMon}</p>, },
             ]} />
           <Text className="text-gray-600">
-            Cập nhật lần cuối: {dayjs(monHoc.thoiGianCapNhatCuoi).toDate().toLocaleDateString('vi-VN')}
+            Cập nhật lần cuối: {dayjs(monHoc?.thoiGianCapNhatCuoi).toDate().toLocaleDateString('vi-VN')}
           </Text>
         </div>
 
@@ -156,12 +164,12 @@ export default function QuanLyBoCauHoi() {
                 <Space direction="vertical" className="w-full" size="small">
                   <div className="flex items-center text-gray-600">
                     <FileTextOutlined className="mr-2" />
-                    <Text>{item.questionCount ?? 70} Câu hỏi</Text>
+                    <Text>{item?.questionCount ?? 70} Câu hỏi</Text>
                   </div>
 
                   <div className="flex items-center text-gray-600">
                     <ClockCircleOutlined className="mr-2" />
-                    <Text>{item.details ?? '20 Dễ, 10 Trung bình, 10 Khó'}</Text>
+                    <Text>{item?.details ?? '20 Dễ, 10 Trung bình, 10 Khó'}</Text>
                   </div>
 
                   <div className="flex items-center text-gray-600">
@@ -203,3 +211,5 @@ export default function QuanLyBoCauHoi() {
     </div>
   );
 }
+const QuanLyBoCauHoi = withGiangVienRole(Element)
+export default QuanLyBoCauHoi

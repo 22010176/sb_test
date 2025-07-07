@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-using Controllers;
 using DatabaseModels;
-using Microsoft.Extensions.FileProviders;
 using Utilities;
 using MailServices;
 
@@ -16,10 +14,11 @@ builder.Services.AddCors(options =>
 {
   options.AddDefaultPolicy(builder =>
     builder
-    .AllowAnyHeader()
-    .AllowCredentials()
-    .AllowAnyMethod()
-    .SetIsOriginAllowed(origin => true));
+      .AllowAnyHeader()
+      .AllowCredentials()
+      .AllowAnyMethod()
+      .SetIsOriginAllowed(origin => true)
+  );
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -89,11 +88,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//   FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "public")),
-//   RequestPath = "/public"
-// });
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -25,6 +25,7 @@
     <ProjectReference Include="..\DatabaseModels\DatabaseModels.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
     <ProjectReference Include="..\MailServices\MailServices.csproj" />
+    <ProjectReference Include="..\StudentControllers\StudentControllers.csproj" />
   </ItemGroup>
 
 </Project>

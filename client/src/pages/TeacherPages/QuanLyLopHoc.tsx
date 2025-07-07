@@ -1,11 +1,13 @@
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { faClipboard, faMailForward } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Input, message, Modal, Popconfirm, Space, Table, type FormInstance } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type Dispatch } from 'react';
+import { useNavigate } from 'react-router';
 
-import { CapNhatLopHoc, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/LopHoc';
+import { CapNhatLopHoc, CreateLopHocLink, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/LopHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 import type { LopHoc } from './types';
-import { useNavigate } from 'react-router';
 
 const { Search } = Input;
 
@@ -39,6 +41,7 @@ function LopHocForm({ form }: { form: FormInstance<unknown> }) {
 function Element() {
   const navigate = useNavigate();
   const [lopHoc, setLopHoc] = useState<LopHoc[]>([]);
+  const [inviteForm, setInviteForm]: [unknown, Dispatch<unknown>] = useState({})
 
   const [isModalVisible, setIsModalVisible] = useState<"add" | "update" | "">('');
   const [searchText, setSearchText] = useState('');
@@ -97,7 +100,7 @@ function Element() {
     {
       width: 150, align: 'center',
       title: <span className="font-semibold text-gray-700">Sĩ số lớp</span>,
-      render: (entry: LopHoc) => (
+      render: () => (
         <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold">
           {0}
         </span>
@@ -124,37 +127,46 @@ function Element() {
           </Popconfirm>
           <Button size='small' variant='outlined' color='green' icon={<ArrowRightOutlined />}
             onClick={() => navigate(`/giang-vien/lop-hoc/${record.id}`)} />
+          <Button size='small' variant='outlined' color='magenta' icon={<FontAwesomeIcon icon={faMailForward} />}
+            onClick={async () => {
+              const result = await CreateLopHocLink(record.id)
+              console.log(result)
+              message.success("Copy link mời thành công!")
+            }} />
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-gray-50 to-gray-100 p-6 overflow-auto">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        {/* Toolbar */}
-        <div className="p-6 bg-gray-50 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex flex-col sm:flex-row gap-3 flex-1">
-              <Search placeholder="Tìm kiếm theo mã môn học hoặc tên môn học" allowClear className="max-w-md"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)} />
-            </div>
+    <>
+      <div className="min-h-full bg-gradient-to-br from-gray-50 to-gray-100 p-6 overflow-auto">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          {/* Toolbar */}
+          <div className="p-6 bg-gray-50 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                <Search placeholder="Tìm kiếm theo mã môn học hoặc tên môn học" allowClear className="max-w-md"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)} />
+              </div>
 
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible('add')}>
-              Thêm lớp học
-            </Button>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible('add')}>
+                Thêm lớp học
+              </Button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="p-6">
+            <Table size='small' columns={columns} dataSource={lopHoc} rowKey="id" pagination={{ pageSize: 10, }}
+              className="bg-white rounded-lg overflow-hidden"
+              rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`} />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="p-6">
-          <Table size='small' columns={columns} dataSource={lopHoc} rowKey="id" pagination={{ pageSize: 10, }}
-            className="bg-white rounded-lg overflow-hidden"
-            rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`} />
-        </div>
-      </div>
 
+      </div>
       {/* Create */}
       <Modal okText='Thêm' cancelText="Hủy" open={isModalVisible === 'add'}
         title={<span className="text-lg font-semibold text-gray-800">Thêm lớp học mới</span>}
@@ -186,7 +198,15 @@ function Element() {
         onCancel={handleCancel}>
         <LopHocForm form={updateForm} />
       </Modal>
-    </div>
+
+      <Modal footer={[]} open={false}
+        title={<span className="text-lg font-semibold text-gray-800">Link tham gia lớp học</span>}>
+        <div className='flex gap-5'>
+          <Input disabled />
+          <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faClipboard} />} />
+        </div>
+      </Modal>
+    </>
   );
 }
 

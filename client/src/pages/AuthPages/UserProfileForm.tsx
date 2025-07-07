@@ -5,19 +5,11 @@ import { useContext, useState } from 'react';
 
 import { CapNhatNguoiDung, type CapNhatInput } from '@/api/TaiKhoan';
 import type { PageContextData, UserData } from '@/App.types';
-import PageContext from '@/contexts/PageContext';
+import { PageContext } from '@/contexts/PageContext';
 import { withAccount } from '@/hoc/auth';
 
-const { Option } = Select;
-// {
-//   "hoTen": "string",
-//   "gioiTinh": 0,
-//   "ngaySinh": "2025-06-29T14:51:27.569Z",
-//   "soDienThoai": "string",
-//   "email": "string"
-// }
 function Element() {
-  const [{ user }, dispatch]: PageContextData = useContext(PageContext)
+  const [{ user }, dispatch]: PageContextData = useContext(PageContext) as PageContextData
 
   const _user = user as UserData
 

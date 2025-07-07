@@ -13,6 +13,17 @@ export async function GetLopHoc() {
   return result.data
 }
 
+export async function CreateLopHocLink(id: number) {
+  console.log(`${url}/link/${id}`)
+  const result = await axios.post(`${url}/${id}`, null, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+
+}
+
 export async function ThemLopHoc(lopHoc: LopHoc) {
   const result = await axios.post(url, lopHoc, {
     headers: {

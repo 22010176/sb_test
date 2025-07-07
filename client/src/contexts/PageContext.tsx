@@ -1,10 +1,10 @@
-import type { AppData, PageAction, PageContext, UserData } from "@/App.types";
+import type { AppData, PageAction, UserData } from "@/App.types";
 import { createContext } from "react";
 
 
-const PageContext = createContext<PageContext>([{ user: 'loading' }, () => { }])
+const PageContext = createContext<unknown>([{ user: 'loading' }, () => { }])
 
-export function PageReducer(state: AppData, action: PageAction) {
+function PageReducer(state: AppData, action: PageAction) {
   switch (action.type) {
     case 'SET_USER':
       return {
@@ -16,4 +16,9 @@ export function PageReducer(state: AppData, action: PageAction) {
   }
 }
 
-export default PageContext;
+export {
+  PageContext,
+  PageReducer
+}
+
+// export  PageContext;

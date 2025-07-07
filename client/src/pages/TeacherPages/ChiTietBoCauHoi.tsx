@@ -324,7 +324,6 @@ function Element() {
         <div className="space-y-4 flex flex-col gap-3">
           {cauHoi?.map((question, index) => (
             <Card key={question.id} className="shadow-sm hover:shadow-md transition-shadow">
-
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center space-x-3">
                   <Text strong className="text-blue-600">{boCauHoi?.tenBoCauHoi}</Text>
@@ -352,9 +351,7 @@ function Element() {
                       await XoaCauHoi(+boCauHoiId, question.id as number).then(result => {
                         setCauHoi(result.data)
                         message.success('Xóa câu hỏi thành công!')
-                      }).catch(err => {
-                        message.error(err.message)
-                      })
+                      }).catch(err => message.error(err.message))
                     }} />
                 </div>
               </div>
@@ -365,9 +362,11 @@ function Element() {
 
               <div className="space-y-2">
                 {question.dapAn?.map((option, i) => (
-                  <div key={i} className={`p-3 rounded-lg border ${option.dungSai
-                    ? 'bg-green-50 border-green-400'
-                    : 'bg-gray-50 border-gray-400'}`}>
+                  <div key={i}
+                    className={[
+                      `p-3 rounded-lg border`,
+                      option.dungSai ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-400'
+                    ].join(' ')}>
                     <p>
                       <span className="font-medium mr-2">{"ABCDE"[i]}.</span>
                       {option.noiDung}
@@ -446,7 +445,6 @@ function Element() {
     </>
   );
 }
-
 
 const ChiTietBoCauHoi = withGiangVienRole(Element)
 

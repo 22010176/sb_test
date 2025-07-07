@@ -35,10 +35,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
     };
 
     mail.To.Add(toEmail);
-    try
-    {
-      await smtp.SendMailAsync(mail);
-    }
+    try { await smtp.SendMailAsync(mail); }
     catch (Exception) { throw; }
   }
 }
