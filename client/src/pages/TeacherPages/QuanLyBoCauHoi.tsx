@@ -4,8 +4,8 @@ import dayjs from 'dayjs';
 import { useEffect, useState, type Dispatch } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { CapNhatBoCauHoi, GetBoCauHoi, ThemBoCauHoi, XoaBoCauHoi } from '@/api/BoCauHoi';
-import { GetMonHocById } from '@/api/MonHoc';
+import { CapNhatBoCauHoi, GetBoCauHoi, ThemBoCauHoi, XoaBoCauHoi } from '@/api/GiangVien/BoCauHoi';
+import { GetMonHocById } from '@/api/GiangVien/MonHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 
 const { Title, Text } = Typography;
@@ -211,5 +211,5 @@ function Element() {
     </div>
   );
 }
-const QuanLyBoCauHoi = withGiangVienRole(Element)
-export default QuanLyBoCauHoi
+const GiangVien_QuanLyBoCauHoi = withGiangVienRole(Element)
+export default GiangVien_QuanLyBoCauHoi

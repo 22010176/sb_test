@@ -1,6 +1,6 @@
-import { GetBoCauHoiById } from '@/api/BoCauHoi';
-import { CapNhatCauHoi, GetCauHoi, ThemCauHoi, XoaCauHoi } from '@/api/CauHoi';
-import { GetMonHocById } from '@/api/MonHoc';
+import { GetBoCauHoiById } from '@/api/GiangVien/BoCauHoi';
+import { CapNhatCauHoi, GetCauHoi, ThemCauHoi, XoaCauHoi } from '@/api/GiangVien/CauHoi';
+import { GetMonHocById } from '@/api/GiangVien/MonHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 
 import { DeleteOutlined, DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
@@ -446,6 +446,6 @@ function Element() {
   );
 }
 
-const ChiTietBoCauHoi = withGiangVienRole(Element)
+const GiangVien_ChiTietBoCauHoi = withGiangVienRole(Element)
 
-export default ChiTietBoCauHoi
+export default GiangVien_ChiTietBoCauHoi

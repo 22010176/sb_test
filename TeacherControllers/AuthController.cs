@@ -155,22 +155,22 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
   [HttpPost("dang-ky")]
   public async Task<IActionResult> RegisterAsync([FromBody] RegisterInput input)
   {
-    NguoiDung nguoiDung = new()
-    {
-      HoTen = input.HoTen,
-      GioiTinh = input.GioiTinh,
-      NgaySinh = TimeZoneInfo.ConvertTimeToUtc(input.NgaySinh),
-      SoDienThoai = input.SoDienThoai,
-      Email = input.Email,
-      MatKhau = AuthUtilities.PasswordHashing(input.MatKhau!),
-      LoaiNguoiDung = input.LoaiNguoiDung,
-      ThoiGianTao = DateTime.UtcNow
-    };
-
-    // await emailSender.SendEmailAsync(nguoiDung.Email!, "Verify your email",
-    //     $"<p>Please confirm your email by <a href=''>clicking here</a>.</p>");
     try
     {
+      NguoiDung nguoiDung = new()
+      {
+        HoTen = input.HoTen,
+        GioiTinh = input.GioiTinh,
+        NgaySinh = TimeZoneInfo.ConvertTimeToUtc(input.NgaySinh),
+        SoDienThoai = input.SoDienThoai,
+        Email = input.Email,
+        MatKhau = AuthUtilities.PasswordHashing(input.MatKhau!),
+        LoaiNguoiDung = input.LoaiNguoiDung,
+        ThoiGianTao = DateTime.UtcNow
+      };
+
+      // await emailSender.SendEmailAsync(nguoiDung.Email!, "Verify your email",
+      //     $"<p>Please confirm your email by <a href=''>clicking here</a>.</p>");
       await context.NguoiDung.AddAsync(nguoiDung);
       await context.SaveChangesAsync();
     }

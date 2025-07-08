@@ -3,7 +3,7 @@ import { Avatar, Button, Card, DatePicker, Form, Input, Select, Space, Upload, m
 import dayjs from 'dayjs';
 import { useContext, useState } from 'react';
 
-import { CapNhatNguoiDung, type CapNhatInput } from '@/api/TaiKhoan';
+import { CapNhatNguoiDung, type CapNhatInput } from '@/api/GiangVien/TaiKhoan';
 import type { PageContextData, UserData } from '@/App.types';
 import { PageContext } from '@/contexts/PageContext';
 import { withAccount } from '@/hoc/auth';

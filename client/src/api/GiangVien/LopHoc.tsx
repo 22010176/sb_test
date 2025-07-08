@@ -21,7 +21,6 @@ export async function CreateLopHocLink(id: number) {
     }
   })
   return result.data
-
 }
 
 export async function ThemLopHoc(lopHoc: LopHoc) {

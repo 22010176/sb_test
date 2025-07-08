@@ -3,7 +3,7 @@ import { Button, Checkbox, Form, Input, message, Select } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-import { DangNhapNguoiDung, type DangNhapInput } from '@/api/TaiKhoan';
+import { DangNhapNguoiDung, type DangNhapInput } from '@/api/GiangVien/TaiKhoan';
 import { withNoAccount } from '@/hoc/auth';
 
 function Element() {

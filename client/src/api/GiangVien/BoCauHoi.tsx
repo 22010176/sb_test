@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// GiangVien url
 const url = import.meta.env.VITE_BOCAUHOI_URL;
 
 export async function GetBoCauHoi(idMonHoc: number) {

@@ -1,4 +1,4 @@
-import { DangKyNguoiDung } from '@/api/TaiKhoan';
+import { DangKyNguoiDung } from '@/api/GiangVien/TaiKhoan';
 import { withNoAccount } from '@/hoc/auth';
 import { LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';

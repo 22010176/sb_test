@@ -19,6 +19,20 @@ export function withGiangVienRole(Component: FC | string) {
   }
 }
 
+export function withHocSinhRole(Component: FC | string) {
+  return (props: JSX.IntrinsicAttributes) => {
+    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
+
+    if (pageData.user === 'loading') return ""
+    if (pageData.user === null) return <Navigate to="/" />
+
+    const user: UserData = pageData.user as UserData
+    if (user.loaiNguoiDung !== 1) return <Navigate to="/" />
+
+    return <Component {...props} />
+  }
+}
+
 export function withAccount(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData

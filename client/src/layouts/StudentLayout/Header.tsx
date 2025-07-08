@@ -32,10 +32,10 @@ const items: MenuProps['items'] = [
 
 function Header() {
   const { pathname } = useLocation()
-  const path = pathname.split('/giang-vien')[1]
+  const path = pathname.split('/hoc-sinh')[1]
   return (
     <header className="bg-[#6B406B] text-white px-10 py-3 flex justify-between items-center">
-      <Link to="/giang-vien" className="flex items-baseline">
+      <Link to="/hoc-sinh" className="flex items-baseline">
         <span className="text-2xl font-bold">A+</span>
         <h1 className="ml-2 text-xl">Online Exam</h1>
       </Link>

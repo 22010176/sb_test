@@ -3,13 +3,14 @@ import { Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table }
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { GetMonHoc, XoaMonHoc, CapNhatMonHoc, ThemMoc } from '@/api/MonHoc';
+import { GetMonHoc, XoaMonHoc, CapNhatMonHoc, ThemMoc } from '@/api/GiangVien/MonHoc';
+import { withGiangVienRole } from '@/hoc/auth';
 
 
 const { Search } = Input;
 const { Option } = Select;
 
-export default function QuanLyMonHoc() {
+function Element() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
 
@@ -89,14 +90,14 @@ export default function QuanLyMonHoc() {
       key: 'index',
       width: 60,
       align: 'center',
-      render: (_, __, index) => (
+      render: (_: unknown, __: object, index: number) => (
         <span className="font-medium text-gray-600">{index + 1}</span>
       ),
     },
     {
       dataIndex: 'maMon', key: 'maMon', width: 150, align: 'center',
       title: <span className="font-semibold text-gray-700">Mã môn học</span>,
-      render: (text) => (
+      render: (text: string) => (
         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-mono text-sm">
           {text}
         </span>
@@ -105,7 +106,7 @@ export default function QuanLyMonHoc() {
     {
       dataIndex: 'tenMon', key: 'tenMon',
       title: <span className="font-semibold text-gray-700">Tên môn học</span>,
-      render: (text) => (
+      render: (text: string) => (
         <span className="font-medium text-gray-800">{text}</span>
       ),
     },
@@ -115,7 +116,7 @@ export default function QuanLyMonHoc() {
       key: 'questionCount',
       width: 150,
       align: 'center',
-      render: (count) => (
+      render: (count: number) => (
         <div className="flex items-center justify-center">
           <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold">
             {count ?? 0}
@@ -128,7 +129,7 @@ export default function QuanLyMonHoc() {
       key: 'action',
       width: 150,
       align: 'center',
-      render: (_, record) => (
+      render: (_: unknown, record: object) => (
         <Space size="small" className="flex justify-center">
           <Button size='small' variant='outlined' color='blue' icon={<EditOutlined />} onClick={() => showModal(record)} />
           <Popconfirm okText="Có" cancelText="Không" placement='left'
@@ -222,3 +223,6 @@ export default function QuanLyMonHoc() {
     </div >
   );
 }
+
+const GiangVien_QuanLyMonHoc = withGiangVienRole(Element)
+export default GiangVien_QuanLyMonHoc

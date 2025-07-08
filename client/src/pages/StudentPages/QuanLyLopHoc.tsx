@@ -6,7 +6,7 @@ import { useEffect, useState, type Dispatch } from 'react';
 import { useNavigate } from 'react-router';
 
 import { CapNhatLopHoc, CreateLopHocLink, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/GiangVien/LopHoc';
-import { withGiangVienRole } from '@/hoc/auth';
+import { withGiangVienRole, withHocSinhRole } from '@/hoc/auth';
 
 const { Search } = Input;
 
@@ -36,7 +36,6 @@ function LopHocForm({ form }: { form: FormInstance<unknown> }) {
     </Form>
   )
 }
-
 type LopHoc = {
   id: number
   maLop: string
@@ -45,13 +44,11 @@ type LopHoc = {
   thoiGianTao: string
 }
 
+
 function Element() {
   const navigate = useNavigate();
   const [lopHoc, setLopHoc] = useState<LopHoc[]>([]);
-  const [inviteForm, setInviteForm]: [{ modal: boolean, inviteLink: string }, Dispatch<unknown>] = useState({
-    modal: false,
-    inviteLink: ""
-  })
+  const [inviteForm, setInviteForm]: [unknown, Dispatch<unknown>] = useState({})
 
   const [isModalVisible, setIsModalVisible] = useState<"add" | "update" | "">('');
   const [searchText, setSearchText] = useState('');
@@ -60,11 +57,7 @@ function Element() {
   const [updateForm] = Form.useForm();
 
   useEffect(function () {
-    GetLopHoc().then(result => {
-      setLopHoc(result.data as LopHoc[])
-    }).catch(err => {
-      message.error(err.message)
-    })
+
   }, [])
 
   const handleCancel = () => {
@@ -209,20 +202,17 @@ function Element() {
         <LopHocForm form={updateForm} />
       </Modal>
 
-      <Modal footer={[]} open={inviteForm.modal}
+      <Modal footer={[]} open={false}
         title={<span className="text-lg font-semibold text-gray-800">Link tham gia lớp học</span>}>
         <div className='flex gap-5'>
-          <Input disabled value={inviteForm.inviteLink} />
-          <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faClipboard} />}
-            onClick={() => {
-
-            }} />
+          <Input disabled />
+          <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faClipboard} />} />
         </div>
       </Modal>
     </>
   );
 }
 
-const GiangVien_QuanLyLopHoc = withGiangVienRole(Element)
+const HocSinh_QuanLyLopHoc = withHocSinhRole(Element)
 
-export default GiangVien_QuanLyLopHoc
+export default HocSinh_QuanLyLopHoc
