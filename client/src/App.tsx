@@ -26,6 +26,7 @@ import StudentLayout from './layouts/StudentLayout';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
+import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
 
 
 function App() {
@@ -64,22 +65,26 @@ function App() {
         </Route>
 
         {/* GiangVien Route */}
-        {import.meta.env.VITE_ROLE === "TEACHER" && <Route path='/giang-vien' element={<TeacherLayout />}>
-          <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
-          <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
-          <Route path='/giang-vien/lop-hoc' element={<GiangVien_QuanLyLopHoc />} />
+        {import.meta.env.VITE_ROLE === "TEACHER" && <>
+          <Route path='/giang-vien' element={<TeacherLayout />}>
+            <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
+            <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
+            <Route path='/giang-vien/lop-hoc' element={<GiangVien_QuanLyLopHoc />} />
 
-          <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
-            <Route path='/giang-vien/lop-hoc/:lopId' element={""} />
+
+
+            <Route path='/giang-vien/mon-hoc' element={<GiangVien_QuanLyMonHoc />} />
+            <Route path='/giang-vien/mon-hoc/:monHocId/:boCauHoiId' element={<GiangVien_ChiTietBoCauHoi />} />
+            <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
+
+            <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
+            <Route path='/giang-vien/ki-thi/:kiThiId' element={<CreateExamInterface />} />
           </Route>
 
-          <Route path='/giang-vien/mon-hoc' element={<GiangVien_QuanLyMonHoc />} />
-          <Route path='/giang-vien/mon-hoc/:monHocId/:boCauHoiId' element={<GiangVien_ChiTietBoCauHoi />} />
-          <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
-
-          <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
-          <Route path='/giang-vien/ki-thi/:kiThiId' element={<CreateExamInterface />} />
-        </Route>}
+          <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
+            <Route path='/giang-vien/lop-hoc/:lopId' element={<ChiTietDanhSachLop />} />
+          </Route>
+        </>}
 
         {/* HocSinh Route */}
         {import.meta.env.VITE_ROLE === 'STUDENT' && <Route element={<StudentLayout />}>

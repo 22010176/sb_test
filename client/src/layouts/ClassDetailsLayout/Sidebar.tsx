@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 function Sidebar() {
   const description = "Lớp tiếng Nhật cơ bản cung cấp cho học viên những kiến thức nền tảng về ngôn ngữ và văn hóa Nhật Bản, bao gồm các kiến thức cơ bản về ngữ pháp, từ vựng và giao tiếp hàng ngày."
   return (
-    <div className="w-80 h-full bg-white shadow-xl flex flex-col">
+    <div className="w-80 h-full bg-white shadow-xl flex flex-col border-r-1">
       {/* Header Section */}
       <div className=" px-4 py-3">
         <div className="flex justify-between items-start mb-2">
@@ -23,7 +23,6 @@ function Sidebar() {
         <p className='text-sm text-gray-500'>
           {description}
         </p>
-        {/* <TextArea disabled value={description} size="small" /> */}
       </div>
 
       {/* Navigation Menu */}

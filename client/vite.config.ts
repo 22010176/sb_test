@@ -6,7 +6,7 @@ import path from 'path'
 // https://vite.dev/config/
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-  console.log(process.env)
+  // console.log(process.env)
   return defineConfig({
     plugins: [
       react(),

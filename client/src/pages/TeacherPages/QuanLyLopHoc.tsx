@@ -2,7 +2,7 @@ import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '
 import { faClipboard, faMailForward } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Input, message, Modal, Popconfirm, Space, Table, type FormInstance } from 'antd';
-import { useEffect, useState, type Dispatch } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { CapNhatLopHoc, CreateLopHocLink, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/GiangVien/LopHoc';
@@ -178,7 +178,6 @@ function Element() {
           </div>
         </div>
 
-
       </div>
       {/* Create */}
       <Modal okText='Thêm' cancelText="Hủy" open={isModalVisible === 'add'}
@@ -213,6 +212,7 @@ function Element() {
       </Modal>
 
       <Modal footer={[]} open={inviteForm.modal}
+        onCancel={() => setInviteForm(val => ({ ...val, modal: false }))}
         title={<span className="text-lg font-semibold text-gray-800">Link tham gia lớp học</span>}>
         <div className='flex gap-5'>
           <Input disabled size='large' value={inviteForm.inviteLink} />
