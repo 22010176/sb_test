@@ -1,41 +1,16 @@
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { faClipboard, faMailForward } from '@fortawesome/free-solid-svg-icons';
+import { faMailForward } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Form, Input, message, Modal, Popconfirm, Space, Table, type FormInstance } from 'antd';
+import { Button, Form, Input, message, Modal, Popconfirm, Space, Table } from 'antd';
 import { useEffect, useState, type Dispatch } from 'react';
 import { useNavigate } from 'react-router';
 
-import { CapNhatLopHoc, CreateLopHocLink, GetLopHoc, ThemLopHoc, XoaLopHoc } from '@/api/GiangVien/LopHoc';
-import { withGiangVienRole, withHocSinhRole } from '@/hoc/auth';
+import { CreateLopHocLink, XoaLopHoc } from '@/api/GiangVien/LopHoc';
+import { withHocSinhRole } from '@/hoc/auth';
+import { ThamGiaLopHoc } from '@/api/HocSinh/LopHoc';
 
 const { Search } = Input;
 
-function LopHocForm({ form }: { form: FormInstance<unknown> }) {
-  return (
-    <Form form={form} layout="vertical" className="mt-6">
-      <Form.Item name="id" hidden={true} />
-
-      <Form.Item name="tenLop"
-        label={<span className="font-semibold text-gray-700">Tên lớp học</span>}
-        rules={[
-          { required: true, message: 'Vui lòng nhập tên lớp học!' },
-          { min: 3, message: 'Tên lớp học phải có ít nhất 3 ký tự!' }
-        ]}>
-        <Input placeholder="Nhập tên lớp học"
-          className="rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500" />
-      </Form.Item>
-
-      <Form.Item name="moTa"
-        label={<span className="font-semibold text-gray-700">Mô tả</span>}
-        rules={[
-          { required: true, message: 'Vui lòng nhập số lượng câu hỏi!' },
-          { type: 'string', message: 'Vui lòng nhập mô tả!' }
-        ]}>
-        <Input.TextArea autoSize={{ maxRows: 5, minRows: 5 }} placeholder="Nhập mô tả" />
-      </Form.Item>
-    </Form>
-  )
-}
 type LopHoc = {
   id: number
   maLop: string
@@ -48,7 +23,6 @@ type LopHoc = {
 function Element() {
   const navigate = useNavigate();
   const [lopHoc, setLopHoc] = useState<LopHoc[]>([]);
-  const [inviteForm, setInviteForm]: [unknown, Dispatch<unknown>] = useState({})
 
   const [isModalVisible, setIsModalVisible] = useState<"add" | "update" | "">('');
   const [searchText, setSearchText] = useState('');
@@ -63,7 +37,6 @@ function Element() {
   const handleCancel = () => {
     setIsModalVisible('');
     createForm.resetFields();
-    updateForm.resetFields();
   };
 
   const deleteCourse = async (id: number) =>
@@ -114,16 +87,11 @@ function Element() {
       title: <span className="font-semibold text-gray-700">Thao tác</span>,
       render: (record: LopHoc) => (
         <Space size="small" className="flex justify-center">
-          <Button size='small' variant='outlined' color='blue' icon={<EditOutlined />}
-            onClick={() => {
-              updateForm.setFieldsValue(record);
-              setIsModalVisible('update');
-            }} />
           <Popconfirm okText="Có" cancelText="Không" placement='left'
             onConfirm={() => deleteCourse(record.id)}
             title={
               <div className="font-medium text-gray-700">
-                Bạn có chắc chắn muốn xóa môn học này?
+                Bạn có chắc chắn muốn rời lớp học này?
               </div>
             }>
             <Button size='small' variant='outlined' color='red' icon={<DeleteOutlined />} />
@@ -155,7 +123,7 @@ function Element() {
               </div>
 
               <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible('add')}>
-                Thêm lớp học
+                Tham gia lớp học
               </Button>
             </div>
           </div>
@@ -170,44 +138,30 @@ function Element() {
 
 
       </div>
-      {/* Create */}
-      <Modal okText='Thêm' cancelText="Hủy" open={isModalVisible === 'add'}
-        title={<span className="text-lg font-semibold text-gray-800">Thêm lớp học mới</span>}
+
+      <Modal okText='Tham gia' cancelText="Hủy" open={isModalVisible === 'add'}
+        title={<span className="text-lg font-semibold text-gray-800">Tham gia lớp học mới</span>}
         onOk={() => {
           createForm.validateFields().then(async values => {
-            ThemLopHoc(values).then(result => {
-              setLopHoc(result.data as LopHoc[])
-              message.success('Thêm môn học thành công!');
-              handleCancel()
-            }).catch(err => message.error(err.message))
+            console.log(values)
+            await ThamGiaLopHoc(values.maLop).then(result => {
+              console.log(result)
+              message.success("Gửi yêu cầu tham gia thành công!")
+            }).catch(err => {
+              console.log(err)
+              message.error("Gửi yêu cầu tham gia thất bại!")
+            })
           })
         }}
         onCancel={handleCancel}>
-        <LopHocForm form={createForm} />
-      </Modal>
+        <Form form={createForm} layout="vertical" className="mt-6">
+          <Form.Item name="maLop"
+            label={<span className="font-semibold text-gray-700">Mã lớp</span>}
+            rules={[{ required: true, message: 'Vui lòng nhập tên lớp học!' },]}>
+            <Input placeholder="Nhập mã lớp học" />
+          </Form.Item>
 
-      {/* Update */}
-      <Modal okText='Cập nhật' cancelText="Hủy" open={isModalVisible === 'update'}
-        title={<span className="text-lg font-semibold text-gray-800">Cập nhật lớp học</span>}
-        onOk={() => {
-          updateForm.validateFields().then(async values => {
-            await CapNhatLopHoc(values).then(result => {
-              setLopHoc(result.data as LopHoc[])
-              message.success('Cập nhật môn học thành công!');
-              handleCancel()
-            }).catch(err => message.error(err.message))
-          });
-        }}
-        onCancel={handleCancel}>
-        <LopHocForm form={updateForm} />
-      </Modal>
-
-      <Modal footer={[]} open={false}
-        title={<span className="text-lg font-semibold text-gray-800">Link tham gia lớp học</span>}>
-        <div className='flex gap-5'>
-          <Input disabled />
-          <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faClipboard} />} />
-        </div>
+        </Form>
       </Modal>
     </>
   );

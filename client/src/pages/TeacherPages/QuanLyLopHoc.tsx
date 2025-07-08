@@ -45,12 +45,15 @@ type LopHoc = {
   thoiGianTao: string
 }
 
+type InviteForm = {
+  modal: boolean,
+  inviteLink: string
+}
 function Element() {
   const navigate = useNavigate();
   const [lopHoc, setLopHoc] = useState<LopHoc[]>([]);
-  const [inviteForm, setInviteForm]: [{ modal: boolean, inviteLink: string }, Dispatch<unknown>] = useState({
-    modal: false,
-    inviteLink: ""
+  const [inviteForm, setInviteForm] = useState<InviteForm>({
+    modal: false, inviteLink: ""
   })
 
   const [isModalVisible, setIsModalVisible] = useState<"add" | "update" | "">('');
@@ -130,7 +133,7 @@ function Element() {
             onConfirm={() => deleteCourse(record.id)}
             title={
               <div className="font-medium text-gray-700">
-                Bạn có chắc chắn muốn xóa môn học này?
+                Bạn có chắc chắn muốn xóa lớp học này?
               </div>
             }>
             <Button size='small' variant='outlined' color='red' icon={<DeleteOutlined />} />
@@ -141,7 +144,7 @@ function Element() {
             onClick={async () => {
               const result = await CreateLopHocLink(record.id)
               console.log(result)
-              message.success("Copy link mời thành công!")
+              setInviteForm({ inviteLink: result.data, modal: true })
             }} />
         </Space>
       ),
@@ -212,10 +215,10 @@ function Element() {
       <Modal footer={[]} open={inviteForm.modal}
         title={<span className="text-lg font-semibold text-gray-800">Link tham gia lớp học</span>}>
         <div className='flex gap-5'>
-          <Input disabled value={inviteForm.inviteLink} />
+          <Input disabled size='large' value={inviteForm.inviteLink} />
           <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faClipboard} />}
             onClick={() => {
-
+              navigator.clipboard.writeText(inviteForm.inviteLink)
             }} />
         </div>
       </Modal>

@@ -1,6 +1,6 @@
 import '@ant-design/v5-patch-for-react-19';
 import { useEffect, useReducer } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
 
 import AuthLayout from "@/layouts/AuthLayout";
 import TeacherLayout from '@/layouts/TeacherLayout';
@@ -23,9 +23,9 @@ import CreateExamInterface from './pages/ExamPage/CreateExamInterface';
 import ExamListInterface from './pages/ExamPage/ExamListInterface';
 
 import StudentLayout from './layouts/StudentLayout';
+import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
-import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 
 
 function App() {
@@ -82,10 +82,10 @@ function App() {
         </Route>}
 
         {/* HocSinh Route */}
-        <Route element={<StudentLayout />}>
+        {import.meta.env.VITE_ROLE === 'STUDENT' && <Route element={<StudentLayout />}>
           <Route path='/hoc-sinh' element={<Navigate to="/hoc-sinh/lop-hoc" />} />
           <Route path='/hoc-sinh/lop-hoc' element={<HocSinh_QuanLyLopHoc />} />
-        </Route>
+        </Route>}
       </Routes>
     </PageContext.Provider>
   )

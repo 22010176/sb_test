@@ -10,10 +10,13 @@ export function withGiangVienRole(Component: FC | string) {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
-    if (pageData.user === null) return <Navigate to="/" />
+    if (pageData.user === null) {
+      localStorage.removeItem('token')
+      return <Navigate to="/" />
+    }
 
     const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 0) return <Navigate to="/" />
+    if (user.loaiNguoiDung !== 0) return <Navigate to={import.meta.env.VITE_HOCSINH_PAGE} />
 
     return <Component {...props} />
   }
@@ -24,10 +27,13 @@ export function withHocSinhRole(Component: FC | string) {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
-    if (pageData.user === null) return <Navigate to="/" />
+    if (pageData.user === null) {
+      localStorage.removeItem('token')
+      return <Navigate to="/" />
+    }
 
     const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 1) return <Navigate to="/" />
+    if (user.loaiNguoiDung !== 1) return <Navigate to={import.meta.env.VITE_GIANGVIEN_PAGE} />
 
     return <Component {...props} />
   }
