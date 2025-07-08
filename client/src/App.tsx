@@ -27,6 +27,7 @@ import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
+import ChiTietLop from './pages/TeacherPages/ChiTietLop';
 
 
 function App() {
@@ -34,12 +35,10 @@ function App() {
   const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
 
   useEffect(function () {
-    console.log(import.meta.env)
     if (localStorage.getItem('token')) GetNguoiDung()
       .then(res => {
         const user = res.data as UserData
         dispatch({ type: 'SET_USER', payload: user })
-        console.log(user)
 
         if (user.loaiNguoiDung === 0) { }
         else if (user.loaiNguoiDung === 1) navigate('/hoc-sinh')
@@ -48,9 +47,8 @@ function App() {
         localStorage.removeItem('token')
         dispatch({ type: 'SET_USER', payload: null })
       })
-    else {
-      dispatch({ type: 'SET_USER', payload: null })
-    }
+    else dispatch({ type: 'SET_USER', payload: null })
+
     document.title = import.meta.env.VITE_ROLE
   }, [])
 
@@ -71,8 +69,6 @@ function App() {
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
             <Route path='/giang-vien/lop-hoc' element={<GiangVien_QuanLyLopHoc />} />
 
-
-
             <Route path='/giang-vien/mon-hoc' element={<GiangVien_QuanLyMonHoc />} />
             <Route path='/giang-vien/mon-hoc/:monHocId/:boCauHoiId' element={<GiangVien_ChiTietBoCauHoi />} />
             <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
@@ -82,7 +78,10 @@ function App() {
           </Route>
 
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
-            <Route path='/giang-vien/lop-hoc/:lopId' element={<ChiTietDanhSachLop />} />
+            <Route path='/giang-vien/lop-hoc/:lopId' element={<ChiTietLop />} />
+            <Route path='/giang-vien/lop-hoc/:lopId/danh-sach-lop' element={<ChiTietDanhSachLop />} />
+            <Route path='/giang-vien/lop-hoc/:lopId/cho-duyet' element={<ChiTietDanhSachLop />} />
+            <Route path='/giang-vien/lop-hoc/:lopId/thanh-tich' element={<ChiTietDanhSachLop />} />
           </Route>
         </>}
 

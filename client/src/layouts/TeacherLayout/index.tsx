@@ -1,6 +1,5 @@
 import { Outlet } from "react-router";
 import Header from './Header';
-import { withGiangVienRole } from "@/hoc/auth";
 
 function TeacherLayout() {
   return (
@@ -12,9 +11,6 @@ function TeacherLayout() {
       </div>
     </div>
   );
-
 }
-
-// const TeacherLayout = withGiangVienRole(Element)
 
 export default TeacherLayout

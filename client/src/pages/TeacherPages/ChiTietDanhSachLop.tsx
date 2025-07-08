@@ -3,8 +3,6 @@ import { Button, Input, Popconfirm, Select, Space, Table } from 'antd';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-const { Option } = Select;
-
 function ChiTietDanhSachLop() {
   const [students, setStudents] = useState([
     { key: '1', stt: 1, name: 'Trịnh Văn Hùng', gender: 'Nam', birthDate: '04/07/2007', phone: '0912 345 678', email: 'tvhung@example.com' },
@@ -17,7 +15,7 @@ function ChiTietDanhSachLop() {
   ]);
 
   const [searchText, setSearchText] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleDelete = (key: string) => {
     setStudents(students.filter(student => student.key !== key));
@@ -25,24 +23,23 @@ function ChiTietDanhSachLop() {
 
   const handleEdit = (record: any) => {
     console.log('Edit student:', record);
-    // Add edit functionality here
   };
 
   const columns = [
-    { title: 'STT', dataIndex: 'stt', key: 'stt', width: 60, className: 'text-center' },
+    { title: <p className='text-center'>STT</p>, dataIndex: 'stt', key: 'stt', width: 60, className: 'text-center' },
     {
-      title: 'Họ và tên', dataIndex: 'name', key: 'name', width: 180, filteredValue: searchText ? [searchText] : null,
+      title: <p className='text-center'>Họ và tên</p>, dataIndex: 'name', key: 'name', width: 180, filteredValue: searchText ? [searchText] : null,
       onFilter: (value: any, record: any) => record.name.toLowerCase().includes(value.toLowerCase())
     },
-    { title: 'Giới tính', dataIndex: 'gender', key: 'gender', width: 100, className: 'text-center' },
-    { title: 'Ngày sinh', dataIndex: 'birthDate', key: 'birthDate', width: 120, className: 'text-center' },
-    { title: 'SĐT', dataIndex: 'phone', key: 'phone', width: 130 },
+    { title: <p className='text-center'>Giới tính</p>, dataIndex: 'gender', key: 'gender', width: 100, className: 'text-center' },
+    { title: <p className='text-center'>Ngày sinh</p>, dataIndex: 'birthDate', key: 'birthDate', width: 120, className: 'text-center' },
+    { title: <p className='text-center'>SĐT</p>, dataIndex: 'phone', key: 'phone', width: 130 },
     {
-      title: 'Email', dataIndex: 'email', key: 'email', width: 200,
+      title: <p className='text-center'>Email</p>, dataIndex: 'email', key: 'email', width: 200,
       render: (email: string) => <Link to="">{email}</Link>
     },
     {
-      title: 'Thao tác', key: 'action', width: 120, className: 'text-center',
+      title: <p className='text-center'>Thao tác</p>, key: 'action', width: 120, className: 'text-center',
       render: (_: any, record: any) => (
         <Space>
           <Popconfirm okText="Có" cancelText="Không" title="Bạn có chắc chắn muốn xóa học sinh này?"
@@ -60,12 +57,9 @@ function ChiTietDanhSachLop() {
     <div className="p-6 bg-white">
       <div className="mb-4 flex justify-between items-center">
         <div className="flex gap-4 items-center">
-          <Input
-            placeholder="Tìm kiếm học sinh"
-            prefix={<SearchOutlined />}
+          <Input placeholder="Tìm kiếm học sinh" prefix={<SearchOutlined />} className="w-100"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="w-80"
           />
           <Select placeholder="Sắp xếp..." className="w-32"
             value={sortOrder}
@@ -80,7 +74,8 @@ function ChiTietDanhSachLop() {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={students} bordered size="small" />    </div>
+      <Table columns={columns} dataSource={students} bordered size="small" />
+    </div>
   );
 };
 

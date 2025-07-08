@@ -1,11 +1,25 @@
 import axios from 'axios'
 
-import type { LopHoc } from '@/pages/TeacherPages/types'
-
 const url: string = import.meta.env.VITE_LOPHOC_URL
+type LopHoc = {
+  id: number
+  maLop: string
+  tenLop: string
+  moTa: string
+  thoiGianTao: string
+}
 
 export async function GetLopHoc() {
   const result = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+
+export async function GetLopHocChiTiet(idLop: number) {
+  const result = await axios.get(`${url}/${idLop}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }

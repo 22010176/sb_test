@@ -66,15 +66,6 @@ type CauHoiFormProps = {
   onCancel: () => void | undefined
 }
 function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }: CauHoiFormProps) {
-  // const [questionType, setQuestionType] = useState<'multiple' | 'single'>('single')
-
-  // useEffect(function () {
-  //   if (formValue == null) return;
-
-  //   if (formValue?.dapAn.reduce((acc, i) => i.dungSai ? acc + 1 : acc, 0) > 1) setQuestionType('multiple')
-  //   else setQuestionType('single')
-  // }, [formValue])
-
   return (
     <div className="space-y-4">
       {/* Bộ câu hỏi */}

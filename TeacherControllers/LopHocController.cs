@@ -5,6 +5,7 @@ using DatabaseModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Utilities;
 
 namespace TeacherControllers;
 
@@ -34,13 +35,88 @@ public class LopHocController(AppDbContext context) : ControllerBase
 
   async Task<LopHoc> CheckInput(int lopId, int userId)
   {
-
     LopHoc? lopHoc = await context.LopHoc.FirstOrDefaultAsync(i => i.Id == lopId);
 
     if (lopHoc == null) throw new Exception("Lớp học không tồn tại!");
     if (lopHoc.IdGiangVien != userId) throw new Exception("Không có quyền sửa lớp học này!");
 
     return lopHoc;
+  }
+
+  [HttpGet("{idLopHoc}")]
+  [Authorize]
+  public async Task<IActionResult> LayThongTinLopChiTiet(int idLopHoc)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      LopHoc lopHoc = await CheckInput(idLopHoc, userId);
+      return Ok(new ResponseFormat
+      {
+        Data = lopHoc,
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Message = "",
+        Success = false,
+        Data = err
+      });
+    }
+  }
+
+  [HttpGet("{idLopHoc}/danh-sach-lop")]
+  [Authorize]
+  public async Task<IActionResult> LayDanhSachLopLopChiTiet(int idLopHoc)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      await CheckInput(idLopHoc, userId);
+
+      var query =
+        from lh in context.LopHoc
+        join mm in context.MaMoiLopHoc on lh.Id equals mm.IdLopHoc
+        join lh_nn in context.LopHoc_NguoiDung on mm.Id equals lh_nn.IdMaMoi
+        where lh.Id == idLopHoc
+        select new
+        {
+          lh.Id,
+          lh.MaLop,
+          lh.MoTa,
+          lh.ThoiGianTao,
+          HocSinh = (
+            from hs in context.NguoiDung
+            where lh_nn.IdNguoiDung == hs.Id
+            select new
+            {
+              hs.HoTen,
+              hs.Email,
+              GioiTinh = hs.GioiTinh.ToString(),
+              hs.NgaySinh,
+              hs.SoDienThoai
+            }).ToList()
+        };
+      return Ok(new ResponseFormat
+      {
+        Data = await query.ToListAsync(),
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Message = "",
+        Success = false,
+        Data = err
+      });
+    }
   }
 
   [HttpGet]
@@ -70,7 +146,7 @@ public class LopHocController(AppDbContext context) : ControllerBase
   }
 
   [HttpPost("{id}")]
-  [Authorize]
+  [Authorize(Roles = "GIANG_VIEN")]
   public async Task<IActionResult> GetInviteLink(int id)
   {
     try
