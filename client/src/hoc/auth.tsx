@@ -51,6 +51,7 @@ export function withAccount(Component: FC | string) {
 }
 
 export function withNoAccount(Component: FC | string) {
+  const role = import.meta.env.VITE_ROLE
   return (props: JSX.IntrinsicAttributes) => {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
@@ -58,7 +59,7 @@ export function withNoAccount(Component: FC | string) {
     if (pageData.user === null) return <Component {...props} />
 
     const user = pageData.user as UserData
-    if (user.loaiNguoiDung === 0) return <Navigate to="/giang-vien" />
+    if (user.loaiNguoiDung === 0) return <Navigate to={role === "TEACHER" ? "/giang-vien" : "/hoc-sinh"} />
 
     return <Navigate to="/" />
   }

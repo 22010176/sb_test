@@ -1,13 +1,14 @@
-import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { faMailForward } from '@fortawesome/free-solid-svg-icons';
+import { EyeFilled, PlusOutlined } from '@ant-design/icons';
+import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Input, message, Modal, Popconfirm, Space, Table } from 'antd';
-import { useEffect, useState, type Dispatch } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { CreateLopHocLink, XoaLopHoc } from '@/api/GiangVien/LopHoc';
+
+import { CapNhatTrangThaiCho } from '@/api/GiangVien/LopHoc_HocSinh';
+import { LayDanhSachHocSinhLopHoc, ThamGiaLopHoc } from '@/api/HocSinh/LopHoc';
 import { withHocSinhRole } from '@/hoc/auth';
-import { ThamGiaLopHoc } from '@/api/HocSinh/LopHoc';
 
 const { Search } = Input;
 
@@ -28,9 +29,12 @@ function Element() {
   const [searchText, setSearchText] = useState('');
 
   const [createForm] = Form.useForm();
-  const [updateForm] = Form.useForm();
 
   useEffect(function () {
+    LayDanhSachHocSinhLopHoc()
+      .then(e => {
+        setLopHoc(e.data)
+      })
 
   }, [])
 
@@ -39,13 +43,13 @@ function Element() {
     createForm.resetFields();
   };
 
-  const deleteCourse = async (id: number) =>
-    await XoaLopHoc(id).then(result => {
-      setLopHoc(result.data as LopHoc[])
-      message.success('Xóa môn học thành công!');
-    }).catch(err => {
-      message.error(err.message)
-    })
+  // const deleteCourse = async (id: number) =>
+  //   await XoaLopHoc(id).then(result => {
+  //     setLopHoc(result.data as LopHoc[])
+  //     message.success('Xóa môn học thành công!');
+  //   }).catch(err => {
+  //     message.error(err.message)
+  //   })
 
 
   const columns: unknown[] = [
@@ -87,23 +91,32 @@ function Element() {
       title: <span className="font-semibold text-gray-700">Thao tác</span>,
       render: (record: LopHoc) => (
         <Space size="small" className="flex justify-center">
+          <Button size='small' variant='outlined' color='blue' icon={<EyeFilled />}
+            onClick={() => {
+
+            }} />
           <Popconfirm okText="Có" cancelText="Không" placement='left'
-            onConfirm={() => deleteCourse(record.id)}
+            onConfirm={() => { }}
             title={
               <div className="font-medium text-gray-700">
                 Bạn có chắc chắn muốn rời lớp học này?
               </div>
             }>
-            <Button size='small' variant='outlined' color='red' icon={<DeleteOutlined />} />
+            <Button size='small' variant='outlined' color='red' icon={<FontAwesomeIcon icon={faArrowRightFromBracket} />}
+              onClick={() => {
+                CapNhatTrangThaiCho({ id: record.id, trangThaiMaMoi: 2 })
+                  .then(async result => {
+                    LayDanhSachHocSinhLopHoc()
+                      .then(e => {
+                        setLopHoc(e.data)
+                      })
+
+                    message.info("Rời lớp học thành công!")
+                  }).catch(e => {
+                    message.error("Rời lớp học thất bại!")
+                  })
+              }} />
           </Popconfirm>
-          <Button size='small' variant='outlined' color='green' icon={<ArrowRightOutlined />}
-            onClick={() => navigate(`/giang-vien/lop-hoc/${record.id}`)} />
-          <Button size='small' variant='outlined' color='magenta' icon={<FontAwesomeIcon icon={faMailForward} />}
-            onClick={async () => {
-              const result = await CreateLopHocLink(record.id)
-              console.log(result)
-              message.success("Copy link mời thành công!")
-            }} />
         </Space>
       ),
     },

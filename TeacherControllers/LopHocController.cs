@@ -82,7 +82,9 @@ public class LopHocController(AppDbContext context) : ControllerBase
         from lh in context.LopHoc
         join mm in context.MaMoiLopHoc on lh.Id equals mm.IdLopHoc
         join lh_nn in context.LopHoc_NguoiDung on mm.Id equals lh_nn.IdMaMoi
-        where lh.Id == idLopHoc
+        where
+          lh.Id == idLopHoc
+          && lh_nn.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
         select new
         {
           lh.Id,
@@ -100,6 +102,51 @@ public class LopHocController(AppDbContext context) : ControllerBase
               hs.NgaySinh,
               hs.SoDienThoai
             }).ToList()
+        };
+      return Ok(new ResponseFormat
+      {
+        Data = await query.ToListAsync(),
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Message = "",
+        Success = false,
+        Data = err
+      });
+    }
+  }
+
+  [HttpGet("{idLopHoc}/cho-duyet")]
+  [Authorize]
+  public async Task<IActionResult> LayDanhSachChoDuyet(int idLopHoc)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      await CheckInput(idLopHoc, userId);
+
+      var query =
+        from lh in context.LopHoc
+        join mm in context.MaMoiLopHoc on lh.Id equals mm.IdLopHoc
+        join lh_nn in context.LopHoc_NguoiDung on mm.Id equals lh_nn.IdMaMoi
+        join hs in context.NguoiDung on lh_nn.IdNguoiDung equals hs.Id
+        where
+          lh.Id == idLopHoc
+          && lh_nn.TrangThaiMaMoi == TrangThaiMaMoi.DANG_CHO
+        orderby lh_nn.ThoiGianYeuCau descending
+        select new
+        {
+          lh_nn.Id,
+          hs.HoTen,
+          hs.Email,
+          GioiTinh = hs.GioiTinh.ToString(),
+          hs.NgaySinh,
+          hs.SoDienThoai
         };
       return Ok(new ResponseFormat
       {

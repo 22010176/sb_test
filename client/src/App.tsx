@@ -25,9 +25,10 @@ import ExamListInterface from './pages/ExamPage/ExamListInterface';
 import StudentLayout from './layouts/StudentLayout';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
-import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
+import ChiTietChoDuyet from './pages/TeacherPages/ChiTietChoDuyet';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
 import ChiTietLop from './pages/TeacherPages/ChiTietLop';
+import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 
 
 function App() {
@@ -80,7 +81,7 @@ function App() {
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
             <Route path='/giang-vien/lop-hoc/:lopId' element={<ChiTietLop />} />
             <Route path='/giang-vien/lop-hoc/:lopId/danh-sach-lop' element={<ChiTietDanhSachLop />} />
-            <Route path='/giang-vien/lop-hoc/:lopId/cho-duyet' element={<ChiTietDanhSachLop />} />
+            <Route path='/giang-vien/lop-hoc/:lopId/cho-duyet' element={<ChiTietChoDuyet />} />
             <Route path='/giang-vien/lop-hoc/:lopId/thanh-tich' element={<ChiTietDanhSachLop />} />
           </Route>
         </>}

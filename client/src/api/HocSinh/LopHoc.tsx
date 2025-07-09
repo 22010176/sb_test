@@ -11,8 +11,13 @@ export async function ThamGiaLopHoc(maLop: string) {
   return result.data
 }
 
-export async function LayDanhSachLopHoc() {
-
+export async function LayDanhSachHocSinhLopHoc() {
+  const result = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
 }
 
 export async function RoiLopHoc() {

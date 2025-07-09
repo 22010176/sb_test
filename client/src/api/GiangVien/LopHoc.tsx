@@ -18,6 +18,23 @@ export async function GetLopHoc() {
   return result.data
 }
 
+export async function LayDanhSachHocSinhLopHoc(idLopHoc: number) {
+  const result = await axios.get(`${url}/${idLopHoc}/danh-sach-lop`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+export async function LayDanhSachChoDuyet(idLopHoc: number) {
+  const result = await axios.get(`${url}/${idLopHoc}/cho-duyet`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+
 export async function GetLopHocChiTiet(idLop: number) {
   const result = await axios.get(`${url}/${idLop}`, {
     headers: {

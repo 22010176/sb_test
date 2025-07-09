@@ -29,6 +29,7 @@ public class LopHocController(AppDbContext context) : ControllerBase
       orderby lh_nd.ThoiGianYeuCau descending
       select new
       {
+        lh_nd.Id,
         lh.MaLop,
         lh.TenLop,
         lh.IdGiangVien,

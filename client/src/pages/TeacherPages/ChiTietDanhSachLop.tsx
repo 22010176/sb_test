@@ -1,9 +1,12 @@
+import { LayDanhSachHocSinhLopHoc } from '@/api/GiangVien/LopHoc';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Input, Popconfirm, Select, Space, Table } from 'antd';
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
 function ChiTietDanhSachLop() {
+  const { lopId } = useParams()
+
   const [students, setStudents] = useState([
     { key: '1', stt: 1, name: 'Trịnh Văn Hùng', gender: 'Nam', birthDate: '04/07/2007', phone: '0912 345 678', email: 'tvhung@example.com' },
     { key: '2', stt: 2, name: 'Lê Minh Khang', gender: 'Nam', birthDate: '15/04/2007', phone: '0987 654 321', email: 'hung@example.com' },
@@ -13,6 +16,12 @@ function ChiTietDanhSachLop() {
     { key: '6', stt: 6, name: 'Khương Phương Anh', gender: 'Nữ', birthDate: '16/03/2007', phone: '0976 543 210', email: 'kphanh@example.com' },
     { key: '7', stt: 7, name: 'Trần Tuấn Dũng', gender: 'Nam', birthDate: '02/09/2007', phone: '0888 999 000', email: 'ttdunga@example.com' }
   ]);
+
+  useEffect(function () {
+    LayDanhSachHocSinhLopHoc(+(lopId ?? 0)).then(function (res) {
+      setStudents(res.data)
+    })
+  }, [lopId])
 
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
