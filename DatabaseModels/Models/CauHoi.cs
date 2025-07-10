@@ -15,6 +15,7 @@ public class MonHoc
   public NguoiDung? NguoiTao { get; set; }
 
   public List<BoCauHoi>? BoCauHoi { get; set; }
+  public List<KiThi>? KiThi { get; set; }
 }
 
 public class BoCauHoi
@@ -41,7 +42,7 @@ public class CauHoi
   public int Id { get; set; }
   public string? NoiDung { get; set; }
   public double? DoKho { get; set; }
-  public LoaiCauHoi LoaiCauHoi{ get; set; }
+  public LoaiCauHoi LoaiCauHoi { get; set; }
   public DateTime? ThoiGianCapNhatCuoi { get; set; }
 
   public int IdBoCauHoi { get; set; }

@@ -1,16 +1,194 @@
-import React, { useState } from 'react';
-import { Card, Button, Input, Select, Row, Col, Typography, Space, Tag } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  BookOutlined,
-  ClockCircleOutlined,
-  CalendarOutlined,
-  CaretDownOutlined
-} from '@ant-design/icons';
+import { BookOutlined, CalendarOutlined, CaretDownOutlined, ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Input, Modal, Row, Select, Space, Tag, Typography } from 'antd';
+import { useState } from 'react';
+import { DatePicker, Form, message } from 'antd';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+
+function ExamCreationForm() {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  const subjects = [
+    'Toán học',
+    'Văn học',
+    'Tiếng Anh',
+    'Vật lý',
+    'Hóa học',
+    'Sinh học',
+    'Lịch sử',
+    'Địa lý',
+    'Tin học',
+    'Giáo dục công dân'
+  ];
+
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('Form values:', values);
+      message.success('Tạo kì thi thành công!');
+
+      // Reset form after successful submission
+      form.resetFields();
+    } catch (error) {
+      message.error('Có lỗi xảy ra khi tạo kì thi!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    message.info('Đã hủy tạo kì thi');
+  };
+
+  return (
+    <Modal open footer={[]} title={
+      <span className="text-lg font-semibold text-gray-800">
+        TẠO KÌ THI
+      </span>
+    }>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        className="space-y-6"
+        requiredMark={false}
+      >
+        {/* Exam Name */}
+        <Form.Item
+          label={
+            <span className="text-gray-700 font-medium">
+              Tên kì thi <span className="text-red-500">*</span>
+            </span>
+          }
+          name="examName"
+          rules={[
+            { required: true, message: 'Vui lòng nhập tên kì thi!' },
+            { min: 3, message: 'Tên kì thi phải có ít nhất 3 ký tự!' }
+          ]}
+        >
+          <Input placeholder="Nhập tên kì thi" className="rounded-lg" />
+        </Form.Item>
+
+        {/* Subject */}
+        <Form.Item
+          label={
+            <span className="text-gray-700 font-medium">
+              Môn thi <span className="text-red-500">*</span>
+            </span>
+          }
+          name="subject"
+          rules={[
+            { required: true, message: 'Vui lòng chọn môn học!' }
+          ]}
+        >
+          <Select placeholder="Chọn môn học" className="rounded-lg" showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+            options={subjects.map(i => ({ value: i, label: i }))} />
+        </Form.Item>
+
+        {/* Duration */}
+        <Form.Item
+          label={
+            <span className="text-gray-700 font-medium">
+              Thời gian làm bài (phút) <span className="text-red-500">*</span>
+            </span>
+          }
+          name="duration"
+          rules={[
+            { required: true, message: 'Vui lòng nhập thời gian làm bài!' },
+            // { type: 'number', min: 15, message: 'Thời gian phải từ 15 đến 300 phút!' }
+          ]}>
+          <Input type="number" placeholder="Nhập thời gian làm bài" suffix="phút" />
+        </Form.Item>
+
+        {/* Start Time */}
+        <Form.Item
+          label={
+            <span className="text-gray-700 font-medium">
+              Thời gian bắt đầu <span className="text-red-500">*</span>
+            </span>
+          }
+          name="startTime"
+          rules={[
+            { required: true, message: 'Vui lòng chọn thời gian bắt đầu!' }
+          ]}
+        >
+          <DatePicker
+
+            placeholder="Chọn thời gian bắt đầu"
+            className="w-full"
+            showTime
+            format="DD/MM/YYYY HH:mm"
+            suffixIcon={<CalendarOutlined />}
+          />
+        </Form.Item>
+
+        {/* End Time */}
+        <Form.Item
+          label={
+            <span className="text-gray-700 font-medium">
+              Thời gian kết thúc <span className="text-red-500">*</span>
+            </span>
+          }
+          name="endTime"
+          rules={[
+            { required: true, message: 'Vui lòng chọn thời gian kết thúc!' },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || !getFieldValue('startTime')) {
+                  return Promise.resolve();
+                }
+                if (value.isAfter(getFieldValue('startTime'))) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('Thời gian kết thúc phải sau thời gian bắt đầu!'));
+              },
+            }),
+          ]}
+        >
+          <DatePicker
+            placeholder="Chọn thời gian kết thúc"
+            className="w-full"
+            showTime
+            format="DD/MM/YYYY HH:mm"
+            suffixIcon={<CalendarOutlined />} />
+        </Form.Item>
+
+        {/* Action Buttons */}
+        <Form.Item className="mb-0 pt-6">
+          <Space className="w-full justify-center" size="large">
+            <Button
+              size="large"
+              onClick={handleCancel}
+              className="px-8 py-2 h-auto rounded-lg border-gray-300 text-gray-600 hover:border-gray-400"
+            >
+              Hủy
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              size="large"
+              className="px-8 py-2 h-auto rounded-lg bg-purple-600 hover:bg-purple-700 border-purple-600"
+            >
+              Thêm
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+}
+
 
 export default function ExamListInterface() {
   const [searchText, setSearchText] = useState('');
@@ -84,27 +262,19 @@ export default function ExamListInterface() {
             />
           </Col>
           <Col span={8}>
-            <Select
-              placeholder="Sắp xếp..."
+            <Select placeholder="Sắp xếp..." size="large" suffixIcon={<CaretDownOutlined />}
               className="w-full"
-              size="large"
-              suffixIcon={<CaretDownOutlined />}
               onChange={(value) => setSortBy(value)}
-            >
-              <Option value="newest">Mới nhất</Option>
-              <Option value="oldest">Cũ nhất</Option>
-              <Option value="name">Theo tên</Option>
-              <Option value="subject">Theo môn học</Option>
-            </Select>
+              options={[
+                { label: "Mới nhất", value: "newest" },
+                { label: "Cũ nhất", value: "oldest" },
+                { label: "Theo tên", value: "name" },
+                { label: "Theo môn học", value: "subject" },
+              ]} />
           </Col>
           <Col span={8}>
             <div className="flex justify-end">
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                size="large"
-                className="bg-purple-600 hover:bg-purple-700 border-purple-600 px-6"
-              >
+              <Button type="primary" icon={<PlusOutlined />} size="large">
                 Tạo kì thi
               </Button>
             </div>
@@ -132,8 +302,7 @@ export default function ExamListInterface() {
                   </Title>
                   <Tag
                     color={getStatusColor(exam.status)}
-                    className="shrink-0 px-3 py-1 text-sm font-medium"
-                  >
+                    className="shrink-0 px-3 py-1 text-sm font-medium">
                     {exam.status}
                   </Tag>
                 </div>
@@ -169,6 +338,7 @@ export default function ExamListInterface() {
           Hiển thị {exams.length} kì thi
         </Text>
       </div>
+      <ExamCreationForm />
     </div>
   );
 }

@@ -19,7 +19,6 @@ import { GetNguoiDung } from '@/api/GiangVien/TaiKhoan';
 import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
-import CreateExamInterface from './pages/ExamPage/CreateExamInterface';
 import ExamListInterface from './pages/ExamPage/ExamListInterface';
 
 import StudentLayout from './layouts/StudentLayout';
@@ -30,6 +29,7 @@ import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
 import ChiTietLop from './pages/TeacherPages/ChiTietLop';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 
+const role = import.meta.env.VITE_ROLE;
 
 function App() {
   const navigate = useNavigate()
@@ -50,7 +50,7 @@ function App() {
       })
     else dispatch({ type: 'SET_USER', payload: null })
 
-    document.title = import.meta.env.VITE_ROLE
+    document.title = role
   }, [])
 
   return (
@@ -64,7 +64,7 @@ function App() {
         </Route>
 
         {/* GiangVien Route */}
-        {import.meta.env.VITE_ROLE === "TEACHER" && <>
+        {role === "TEACHER" && <>
           <Route path='/giang-vien' element={<TeacherLayout />}>
             <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
@@ -75,7 +75,7 @@ function App() {
             <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
 
             <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
-            <Route path='/giang-vien/ki-thi/:kiThiId' element={<CreateExamInterface />} />
+            {/* <Route path='/giang-vien/ki-thi/:kiThiId' element={<DanhSachKiThi />} /> */}
           </Route>
 
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>
@@ -87,7 +87,7 @@ function App() {
         </>}
 
         {/* HocSinh Route */}
-        {import.meta.env.VITE_ROLE === 'STUDENT' && <Route element={<StudentLayout />}>
+        {role === 'STUDENT' && <Route element={<StudentLayout />}>
           <Route path='/hoc-sinh' element={<Navigate to="/hoc-sinh/lop-hoc" />} />
           <Route path='/hoc-sinh/lop-hoc' element={<HocSinh_QuanLyLopHoc />} />
         </Route>}
