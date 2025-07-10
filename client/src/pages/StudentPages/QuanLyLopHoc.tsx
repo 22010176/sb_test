@@ -43,15 +43,6 @@ function Element() {
     createForm.resetFields();
   };
 
-  // const deleteCourse = async (id: number) =>
-  //   await XoaLopHoc(id).then(result => {
-  //     setLopHoc(result.data as LopHoc[])
-  //     message.success('Xóa môn học thành công!');
-  //   }).catch(err => {
-  //     message.error(err.message)
-  //   })
-
-
   const columns: unknown[] = [
     {
       width: 60, align: 'center',

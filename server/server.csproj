@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
     <ProjectReference Include="..\MailServices\MailServices.csproj" />
     <ProjectReference Include="..\StudentControllers\StudentControllers.csproj" />
+    <ProjectReference Include="..\RealtimeServer\RealtimeServer.csproj" />
   </ItemGroup>
 
 </Project>

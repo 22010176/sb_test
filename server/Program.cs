@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using DatabaseModels;
 using Utilities;
 using MailServices;
+using RealtimeServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 });
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddSignalR();
 builder.Services
 .AddControllers()
 .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -92,5 +93,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHub<LopHocHub>("/socket/lop-hoc");
 
 app.Run();

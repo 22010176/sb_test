@@ -80,11 +80,7 @@ public class LopHocController(AppDbContext context) : ControllerBase
 
       var query =
         from lh in context.LopHoc
-        join mm in context.MaMoiLopHoc on lh.Id equals mm.IdLopHoc
-        join lh_nn in context.LopHoc_NguoiDung on mm.Id equals lh_nn.IdMaMoi
-        where
-          lh.Id == idLopHoc
-          && lh_nn.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
+        where lh.Id == idLopHoc
         select new
         {
           lh.Id,
@@ -93,9 +89,14 @@ public class LopHocController(AppDbContext context) : ControllerBase
           lh.ThoiGianTao,
           HocSinh = (
             from hs in context.NguoiDung
-            where lh_nn.IdNguoiDung == hs.Id
+            join mm in context.MaMoiLopHoc on lh.Id equals mm.IdLopHoc
+            join lh_nn in context.LopHoc_NguoiDung on mm.Id equals lh_nn.IdMaMoi
+            where
+              lh_nn.IdNguoiDung == hs.Id
+              && lh_nn.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
             select new
             {
+              lh_nn.Id,
               hs.HoTen,
               hs.Email,
               GioiTinh = hs.GioiTinh.ToString(),

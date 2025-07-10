@@ -32,7 +32,7 @@ public class LopHoc
 
 public enum TrangThaiMaMoi
 {
-    DANG_CHO, DONG_Y, TU_CHOI
+    DANG_CHO, DONG_Y
 }
 public class LopHoc_NguoiDung
 {
