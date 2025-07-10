@@ -19,7 +19,6 @@ import { GetNguoiDung } from '@/api/GiangVien/TaiKhoan';
 import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
-import ExamListInterface from './pages/ExamPage/ExamListInterface';
 
 import StudentLayout from './layouts/StudentLayout';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
@@ -28,6 +27,7 @@ import ChiTietChoDuyet from './pages/TeacherPages/ChiTietChoDuyet';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
 import ChiTietLop from './pages/TeacherPages/ChiTietLop';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
+import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
 
 const role = import.meta.env.VITE_ROLE;
 
@@ -74,7 +74,7 @@ function App() {
             <Route path='/giang-vien/mon-hoc/:monHocId/:boCauHoiId' element={<GiangVien_ChiTietBoCauHoi />} />
             <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
 
-            <Route path='/giang-vien/ki-thi' element={<ExamListInterface />} />
+            <Route path='/giang-vien/ki-thi' element={<QuanLyKiThi />} />
             {/* <Route path='/giang-vien/ki-thi/:kiThiId' element={<DanhSachKiThi />} /> */}
           </Route>
 
