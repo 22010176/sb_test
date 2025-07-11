@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Security.Claims;
 using DatabaseModels;
+using DatabaseModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -57,14 +57,28 @@ public class KiThiController(AppDbContext context) : ControllerBase
       });
     }
   }
+
   [HttpPost]
-  public async Task<IActionResult> TaoKiThi()
+  [Authorize(Roles = "GIANG_VIEN")]
+  public async Task<IActionResult> TaoKiThi(KiThiInput input)
   {
     try
     {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      KiThi kiThi = new()
+      {
+        TenKiThi = input.TenKiThi,
+        ThoiGianVaoLamBai = TimeZoneInfo.ConvertTimeToUtc(input.ThoiGianVaoLamBai),
+        ThoiGianLamBaiThi = input.ThoiGianLamBaiThi,
+        IdMonHoc = input.IdMonHoc,
+      };
+
+      await context.AddAsync(kiThi);
+      await context.SaveChangesAsync();
+
       return Ok(new ResponseFormat
       {
-        Data = "",
+        Data = await GetDanhSachKiThi(userId),
         Success = true,
         Message = ""
       });
@@ -102,14 +116,22 @@ public class KiThiController(AppDbContext context) : ControllerBase
       });
     }
   }
+
   [HttpDelete("{idKiThi}")]
-  public async Task<IActionResult> LayDanhSachKiThi(int idKiThi)
+  public async Task<IActionResult> XoaKiThi(int idKiThi)
   {
     try
     {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      KiThi? kiThi = await context.KiThi.FirstOrDefaultAsync(i => i.Id == idKiThi);
+      if (kiThi == null) throw new Exception("");
+
+      context.KiThi.Remove(kiThi);
+      await context.SaveChangesAsync();
+
       return Ok(new ResponseFormat
       {
-        Data = "",
+        Data = await GetDanhSachKiThi(userId),
         Success = true,
         Message = ""
       });
@@ -124,4 +146,13 @@ public class KiThiController(AppDbContext context) : ControllerBase
       });
     }
   }
+}
+
+public record KiThiInput
+{
+  public string? TenKiThi { get; set; }
+  public int ThoiGianLamBaiThi { get; set; }
+  public DateTime ThoiGianVaoLamBai { get; set; }
+
+  public int IdMonHoc { get; set; }
 }

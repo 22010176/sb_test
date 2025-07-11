@@ -1,39 +1,51 @@
-import { BookOutlined, CalendarOutlined, CaretDownOutlined, ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Form, Input, message, Modal, Row, Select, Space, Tag, Typography } from 'antd';
-import { useState } from 'react';
+import { LayDanhSachKiThi, TaoKiThi, XoaKiThi, type KiThiInput } from '@/api/GiangVien/KiThi';
+import { GetMonHoc } from '@/api/GiangVien/MonHoc';
 
-const { Title, Text } = Typography;
+import { CalendarOutlined, CaretDownOutlined, ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { faBookBookmark, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Card, Col, DatePicker, Form, Input, message, Modal, Row, Select, Space, Tag } from 'antd';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
 function QuanLyKiThi() {
   const [searchText, setSearchText] = useState('');
+  const [createForm, setCreateForm] = useState(false)
   const [sortBy, setSortBy] = useState('');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [kiThi, setKiThi] = useState([])
 
-  const subjects = [
-    'Toán học',
-    'Văn học',
-    'Tiếng Anh',
-    'Vật lý',
-    'Hóa học',
-    'Sinh học',
-    'Lịch sử',
-    'Địa lý',
-    'Tin học',
-    'Giáo dục công dân'
-  ];
+  const [monHoc, setMonHoc] = useState([])
+
+  useEffect(function () {
+    GetMonHoc().then(result => {
+      console.log(result)
+      setMonHoc(result.data)
+    })
+    LayDanhSachKiThi().then(reuslt => {
+      setKiThi(reuslt.data)
+    })
+  }, [])
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('Form values:', values);
-      message.success('Tạo kì thi thành công!');
-
-      // Reset form after successful submission
-      form.resetFields();
+      const value: KiThiInput = {
+        tenKiThi: values.tenKiThi,
+        thoiGianLamBaiThi: +values.thoiGianLamBaiThi,
+        thoiGianVaoLamBai: values.thoiGianVaoLamBai.toDate(),
+        idMonHoc: values.idMonHoc
+      }
+      TaoKiThi(value).then(value => {
+        setKiThi(value.data)
+        message.success('Tạo kì thi thành công!');
+        setCreateForm(false)
+        form.resetFields();
+      }).catch(err => {
+        message.error('Có lỗi xảy ra khi tạo kì thi!');
+      })
     } catch (error) {
       message.error('Có lỗi xảy ra khi tạo kì thi!');
     } finally {
@@ -43,59 +55,23 @@ function QuanLyKiThi() {
 
   const handleCancel = () => {
     form.resetFields();
-    message.info('Đã hủy tạo kì thi');
+    setCreateForm(false)
   };
 
-  const exams = [
-    {
-      id: 1,
-      title: "Thi giữa kỳ môn Toán rời rạc",
-      subject: "Toán rời rạc",
-      duration: "90 phút",
-      status: "Chưa diễn ra",
-      statusColor: "green",
-      startDate: "24/06/2025 8:00",
-      endDate: "24/06/2025 9:30"
-    },
-    {
-      id: 2,
-      title: "Khảo sát Tiếng Nhật N3",
-      subject: "Tiếng Nhật",
-      duration: "90 phút",
-      status: "Chưa diễn ra",
-      statusColor: "green",
-      startDate: "22/06/2025 14:00",
-      endDate: "22/06/2025 15:30"
-    },
-    {
-      id: 3,
-      title: "Thi cuối kỳ môn Kỹ thuật số",
-      subject: "Kỹ thuật số",
-      duration: "60 phút",
-      status: "Đã diễn ra",
-      statusColor: "orange",
-      startDate: "18/06/2025 8:00",
-      endDate: "24/06/2025 9:00"
-    },
-    {
-      id: 4,
-      title: "Thi cuối kỳ Tiếng Anh chuyên ngành",
-      subject: "Tiếng Anh chuyên ngành",
-      duration: "90 phút",
-      status: "Đã diễn ra",
-      statusColor: "orange",
-      startDate: "15/06/2025 14:00",
-      endDate: "15/06/2025 15:30"
-    }
-  ];
+  const getStatusColor = (timeStart: Date, time: number) => {
+    const start = dayjs(timeStart), current = dayjs(), end = dayjs(timeStart).add(time, 'minutes')
+    if (current.isBefore(start)) return 'green'
+    if (current.isAfter(start) && current.isBefore(end)) return 'orange'
+    if (current.isAfter(end)) return 'blue'
+    return 'gray'
+  };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Chưa diễn ra': return 'green';
-      case 'Đã diễn ra': return 'orange';
-      case 'Đang diễn ra': return 'blue';
-      default: return 'gray';
-    }
+  const getStatusString = (timeStart: Date, time: number) => {
+    const start = dayjs(timeStart), current = dayjs(), end = dayjs(timeStart).add(time, 'minutes')
+    if (current.isBefore(start)) return 'Chưa diễn ra'
+    if (current.isAfter(start) && current.isBefore(end)) return 'Đang diễn ra'
+    if (current.isAfter(end)) return 'Đã kết thúc'
+    return ''
   };
 
   return (
@@ -106,8 +82,7 @@ function QuanLyKiThi() {
           <Col span={8}>
             <Input placeholder="Tìm kiếm kì thi" prefix={<SearchOutlined className="text-gray-400" />}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
+              onChange={(e) => setSearchText(e.target.value)} />
           </Col>
           <Col span={8}>
             <Select placeholder="Sắp xếp..." suffixIcon={<CaretDownOutlined />}
@@ -122,7 +97,8 @@ function QuanLyKiThi() {
           </Col>
           <Col span={8}>
             <div className="flex justify-end">
-              <Button type="primary" icon={<PlusOutlined />}>
+              <Button type="primary" icon={<PlusOutlined />}
+                onClick={() => setCreateForm(true)}>
                 Tạo kì thi
               </Button>
             </div>
@@ -131,42 +107,53 @@ function QuanLyKiThi() {
       </div>
 
       {/* Title */}
-      <Title level={3} className="!mb-6 text-purple-700 font-bold">
+      <h1 className="text-2xl mb-6 text-purple-700 font-bold">
         DANH SÁCH KÌ THI
-      </Title>
+      </h1>
 
       {/* Exams Grid */}
       <Row gutter={[16, 16]}>
-        {exams.map((exam) => (
+        {kiThi.map((exam: any) => (
           <Col span={12} key={exam.id}>
             <Card className="hover:shadow-lg transition-all duration-300 border-gray-200 h-full">
               <div className="mb-4">
                 <div className="flex justify-between items-start mb-3">
-                  <Title level={5} className="!mb-0 text-gray-800 flex-1 pr-4">
-                    {exam.title}
-                  </Title>
-                  <Tag color={getStatusColor(exam.status)} className="shrink-0 px-3 py-1 text-sm font-medium">
-                    {exam.status}
-                  </Tag>
+                  <p className="!mb-0 text-2xl font-bold text-gray-800 flex-1 pr-4">
+                    {exam.tenKiThi}
+                  </p>
+                  <div className='flex justify-end items-center'>
+                    <Tag className="shrink-0 px-3 py-1 text-sm font-medium" color={getStatusColor(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)} >
+                      {getStatusString(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)}
+                    </Tag>
+                    <Button variant='text' color='red' icon={<FontAwesomeIcon icon={faTrashCan} />}
+                      onClick={async e => {
+                        XoaKiThi(exam.id).then(i => {
+                          setKiThi(i.data)
+                          message.success("Xóa kì thi thành công!")
+                        }).catch(e => {
+                          message.success("Xóa kì thi thất bại!")
+                        })
+                      }} />
+                  </div>
                 </div>
               </div>
 
               <Space direction="vertical" className="w-full" size="middle">
                 <div className="flex items-center text-gray-600">
-                  <BookOutlined className="mr-3 text-blue-500" />
-                  <Text className="text-base">{exam.subject}</Text>
+                  <FontAwesomeIcon icon={faBookBookmark} className="mr-3 text-blue-500" />
+                  <p className="text-base">{exam.tenMon}</p>
                   <div className="ml-auto flex items-center">
                     <ClockCircleOutlined className="mr-2 text-red-500" />
-                    <Text className="text-base font-medium">{exam.duration}</Text>
+                    <p className="text-base font-medium">{exam.thoiGianLamBaiThi}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center text-gray-600">
                   <CalendarOutlined className="mr-3 text-green-500" />
-                  <Text className="text-base">{exam.startDate}</Text>
+                  <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</p>
                   <div className="ml-auto flex items-center">
                     <CalendarOutlined className="mr-2 text-purple-500" />
-                    <Text className="text-base">{exam.endDate}</Text>
+                    <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).add(exam.thoiGianLamBaiThi, 'minutes').format("DD/MM/YYYY HH:mm")}</p>
                   </div>
                 </div>
               </Space>
@@ -177,24 +164,25 @@ function QuanLyKiThi() {
 
       {/* Load More or Pagination could be added here */}
       <div className="text-center mt-8">
-        <Text className="text-gray-500">
-          Hiển thị {exams.length} kì thi
-        </Text>
+        <p className="text-gray-500">
+          Hiển thị {kiThi.length} kì thi
+        </p>
       </div>
-      <Modal open footer={[]} title={
-        <span className="text-lg font-semibold text-gray-800">
-          TẠO KÌ THI
-        </span>
-      }>
+      <Modal open={createForm} footer={[]}
+        title={
+          <span className="text-lg font-semibold text-gray-800">
+            TẠO KÌ THI
+          </span>
+        }
+        onCancel={handleCancel}>
         <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
           {/* Exam Name */}
-          <Form.Item
+          <Form.Item name="tenKiThi"
             label={
               <span className="text-gray-700 font-medium">
                 Tên kì thi <span className="text-red-500">*</span>
               </span>
             }
-            name="examName"
             rules={[
               { required: true, message: 'Vui lòng nhập tên kì thi!' },
               { min: 3, message: 'Tên kì thi phải có ít nhất 3 ký tự!' }
@@ -203,36 +191,32 @@ function QuanLyKiThi() {
           </Form.Item>
 
           {/* Subject */}
-          <Form.Item
+          <Form.Item name="idMonHoc"
             label={
               <span className="text-gray-700 font-medium">
                 Môn thi <span className="text-red-500">*</span>
               </span>
             }
-            name="subject"
+
             rules={[{ required: true, message: 'Vui lòng chọn môn học!' }]}>
-            <Select placeholder="Chọn môn học" className="rounded-lg" showSearch
+            <Select placeholder="Chọn môn học" className="rounded-lg"
               optionFilterProp="children"
-              filterOption={(input, option: any) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-              options={subjects.map(i => ({ value: i, label: i }))} />
+              options={monHoc.map((i: any) => ({ value: i.id, label: i.tenMon }))} />
           </Form.Item>
 
           {/* Duration */}
-          <Form.Item
+          <Form.Item name="thoiGianLamBaiThi"
             label={
               <span className="text-gray-700 font-medium">
                 Thời gian làm bài (phút) <span className="text-red-500">*</span>
               </span>
             }
-            name="duration"
             rules={[{ required: true, message: 'Vui lòng nhập thời gian làm bài!' },]}>
             <Input type="number" placeholder="Nhập thời gian làm bài" suffix="phút" />
           </Form.Item>
 
           {/* Start Time */}
-          <Form.Item name="startTime"
+          <Form.Item name="thoiGianVaoLamBai"
             label={
               <span className="text-gray-700 font-medium">
                 Thời gian bắt đầu <span className="text-red-500">*</span>
@@ -243,13 +227,19 @@ function QuanLyKiThi() {
           </Form.Item>
 
           {/* End Time */}
-          <Form.Item name="endTime"
+          <Form.Item dependencies={['thoiGianVaoLamBai', 'thoiGianLamBaiThi']}
             label={
               <span className="text-gray-700 font-medium">
                 Thời gian kết thúc <span className="text-red-500">*</span>
               </span>
             }>
-            <DatePicker placeholder="Chọn thời gian kết thúc" className="w-full" showTime disabled format="DD/MM/YYYY HH:mm" />
+            {() => {
+              const { thoiGianVaoLamBai, thoiGianLamBaiThi } = form.getFieldsValue()
+              const reuslt = dayjs(thoiGianVaoLamBai).add(+(thoiGianLamBaiThi ?? 0), 'minutes')
+              return (
+                <DatePicker placeholder="Chọn thời gian kết thúc" className="w-full" showTime disabled format="DD/MM/YYYY HH:mm" value={reuslt} />
+              )
+            }}
           </Form.Item>
 
           {/* Action Buttons */}

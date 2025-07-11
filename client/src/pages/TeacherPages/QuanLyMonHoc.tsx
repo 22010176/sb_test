@@ -3,12 +3,10 @@ import { Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table }
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { GetMonHoc, XoaMonHoc, CapNhatMonHoc, ThemMoc } from '@/api/GiangVien/MonHoc';
+import { CapNhatMonHoc, GetMonHoc, ThemMoc, XoaMonHoc } from '@/api/GiangVien/MonHoc';
 import { withGiangVienRole } from '@/hoc/auth';
 
-
 const { Search } = Input;
-const { Option } = Select;
 
 function Element() {
   const navigate = useNavigate();
@@ -18,52 +16,34 @@ function Element() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [form] = Form.useForm();
-  console.log(courses)
 
   useEffect(() => {
     GetMonHoc().then(result => {
       // console.log(result)
       setCourses(result.data)
-    }).catch(err => {
-      message.error(err.message)
-    })
+    }).catch(err => message.error(err.message))
   }, [])
 
   const showModal = (course = null) => {
     setEditingCourse(course);
     setIsModalVisible(true);
-    if (course) {
-      form.setFieldsValue(course);
-    } else {
-      form.resetFields();
-    }
+    if (course) form.setFieldsValue(course);
+    else form.resetFields();
   };
 
   const handleOk = async () => {
     form.validateFields().then(async values => {
       if (editingCourse) {
-        // setCourses(courses.map(course =>
-        //   course.id === editingCourse.id ? { ...course, ...values } : course
-        // ));
         console.log(values)
         await CapNhatMonHoc(values).then(result => {
           setCourses(result.data)
-          console.log(result)
           message.success('Cập nhật môn học thành công!');
-        }).catch(err => {
-          message.error(err.message)
-        })
-      } else {
-        await ThemMoc(values).then(result => {
-          setCourses(result.data)
-          console.log(result)
-          message.success('Thêm môn học thành công!');
-          // message.success('Cập nhật môn học thành công!');
-        }).catch(err => {
-          message.error(err.message)
-        })
-        console.log(values)
-      }
+        }).catch(err => message.error(err.message))
+      } else await ThemMoc(values).then(result => {
+        setCourses(result.data)
+        message.success('Thêm môn học thành công!');
+      }).catch(err => message.error(err.message))
+
       setIsModalVisible(false);
       setEditingCourse(null);
     });
@@ -78,18 +58,14 @@ function Element() {
     XoaMonHoc(id).then(result => {
       setCourses(result.data)
       message.success('Xóa môn học thành công!');
-    }).catch(err => {
-      message.error(err.message)
-    });
+    }).catch(err => message.error(err.message));
 
   };
 
   const columns = [
     {
+      key: 'index', width: 60, align: 'center',
       title: <span className="font-semibold text-gray-700">STT</span>,
-      key: 'index',
-      width: 60,
-      align: 'center',
       render: (_: unknown, __: object, index: number) => (
         <span className="font-medium text-gray-600">{index + 1}</span>
       ),
@@ -129,7 +105,7 @@ function Element() {
       key: 'action',
       width: 150,
       align: 'center',
-      render: (_: unknown, record: object) => (
+      render: (_: unknown, record: any) => (
         <Space size="small" className="flex justify-center">
           <Button size='small' variant='outlined' color='blue' icon={<EditOutlined />} onClick={() => showModal(record)} />
           <Popconfirm okText="Có" cancelText="Không" placement='left'
@@ -184,8 +160,7 @@ function Element() {
             rowKey="id"
             pagination={{ pageSize: 10, }}
             className="bg-white rounded-lg overflow-hidden"
-            rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`
-            } />
+            rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`} />
         </div>
       </div>
 
