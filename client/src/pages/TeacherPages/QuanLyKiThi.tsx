@@ -116,7 +116,7 @@ function QuanLyKiThi() {
       <Row gutter={[16, 16]}>
         {kiThi.map((exam: any) => (
           <Col span={12} key={exam.id}>
-            <Link to="#">
+            <Link to={`/giang-vien/ki-thi/${exam.id}`}>
 
               <Card className="hover:shadow-lg transition-all duration-300 border-gray-200 h-full">
                 <div className="mb-4">

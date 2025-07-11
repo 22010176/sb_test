@@ -32,6 +32,7 @@ import {
 } from './pages/TeacherPages/ThongTinChiTiet';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
+import ThongTinKithiChiTietForm from './pages/TeacherPages/ThongTinKithiChiTietForm';
 
 const role = import.meta.env.VITE_ROLE;
 
@@ -83,7 +84,7 @@ function App() {
 
           <Route path='/giang-vien/ki-thi' element={<ExamDetailsLayout />}>
             <Route path='/giang-vien/ki-thi/:idKiThi' element={<ChiTietKiThi />} />
-            <Route path='/giang-vien/ki-thi/:idKiThi/chi-tiet' element={"aaa"} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/chi-tiet' element={<ThongTinKithiChiTietForm />} />
             <Route path='/giang-vien/ki-thi/:idKiThi/danh-sach-thi-sinh' element={"1"} />
             <Route path='/giang-vien/ki-thi/:idKiThi/cau-hinh-cau-hoi' element={"2"} />
             <Route path='/giang-vien/ki-thi/:idKiThi/thanh-tich' element={"3"} />

@@ -1,3 +1,4 @@
+import { LayKiThiChiTiet } from '@/api/GiangVien/KiThi';
 import { faChartColumn, faFileLines, faGear, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
@@ -5,31 +6,30 @@ import { Link, useLocation, useParams } from 'react-router';
 
 function Sidebar() {
   const { pathname } = useLocation()
-  const { lopId } = useParams()
+  const { idKiThi } = useParams()
 
-  const [lopHoc, setLopHoc] = useState({})
+  const [kiThi, setKiThi] = useState<any>({})
 
   useEffect(function () {
-    // GetLopHocChiTiet(+(lopId ?? 0)).then(result => {
-    //   console.log(result)
-    //   setLopHoc(result.data)
-    // })
-  }, [lopId])
+    LayKiThiChiTiet(+(idKiThi ?? 0)).then(result => {
+      setKiThi(result.data)
+    })
+  }, [idKiThi])
 
   return (
     <div className="w-80 h-full bg-white shadow-xl flex flex-col border-r-1">
       {/* Header Section */}
       <div className=" px-4 py-3">
         <div className="flex justify-between items-start mb-2">
-          <h2 className="text-xl font-bold">dddd</h2>
+          <h2 className="text-xl font-bold">{kiThi.tenKiThi}</h2>
         </div>
-        <p className="">Môn học: ddd</p>
+        <p className="">Môn học: {kiThi.tenMon}</p>
       </div>
 
       {/* Navigation Menu */}
       <nav className=" flex flex-col flex-1 px-4 py-2 gap-2">
         {/* Main Menu Items */}
-        <Link to={`/giang-vien/ki-thi/${lopId}`}
+        <Link to={`/giang-vien/ki-thi/${idKiThi}`}
           className={[
             "flex items-center gap-3 p-2 rounded-xl group",
             pathname.includes("chi-tiet") ? "bg-purple-50 text-purple-800" : "hover:bg-purple-50 hover:text-purple-700 text-gray-700"
@@ -40,7 +40,7 @@ function Sidebar() {
           <span className="font-medium">Thông tin kì thi</span>
         </Link>
 
-        <Link to={`/giang-vien/ki-thi/${lopId}/danh-sach-thi-sinh`}
+        <Link to={`/giang-vien/ki-thi/${idKiThi}/danh-sach-thi-sinh`}
           className={[
             "flex items-center gap-3 p-2 rounded-xl group",
             pathname.includes("cho-duyet") ? 'bg-green-50 text-green-800' : "hover:bg-green-50 hover:text-green-700 text-gray-700"
@@ -51,7 +51,7 @@ function Sidebar() {
           <span className="font-medium">Danh sách thí sinh</span>
         </Link>
 
-        <Link to={`/giang-vien/ki-thi/${lopId}/cau-hinh-cau-hoi`}
+        <Link to={`/giang-vien/ki-thi/${idKiThi}/cau-hinh-cau-hoi`}
           className={[
             "flex items-center gap-3 p-2 rounded-xl group",
             pathname.includes("cau-hinh-cau-hoi") ? 'bg-blue-50 text-blue-800' : "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
@@ -62,7 +62,7 @@ function Sidebar() {
           <span className="font-medium">Cấu hình câu hỏi</span>
         </Link>
 
-        <Link to={`/giang-vien/ki-thi/${lopId}/thanh-tich`}
+        <Link to={`/giang-vien/ki-thi/${idKiThi}/thanh-tich`}
           className={[
             "flex items-center gap-3 p-2 rounded-xl group",
             pathname.includes("thanh-tich") ? 'bg-red-50 text-red-800' : "hover:bg-red-50 hover:text-red-700 text-gray-700"

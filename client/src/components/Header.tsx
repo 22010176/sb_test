@@ -30,7 +30,7 @@ const items: MenuProps['items'] = [
   },
 ];
 
-function Header() {
+function TeacherHeader() {
   const { pathname } = useLocation()
   const path = pathname.split('/giang-vien')[1]
   return (
@@ -56,4 +56,4 @@ function Header() {
     </header>
   )
 }
-export default Header
+export default TeacherHeader

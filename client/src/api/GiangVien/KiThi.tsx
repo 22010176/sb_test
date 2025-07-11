@@ -26,8 +26,18 @@ export async function TaoKiThi(kiThi: KiThiInput) {
   })
   return result.data
 }
+
 export async function XoaKiThi(idKiThi: number) {
   const result = await axios.delete(`${url}/${idKiThi}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+
+export async function LayKiThiChiTiet(idKiThi: number) {
+  const result = await axios.get(`${url}/${idKiThi}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }

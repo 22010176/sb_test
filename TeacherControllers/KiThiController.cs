@@ -33,6 +33,50 @@ public class KiThiController(AppDbContext context) : ControllerBase
     return [.. await query.ToListAsync()];
   }
 
+  [HttpGet("{idKiThi}")]
+  public async Task<IActionResult> LayThongTinChiTietKiThi(int idKiThi)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      object? kiThi = (await (
+        from kt in context.KiThi
+        join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
+        where
+          kt.Id == idKiThi
+          && mh.IdGiangVien == userId
+        select new
+        {
+          kt.Id,
+          kt.TenKiThi,
+          kt.ThoiGianLamBaiThi,
+          kt.ThoiGianVaoLamBai,
+          kt.IdMonHoc,
+          mh.MaMon,
+          mh.TenMon,
+        }
+      ).ToListAsync()).FirstOrDefault();
+      if (kiThi == null) throw new Exception("");
+
+      return Ok(new ResponseFormat
+      {
+        Data = kiThi,
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+
+      return BadRequest(new ResponseFormat
+      {
+        Data = err,
+        Success = false,
+        Message = ""
+      });
+    }
+  }
+
   [HttpGet]
   public async Task<IActionResult> LayDanhSachKiThi()
   {
