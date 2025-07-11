@@ -14,18 +14,22 @@ import ClassDetailsLayout from '@/layouts/ClassDetailsLayout';
 import UserProfileForm from '@/pages/AuthPages/UserProfileForm';
 import GiangVien_QuanLyLopHoc from '@/pages/TeacherPages/QuanLyLopHoc';
 import GiangVien_QuanLyMonHoc from '@/pages/TeacherPages/QuanLyMonHoc';
+import ExamDetailsLayout from './layouts/ExamDetailsLayout';
+import StudentLayout from './layouts/StudentLayout';
 
 import { GetNguoiDung } from '@/api/GiangVien/TaiKhoan';
 import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
 
-import StudentLayout from './layouts/StudentLayout';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import ChiTietChoDuyet from './pages/TeacherPages/ChiTietChoDuyet';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
-import ChiTietLop from './pages/TeacherPages/ChiTietLop';
+import {
+  ChiTietKiThi,
+  ChiTietLop
+} from './pages/TeacherPages/ThongTinChiTiet';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
 
@@ -75,7 +79,14 @@ function App() {
             <Route path='/giang-vien/mon-hoc/:monHocId' element={<GiangVien_QuanLyBoCauHoi />} />
 
             <Route path='/giang-vien/ki-thi' element={<QuanLyKiThi />} />
-            {/* <Route path='/giang-vien/ki-thi/:kiThiId' element={<DanhSachKiThi />} /> */}
+          </Route>
+
+          <Route path='/giang-vien/ki-thi' element={<ExamDetailsLayout />}>
+            <Route path='/giang-vien/ki-thi/:idKiThi' element={<ChiTietKiThi />} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/chi-tiet' element={"aaa"} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/danh-sach-thi-sinh' element={"1"} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/cau-hinh-cau-hoi' element={"2"} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/thanh-tich' element={"3"} />
           </Route>
 
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>

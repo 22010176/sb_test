@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Col, DatePicker, Form, Input, message, Modal, Row, Select, Space, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 
 function QuanLyKiThi() {
   const [searchText, setSearchText] = useState('');
@@ -115,49 +116,52 @@ function QuanLyKiThi() {
       <Row gutter={[16, 16]}>
         {kiThi.map((exam: any) => (
           <Col span={12} key={exam.id}>
-            <Card className="hover:shadow-lg transition-all duration-300 border-gray-200 h-full">
-              <div className="mb-4">
-                <div className="flex justify-between items-start mb-3">
-                  <p className="!mb-0 text-2xl font-bold text-gray-800 flex-1 pr-4">
-                    {exam.tenKiThi}
-                  </p>
-                  <div className='flex justify-end items-center'>
-                    <Tag className="shrink-0 px-3 py-1 text-sm font-medium" color={getStatusColor(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)} >
-                      {getStatusString(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)}
-                    </Tag>
-                    <Button variant='text' color='red' icon={<FontAwesomeIcon icon={faTrashCan} />}
-                      onClick={async e => {
-                        XoaKiThi(exam.id).then(i => {
-                          setKiThi(i.data)
-                          message.success("Xóa kì thi thành công!")
-                        }).catch(e => {
-                          message.success("Xóa kì thi thất bại!")
-                        })
-                      }} />
-                  </div>
-                </div>
-              </div>
+            <Link to="#">
 
-              <Space direction="vertical" className="w-full" size="middle">
-                <div className="flex items-center text-gray-600">
-                  <FontAwesomeIcon icon={faBookBookmark} className="mr-3 text-blue-500" />
-                  <p className="text-base">{exam.tenMon}</p>
-                  <div className="ml-auto flex items-center">
-                    <ClockCircleOutlined className="mr-2 text-red-500" />
-                    <p className="text-base font-medium">{exam.thoiGianLamBaiThi}</p>
+              <Card className="hover:shadow-lg transition-all duration-300 border-gray-200 h-full">
+                <div className="mb-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <p className="!mb-0 text-2xl font-bold text-gray-800 flex-1 pr-4">
+                      {exam.tenKiThi}
+                    </p>
+                    <div className='flex justify-end items-center'>
+                      <Tag className="shrink-0 px-3 py-1 text-sm font-medium" color={getStatusColor(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)} >
+                        {getStatusString(exam.thoiGianVaoLamBai, exam.thoiGianLamBaiThi)}
+                      </Tag>
+                      <Button variant='text' color='red' icon={<FontAwesomeIcon icon={faTrashCan} />}
+                        onClick={async e => {
+                          XoaKiThi(exam.id).then(i => {
+                            setKiThi(i.data)
+                            message.success("Xóa kì thi thành công!")
+                          }).catch(e => {
+                            message.success("Xóa kì thi thất bại!")
+                          })
+                        }} />
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center text-gray-600">
-                  <CalendarOutlined className="mr-3 text-green-500" />
-                  <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</p>
-                  <div className="ml-auto flex items-center">
-                    <CalendarOutlined className="mr-2 text-purple-500" />
-                    <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).add(exam.thoiGianLamBaiThi, 'minutes').format("DD/MM/YYYY HH:mm")}</p>
+                <Space direction="vertical" className="w-full" size="middle">
+                  <div className="flex items-center text-gray-600">
+                    <FontAwesomeIcon icon={faBookBookmark} className="mr-3 text-blue-500" />
+                    <p className="text-base">{exam.tenMon}</p>
+                    <div className="ml-auto flex items-center">
+                      <ClockCircleOutlined className="mr-2 text-red-500" />
+                      <p className="text-base font-medium">{exam.thoiGianLamBaiThi}</p>
+                    </div>
                   </div>
-                </div>
-              </Space>
-            </Card>
+
+                  <div className="flex items-center text-gray-600">
+                    <CalendarOutlined className="mr-3 text-green-500" />
+                    <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</p>
+                    <div className="ml-auto flex items-center">
+                      <CalendarOutlined className="mr-2 text-purple-500" />
+                      <p className="text-base">{dayjs(exam.thoiGianVaoLamBai).add(exam.thoiGianLamBaiThi, 'minutes').format("DD/MM/YYYY HH:mm")}</p>
+                    </div>
+                  </div>
+                </Space>
+              </Card>
+            </Link>
           </Col>
         ))}
       </Row>
