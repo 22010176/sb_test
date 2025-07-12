@@ -137,21 +137,10 @@ const ThongTinKithiChiTietForm = () => {
         </div>
 
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            onClick={onEdit}
-            className="h-10 px-6 rounded-lg border-gray-300 hover:border-blue-500 hover:text-blue-500 transition-colors"
-          >
+          <Button type="default" icon={<EditOutlined />} onClick={onEdit}>
             Chỉnh sửa
           </Button>
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            onClick={handleSave}
-            loading={loading}
-            className="h-10 px-6 rounded-lg bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600 transition-colors"
-          >
+          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={loading}>
             Lưu
           </Button>
         </div>
