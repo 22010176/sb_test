@@ -139,10 +139,19 @@ public class KiThiController(AppDbContext context) : ControllerBase
   }
 
   [HttpPut("{idKiThi}")]
-  public async Task<IActionResult> CapNhatKiThi(int idKiThi)
+  public async Task<IActionResult> CapNhatKiThi(int idKiThi, KiThiInput input)
   {
     try
     {
+      KiThi? kiThi = await context.KiThi.FirstOrDefaultAsync(i => i.Id == idKiThi);
+      if (kiThi == null) throw new Exception("");
+
+      kiThi.TenKiThi = input.TenKiThi;
+      kiThi.IdMonHoc = input.IdMonHoc;
+      kiThi.ThoiGianLamBaiThi = input.ThoiGianLamBaiThi;
+      kiThi.ThoiGianVaoLamBai = TimeZoneInfo.ConvertTimeToUtc(input.ThoiGianVaoLamBai);
+      await context.SaveChangesAsync();
+
       return Ok(new ResponseFormat
       {
         Data = "",

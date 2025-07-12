@@ -1,14 +1,15 @@
-import { LayKiThiChiTiet } from '@/api/GiangVien/KiThi';
+import { CapNhatKiThi, LayKiThiChiTiet } from '@/api/GiangVien/KiThi';
 import { GetMonHoc } from '@/api/GiangVien/MonHoc';
+
 import { EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, InputNumber, Select } from 'antd';
+import { Button, DatePicker, Form, Input, InputNumber, message, Select } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-
-const { Option } = Select;
+import { useNavigate, useParams } from 'react-router';
 
 const ThongTinKithiChiTietForm = () => {
+  const navigate = useNavigate()
+
   const { idKiThi } = useParams()
   const [kiThi, setKiThi] = useState<any>({})
   const [monHoc, setMonHoc] = useState([])
@@ -40,9 +41,34 @@ const ThongTinKithiChiTietForm = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       console.log('Form values:', values);
+      const input = {
+        idMonHoc: values.idMonHoc,
+        tenKiThi: values.tenKiThi,
+        thoiGianLamBaiThi: +values.thoiGianLamBaiThi,
+        thoiGianVaoLamBai: dayjs(values.thoiGianVaoLamBai).toDate()
+      }
+      console.log(input)
+      await CapNhatKiThi(+(idKiThi ?? 0), input).then(function (data) {
+        console.log(data)
+        LayKiThiChiTiet(+(idKiThi ?? 0)).then(result => {
+          const input = result.data
+          setKiThi(input)
+          form.setFieldsValue({
+            tenKiThi: input.tenKiThi,
+            idMonHoc: input.idMonHoc,
+            thoiGianLamBaiThi: +input.thoiGianLamBaiThi,
+            thoiGianVaoLamBai: dayjs(input.thoiGianVaoLamBai),
+          })
+          message.success("Cập nhật thành công!")
+        })
+      }).catch(err => {
+        message.error("Cập nhật thất bại!")
+      })
+      console.log(input)
       // Handle form submission here
     } finally {
       setLoading(false);
+      navigate(0)
     }
   };
 
@@ -57,17 +83,7 @@ const ThongTinKithiChiTietForm = () => {
 
   return (
     <div className='p-10'>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{
-          tenKiThi: kiThi.tenKiThi,
-          idMonHoc: kiThi.idMonHoc,
-          thoiGianLamBaiThi: kiThi.thoiGianLamBaiThi,
-          thoiGianVaoLamBai: dayjs(kiThi.thoiGianVaoLamBai),
-        }}
-        className="space-y-6">
+      <Form form={form} layout="vertical" onFinish={onFinish} className="space-y-6">
         <div className="space-y-4">
           <Form.Item
             label={<span className="text-gray-700 font-medium">Tên kì thi <span className="text-red-500">*</span></span>}
@@ -90,7 +106,7 @@ const ThongTinKithiChiTietForm = () => {
             label={<span className="text-gray-700 font-medium">Thời gian làm bài thi (phút) <span className="text-red-500">*</span></span>}
             name="thoiGianLamBaiThi"
             rules={[{ required: true, message: 'Vui lòng nhập thời gian làm bài!' },]}>
-            <Input type='number' className='w-20' placeholder="Nhập thời gian (phút)" />
+            <InputNumber className='w-20' placeholder="Nhập thời gian (phút)" />
           </Form.Item>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
