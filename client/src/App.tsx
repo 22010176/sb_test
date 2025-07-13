@@ -26,14 +26,13 @@ import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import ChiTietChoDuyet from './pages/TeacherPages/ChiTietChoDuyet';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
-import {
-  ChiTietKiThi,
-  ChiTietLop
-} from './pages/TeacherPages/ThongTinChiTiet';
+import { ChiTietKiThi, ChiTietLop } from './pages/TeacherPages/ThongTinChiTiet';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
-import ThongTinKithiChiTietForm from './pages/TeacherPages/ThongTinKithiChiTietForm';
+import ChiTietKiThiForm from './pages/TeacherPages/ChiTietKiThiForm';
 import ChiTietKiThiDanhSachThiSinh from './pages/TeacherPages/ChiTietKiThiDanhSachThiSinh';
+import ChiTietKiThiKetQua from './pages/TeacherPages/ChiTietKiThiKetQua';
+import ChiTietKiThiCauHoi from './pages/TeacherPages/ChiTietKiThiCauHoi';
 
 const role = import.meta.env.VITE_ROLE;
 
@@ -84,10 +83,10 @@ function App() {
 
           <Route path='/giang-vien/ki-thi' element={<ExamDetailsLayout />}>
             <Route path='/giang-vien/ki-thi/:idKiThi' element={<ChiTietKiThi />} />
-            <Route path='/giang-vien/ki-thi/:idKiThi/chi-tiet' element={<ThongTinKithiChiTietForm />} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/chi-tiet' element={<ChiTietKiThiForm />} />
             <Route path='/giang-vien/ki-thi/:idKiThi/danh-sach-thi-sinh' element={<ChiTietKiThiDanhSachThiSinh />} />
-            <Route path='/giang-vien/ki-thi/:idKiThi/cau-hinh-cau-hoi' element={"2"} />
-            <Route path='/giang-vien/ki-thi/:idKiThi/thanh-tich' element={"3"} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/cau-hinh-cau-hoi' element={<ChiTietKiThiCauHoi />} />
+            <Route path='/giang-vien/ki-thi/:idKiThi/thanh-tich' element={<ChiTietKiThiKetQua />} />
           </Route>
 
           <Route path='/giang-vien/lop-hoc' element={<ClassDetailsLayout />}>

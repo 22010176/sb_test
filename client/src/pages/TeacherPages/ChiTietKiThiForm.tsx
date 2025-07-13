@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-const ThongTinKithiChiTietForm = () => {
+const ChiTietKiThiForm = () => {
   const navigate = useNavigate()
 
   const { idKiThi } = useParams()
@@ -145,4 +145,4 @@ const ThongTinKithiChiTietForm = () => {
   );
 };
 
-export default ThongTinKithiChiTietForm;
+export default ChiTietKiThiForm;
