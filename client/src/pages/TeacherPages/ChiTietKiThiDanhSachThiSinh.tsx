@@ -1,6 +1,11 @@
+import { GetLopHoc } from '@/api/GiangVien/LopHoc';
+import { LayDanhSachLopHoc, ThemDanhSachLopHoc, XoaDanhSachLopHoc } from '@/api/GiangVien/LopHoc_KiThi';
 import { DeleteOutlined, PlusOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Collapse, Input, Modal, Select, Table, Typography } from 'antd';
-import { useState } from 'react';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Avatar, Button, Collapse, Input, message, Modal, Result, Select, Table, Typography } from 'antd';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 
 const { Text, Title } = Typography;
 
@@ -12,7 +17,7 @@ const ExamInterface = () => {
     question3: 'B'
   });
 
-  const handleAnswerChange = (questionId, value) => {
+  const handleAnswerChange = (questionId: any, value: any) => {
     setSelectedAnswers(prev => ({
       ...prev,
       [questionId]: value
@@ -212,49 +217,25 @@ const ExamInterface = () => {
 };
 
 function ChiTietKiThiDanhSachThiSinh() {
-  const [selectedAnswers, setSelectedAnswers] = useState({
-    question1: 'A',
-    question2: 'A',
-    question3: 'B'
-  });
-
-  const handleAnswerChange = (questionId, value) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [questionId]: value
-    }));
-  };
-
-  const studentInfo = {
-    name: "Nguyễn Văn Bình",
-    gender: "Nam",
-    birthDate: "15/01/2004",
-    phoneNumber: "0872837290",
-    correctAnswers: "35/50",
-    score: "7.0/10"
-  };
-
-  const examStats = {
-    totalQuestions: 50,
-    difficulty: {
-      easy: 0.2,
-      medium: 0.25,
-      hard: 0.4
-    }
-  };
+  const { idKiThi } = useParams();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [themLopModal, setThemLop] = useState(false)
+  const [lopChon, setLopChon] = useState([])
 
   const [danhSachLopGV, setDanhLopGV] = useState([])
+  const [lopKiThi, setLopKiThi] = useState<any>([])
 
-  const classData = [
-    { id: 1, name: 'Toán rời rạc N01', students: 25 },
-    { id: 2, name: 'Toán rời rạc N02', students: 20 },
-    { id: 3, name: 'Toán rời rạc N03', students: 15 },
-    { id: 4, name: 'Toán rời rạc N04', students: 20 },
-    { id: 5, name: 'Toán rời rạc N05', students: 25 },
-  ];
+
+  console.log({ lopKiThi, danhSachLopGV })
+  useEffect(function () {
+    LayDanhSachLopHoc(+(idKiThi ?? 0)).then(result => {
+      setLopKiThi(result.data)
+    })
+    GetLopHoc().then(Result => {
+      setDanhLopGV(Result.data)
+    })
+  }, [idKiThi])
 
   const columns = [
     {
@@ -278,10 +259,6 @@ function ChiTietKiThiDanhSachThiSinh() {
     }
   ];
 
-  const filteredClasses = classData.filter(cls =>
-    cls.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="m-10">
       {/* Header */}
@@ -300,7 +277,7 @@ function ChiTietKiThiDanhSachThiSinh() {
 
       {/* Search and Stats */}
       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-5">
-        <Text>Tổng số lớp: <span className="font-semibold text-gray-800">5</span></Text>
+        <Text>Tổng số lớp: <span className="font-semibold text-gray-800">{lopKiThi[0]?.lopHoc?.length}</span></Text>
         <Text>Tổng số học sinh: <span className="font-semibold text-gray-800">105</span></Text>
       </div>
 
@@ -309,17 +286,25 @@ function ChiTietKiThiDanhSachThiSinh() {
         <Collapse
           accordion
           bordered={false}
-          items={filteredClasses.map((i, j) => ({
+          items={lopKiThi[0]?.lopHoc?.map((i: any, j: number) => ({
             key: j,
-            label: <p className='font-bold'>{i.name}</p>,
-            children: (
-              <Table columns={columns} />
-            )
+            label: <p className='font-semibold'>{i.tenLop}</p>,
+            children: <Table columns={columns} />,
+            extra: <Button variant='text' color='red' icon={<FontAwesomeIcon icon={faTrash} />}
+              onClick={async e => {
+                e.stopPropagation()
+                console.log(i)
+                await XoaDanhSachLopHoc(i.id).then(a => {
+                  setLopKiThi(a.data)
+                }).catch(err => {
+                  message.error("Xóa thất bại!")
+                })
+              }} />
           }))} />
       </div>
 
       {/* No results message */}
-      {filteredClasses.length === 0 && (
+      {lopKiThi[0]?.lopHoc?.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">
             <SearchOutlined />
@@ -335,9 +320,31 @@ function ChiTietKiThiDanhSachThiSinh() {
       <Modal open={themLopModal} title="THÊM LỚP" okText="Xác nhận" cancelText="Hủy"
         onCancel={() => {
           setThemLop(false)
+          setLopChon([])
+        }}
+        onOk={async () => {
+          const kiThi = +(idKiThi ?? 0)
+          const input = lopChon.map(i => ({
+            idKiThi: kiThi,
+            idLopHoc: i
+          }))
+          await ThemDanhSachLopHoc(kiThi, input).then(result => {
+            setLopKiThi(result.data)
+          }).catch(err => {
+            message.error("Them that bai!")
+          })
+          setThemLop(false)
+          setLopChon([])
         }}>
         <Select mode="multiple" allowClear style={{ width: '100%' }} placeholder="Please select"
-          options={[]} />
+          value={lopChon}
+          onChange={value => setLopChon(value)}
+          options={danhSachLopGV
+            .filter((i: any) => !lopKiThi[0]?.lopHoc.some((j: any) => j.maLop === i.maLop))
+            .map((i: any) => ({
+              label: i.tenLop,
+              value: i.id
+            }))} />
       </Modal>
 
       <Modal open={false} title="XEM CHI TIẾT BÀI LÀM" okText="Xác nhận" cancelText="Hủy" width={1000} footer={[]}

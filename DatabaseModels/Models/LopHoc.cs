@@ -13,6 +13,7 @@ public class MaMoiLopHoc
     public LopHoc? LopHoc { get; set; }
 
     public List<LopHoc_NguoiDung>? LopHoc_NguoiDung { get; set; }
+    public List<LopHoc_KiThi>? LopHoc_KiThi { get; set; }
 }
 
 public class LopHoc

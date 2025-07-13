@@ -13,5 +13,18 @@ public class KiThi
 
   public int IdMonHoc { get; set; }
   public MonHoc? MonHoc { get; set; }
+
+  public List<LopHoc_KiThi>? LopHoc_KiThi { get; set; }
 }
 
+public class LopHoc_KiThi
+{
+  [Key]
+  public int Id { get; set; }
+
+  public int IdLopHoc { get; set; }
+  public LopHoc? LopHoc { get; set; }
+
+  public int IdKiThi { get; set; }
+  public KiThi? KiThi { get; set; }
+}

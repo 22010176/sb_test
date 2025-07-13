@@ -34,20 +34,15 @@ const ThongTinKithiChiTietForm = () => {
     })
   }, [idKiThi])
 
-  const onFinish = async (values) => {
+  const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('Form values:', values);
       const input = {
         idMonHoc: values.idMonHoc,
         tenKiThi: values.tenKiThi,
         thoiGianLamBaiThi: +values.thoiGianLamBaiThi,
         thoiGianVaoLamBai: dayjs(values.thoiGianVaoLamBai).toDate()
       }
-      console.log(input)
       await CapNhatKiThi(+(idKiThi ?? 0), input).then(function (data) {
         console.log(data)
         LayKiThiChiTiet(+(idKiThi ?? 0)).then(result => {
@@ -64,8 +59,7 @@ const ThongTinKithiChiTietForm = () => {
       }).catch(err => {
         message.error("Cập nhật thất bại!")
       })
-      console.log(input)
-      // Handle form submission here
+
     } finally {
       setLoading(false);
       navigate(0)

@@ -18,6 +18,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<DapAnCauHoi> DapAnCauHoi { get; set; }
   public DbSet<MaMoiLopHoc> MaMoiLopHoc { get; set; }
   public DbSet<KiThi> KiThi { get; set; }
+  public DbSet<LopHoc_KiThi> LopHoc_KiThi { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -31,6 +32,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     var boCauHoi = modelBuilder.Entity<BoCauHoi>();
     var cauHoi = modelBuilder.Entity<CauHoi>();
     var dapAnCauHoi = modelBuilder.Entity<DapAnCauHoi>();
+
+    var lopHoc_kiThi = modelBuilder.Entity<LopHoc_KiThi>();
+    lopHoc_kiThi.HasIndex(t => new { t.IdKiThi, t.IdLopHoc }).IsUnique(true);
 
     nguoiDung.HasIndex(t => t.Email).IsUnique(true);
     nguoiDung.HasIndex(t => t.SoDienThoai).IsUnique(true);
