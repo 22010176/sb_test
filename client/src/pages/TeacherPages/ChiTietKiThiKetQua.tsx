@@ -1,6 +1,5 @@
-import React from 'react';
-import { ChevronDown, Trophy, Medal, Award, Users } from 'lucide-react';
 import { Select } from 'antd';
+import { Award, Medal, Trophy } from 'lucide-react';
 
 export default function ChiTietKiThiKetQua() {
   const topStudents = [
@@ -30,7 +29,7 @@ export default function ChiTietKiThiKetQua() {
 
   const maxCount = Math.max(...scoreDistribution.map(item => item.count));
 
-  const getRankIcon = (rank) => {
+  const getRankIcon = (rank: any) => {
     switch (rank) {
       case 1: return <Trophy className="w-5 h-5 text-yellow-500" />;
       case 2: return <Medal className="w-5 h-5 text-gray-400" />;

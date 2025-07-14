@@ -28,6 +28,7 @@
     <ProjectReference Include="..\MailServices\MailServices.csproj" />
     <ProjectReference Include="..\StudentControllers\StudentControllers.csproj" />
     <ProjectReference Include="..\RealtimeServer\RealtimeServer.csproj" />
+    <ProjectReference Include="..\TestControllers\TestControllers.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,14 +1,25 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { CheckCircleOutlined } from '@ant-design/icons';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typography } from 'antd';
+import { useParams } from 'react-router';
+import { LayKiThiChiTiet } from '@/api/GiangVien/KiThi';
+import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
 
 const { Text } = Typography;
 const { Option } = Select;
 
-const ChiTietKiThiCauHoi = () => {
+function ChiTietKiThiCauHoi() {
+  const { idKiThi } = useParams()
+  console.log({ idKiThi })
+  const [kiThi, setKiThi] = useState({})
+
+  const [addQuestionModal, setAddQuestionModal] = useState(false)
+
   const [questionSets, setQuestionSets] = useState([
     { id: 1, title: 'I. Lý thuyết tổ hợp', easy: 15, medium: 10, hard: 5 },
     { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
@@ -28,19 +39,26 @@ const ChiTietKiThiCauHoi = () => {
 
   const totalQuestions = questionSets.reduce((sum, set) => sum + set.easy + set.medium + set.hard, 0);
 
-  const handleAddSet = () => {
-    setEditingSet(null);
-    form.resetFields();
-    setIsModalVisible(true);
-  };
+  useEffect(function () {
+    LayKiThiChiTiet(+(idKiThi ?? 0)).then(async function (result) {
+      setKiThi(result.data)
+    })
+  }, [idKiThi])
 
-  const handleEditSet = (set) => {
+  useEffect(function () {
+    if (!kiThi.idMonHoc) return;
+    GetBoCauHoi(+(kiThi as any).idMonHoc).then(function (result) {
+      console.log(result)
+    })
+  }, [kiThi])
+  console.log(kiThi)
+  const handleEditSet = (set: any) => {
     setEditingSet(set);
     form.setFieldsValue(set);
     setIsModalVisible(true);
   };
 
-  const handleDeleteSet = (id) => {
+  const handleDeleteSet = (id: any) => {
     Modal.confirm({
       title: 'Xác nhận xóa',
       content: 'Bạn có chắc chắn muốn xóa bộ đề này không?',
@@ -86,9 +104,16 @@ const ChiTietKiThiCauHoi = () => {
         <h1 className="text-2xl font-bold text-gray-800">
           Tổng số lượng câu hỏi: {totalQuestions}
         </h1>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddSet}>
-          Thêm bộ đề
-        </Button>
+        <div className='flex items-center gap-2'>
+          <Button variant='solid' color='blue' icon={<PlusOutlined />}
+            onClick={() => setAddQuestionModal(true)}>
+            Thêm câu hỏi
+          </Button>
+          <Button variant='solid' color='green' icon={<FontAwesomeIcon icon={faPen} />}
+            onClick={() => setAddQuestionModal(true)}>
+            Sửa cấu hình
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-5 space-y-4">
@@ -158,7 +183,8 @@ const ChiTietKiThiCauHoi = () => {
         </Form>
       </Modal>
 
-      <Modal open width={1000}
+      <Modal open={addQuestionModal} width={1000}
+        onCancel={() => setAddQuestionModal(false)}
         title={<p className='text-lg font-bold uppercase'>Thêm câu hỏi</p>}>
         <div className="mb-6">
           <Text strong className="block mb-2">

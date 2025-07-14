@@ -11,7 +11,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<NguoiDung> NguoiDung { get; set; }
   public DbSet<LopHoc> LopHoc { get; set; }
   public DbSet<LopHoc_NguoiDung> LopHoc_NguoiDung { get; set; }
-
   public DbSet<MonHoc> MonHoc { get; set; }
   public DbSet<BoCauHoi> BoCauHoi { get; set; }
   public DbSet<CauHoi> CauHoi { get; set; }

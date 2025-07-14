@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Security.Claims;
-
 using DatabaseModels;
 using DatabaseModels.Models;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
