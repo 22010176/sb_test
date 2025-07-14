@@ -2,6 +2,12 @@ import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-de
 import { Button, Card, Form, Input, InputNumber, message, Modal, Select } from 'antd';
 import { useState } from 'react';
 
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Typography } from 'antd';
+
+const { Text } = Typography;
+const { Option } = Select;
+
 const ChiTietKiThiCauHoi = () => {
   const [questionSets, setQuestionSets] = useState([
     { id: 1, title: 'I. Lý thuyết tổ hợp', easy: 15, medium: 10, hard: 5 },
@@ -121,69 +127,154 @@ const ChiTietKiThiCauHoi = () => {
         ))}
       </div>
 
-      {/* Modal for Add/Edit */}
-      <Modal
+      <Modal cancelText="Hủy" className="top-20"
         title={editingSet ? 'Chỉnh sửa bộ đề' : 'Thêm bộ đề mới'}
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
-        okText={editingSet ? 'Cập nhật' : 'Thêm'}
-        cancelText="Hủy"
-        className="top-20"
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          className="mt-4"
-        >
-          <Form.Item
-            label="Tiêu đề bộ đề"
-            name="title"
-            rules={[{ required: true, message: 'Vui lòng nhập tiêu đề bộ đề!' }]}
-          >
+        okText={editingSet ? 'Cập nhật' : 'Thêm'}>
+        <Form form={form} layout="vertical" className="mt-4">
+          <Form.Item label="Tiêu đề bộ đề" name="title"
+            rules={[{ required: true, message: 'Vui lòng nhập tiêu đề bộ đề!' }]}>
             <Input placeholder="Nhập tiêu đề bộ đề" />
           </Form.Item>
 
           <div className="grid grid-cols-3 gap-4">
-            <Form.Item
-              label="Số câu dễ"
-              name="easy"
-              rules={[{ required: true, message: 'Vui lòng nhập số câu dễ!' }]}
-            >
-              <InputNumber
-                min={0}
-                placeholder="0"
-                className="w-full"
-              />
+            <Form.Item label="Số câu dễ" name="easy"
+              rules={[{ required: true, message: 'Vui lòng nhập số câu dễ!' }]}>
+              <InputNumber min={0} placeholder="0" className="w-full" />
             </Form.Item>
 
-            <Form.Item
-              label="Số câu trung bình"
-              name="medium"
-              rules={[{ required: true, message: 'Vui lòng nhập số câu trung bình!' }]}
-            >
-              <InputNumber
-                min={0}
-                placeholder="0"
-                className="w-full"
-              />
+            <Form.Item label="Số câu trung bình" name="medium"
+              rules={[{ required: true, message: 'Vui lòng nhập số câu trung bình!' }]}>
+              <InputNumber min={0} placeholder="0" className="w-full" />
             </Form.Item>
 
-            <Form.Item
-              label="Số câu khó"
-              name="hard"
-              rules={[{ required: true, message: 'Vui lòng nhập số câu khó!' }]}
-            >
-              <InputNumber
-                min={0}
-                placeholder="0"
-                className="w-full"
-              />
+            <Form.Item label="Số câu khó" name="hard"
+              rules={[{ required: true, message: 'Vui lòng nhập số câu khó!' }]}>
+              <InputNumber min={0} placeholder="0" className="w-full" />
             </Form.Item>
           </div>
         </Form>
       </Modal>
-    </div>
+
+      <Modal open width={1000}
+        title={<p className='text-lg font-bold uppercase'>Thêm câu hỏi</p>}>
+        <div className="mb-6">
+          <Text strong className="block mb-2">
+            Chọn bộ câu hỏi <span className="text-red-500">*</span>
+          </Text>
+          <Select placeholder="Chọn bộ câu hỏi" className="w-full">
+            <Option value="set1">Bộ câu hỏi 1</Option>
+            <Option value="set2">Bộ câu hỏi 2</Option>
+            <Option value="set3">Bộ câu hỏi 3</Option>
+          </Select>
+        </div>
+        <hr className="my-6 border-gray-200" />
+        <div className='flex flex-col gap-5'>
+          {/* Câu hỏi 1 */}
+          <Card>
+            <div className="flex items-center mb-4 gap-3">
+              <Text strong className="text-lg">I. Lý thuyết tổ hợp</Text>
+              <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">
+                DỄ
+              </span>
+              <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                CHỌN ĐÁP ÁN ĐÚNG NHẤT
+              </span>
+            </div>
+
+            <div className="mb-4">
+              <Text strong className="text-base">
+                Câu 1: Cho 2 tập A, B với |A|=13,|B|=19,|A∩B|=1. |A∪B| là:
+              </Text>
+            </div>
+
+            <div className="space-y-2">
+              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
+                <div className="flex items-center gap-2">
+                  <Text strong>A.</Text>
+                  <Text>12</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
+                <div className="flex items-center gap-2">
+                  <Text strong>B.</Text>
+                  <Text>32</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircleOutlined className="text-green-500" />
+                  <Text strong>C.</Text>
+                  <Text>31</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
+                <div className="flex items-center gap-2">
+                  <Text strong>D.</Text>
+                  <Text>18</Text>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Câu hỏi 2 */}
+          {/* <Card>
+            <div className="flex items-center mb-4 gap-3">
+              <Text strong className="text-lg">I. Lý thuyết tổ hợp</Text>
+              <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
+                TRUNG BÌNH
+              </span>
+              <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                CHỌN NHIỀU ĐÁP ÁN
+              </span>
+            </div>
+
+            <div className="mb-4">
+              <Text strong className="text-base">
+                Câu 2: Một nhóm có 5 bạn: An, Bình, Cường, Duyên và Hoa. Người ta cần chọn ra 2 bạn để tham gia một trò chơi. Trong các phương án sau, đâu là phát biểu đúng về cách chọn?
+              </Text>
+            </div>
+
+            <div className="space-y-2">
+              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircleOutlined className="text-green-500" />
+                  <Text strong>A.</Text>
+                  <Text>Nếu chọn An rồi Bình là một cách, chọn Bình rồi An là một cách khác.</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
+                <div className="flex items-center gap-2">
+                  <Text strong>B.</Text>
+                  <Text>Nếu chọn An rồi Bình là một cách, chọn Bình rồi An là một cách khác.</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
+                <div className="flex items-center gap-2">
+                  <CheckCircleOutlined className="text-green-500" />
+                  <Text strong>C.</Text>
+                  <Text>Việc chọn 2 bạn để tham gia trò chơi là tổ hợp, không quan tâm đến thứ tự.</Text>
+                </div>
+              </div>
+
+              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
+                <div className="flex items-center gap-2">
+                  <Text strong>D.</Text>
+                  <Text>Có 20 cách để chọn 2 bạn từ nhóm trên.</Text>
+                </div>
+              </div>
+            </div>
+          </Card> */}
+        </div>
+      </Modal >
+    </div >
   );
 };
 

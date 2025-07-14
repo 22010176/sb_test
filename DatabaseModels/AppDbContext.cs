@@ -19,6 +19,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<MaMoiLopHoc> MaMoiLopHoc { get; set; }
   public DbSet<KiThi> KiThi { get; set; }
   public DbSet<LopHoc_KiThi> LopHoc_KiThi { get; set; }
+  public DbSet<CauHinhCauHoiKiThi> CauHinhCauHoiKiThi { get; set; }
+  public DbSet<CauHoiKiThi> CauHoiKiThi { get; set; }
+  public DbSet<DapAnCauHoiKiThi> DapAnCauHoiKiThi { get; set; }
+  public DbSet<KiThi_CauHoi> KiThi_CauHoi { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
