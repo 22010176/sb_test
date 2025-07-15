@@ -24,25 +24,44 @@ public class CauHoiController(AppDbContext context) : ControllerBase
     try
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
-      // List<MonHoc> monHoc = await MonHocController.LayDanhSachMonHoc(context, userId);
-      // var query =
-      //   from mh in context.MonHoc
-
-      //   select new
-      //   {
-      //     mh.Id,
-      //     mh.TenMon,
-      //     mh.ThoiGianCapNhatCuoi,
-      //     BoCauHoi = (
-      //       from bch in context.BoCauHoi
-      //       where bch.IdMonHoc == mh.Id
-      //       select bch
-      //     ).ToList()
-      //   };
+      var query =
+        from mh in context.MonHoc
+        where mh.IdGiangVien == userId
+        select new
+        {
+          mh.Id,
+          mh.MaMon,
+          mh.TenMon,
+          BoCauHoi = (
+            from bch in context.BoCauHoi
+            where bch.IdMonHoc == mh.Id
+            select new
+            {
+              bch.Id,
+              bch.TenBoCauHoi,
+              CauHoi = (
+                from ch in context.CauHoi
+                where ch.IdBoCauHoi == bch.Id
+                select new
+                {
+                  ch.Id,
+                  ch.NoiDung,
+                  ch.DoKho,
+                  LoaiCauHoi = ch.LoaiCauHoi.ToString(),
+                  DapAn = (
+                    from da in context.DapAnCauHoi
+                    where da.IdCauHoi == ch.Id
+                    select da
+                  ).ToList()
+                }
+              ).ToList()
+            }
+          ).ToList()
+        };
       return Ok(new
       {
         Success = true,
-        // Data = await query.ToListAsync()
+        Data = await query.ToListAsync()
       });
     }
     catch (Exception err)
@@ -84,6 +103,27 @@ public class CauHoiController(AppDbContext context) : ControllerBase
       await context.SaveChangesAsync();
 
       // Them dap an
+      List<DapAnCauHoi> dapAnCauHoi = [];
+      foreach (var ch in cauHoi)
+      {
+        int soLuongDapAn = random.Next(3, 6);
+        int dungSai = 0;
+        for (int i = 0; i < soLuongDapAn; ++i)
+        {
+          bool _dungSai = dungSai == 0 || (
+            ch.LoaiCauHoi == LoaiCauHoi.NHIEU_DAP_AN && random.Next(2) == 1
+          );
+          dapAnCauHoi.Add(new()
+          {
+            IdCauHoi = ch.Id,
+            NoiDung = RandomUtils.GenerateString(random.Next(10, 50)),
+            DungSai = _dungSai
+          });
+          if (_dungSai) ++dungSai;
+        }
+      }
+      await context.DapAnCauHoi.AddRangeAsync(dapAnCauHoi);
+      await context.SaveChangesAsync();
 
       return Ok(new ResponseFormat
       {
@@ -107,8 +147,6 @@ public class CauHoiController(AppDbContext context) : ControllerBase
     try
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
-
-
       context.BoCauHoi.RemoveRange(
         from bch in context.BoCauHoi
         join mh in context.MonHoc on bch.IdMonHoc equals mh.Id

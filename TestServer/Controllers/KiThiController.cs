@@ -4,6 +4,7 @@ using DatabaseModels;
 using DatabaseModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Utilities;
@@ -60,7 +61,33 @@ public class KiThiController(AppDbContext context) : ControllerBase
     try
     {
       int id = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+
       List<KiThi> kiThi = [];
+      List<MonHoc> monHoc = await MonHocController.LayDanhSachMonHoc(context, id);
+
+      // Them lopHoc
+      foreach (var mh in monHoc)
+      {
+        for (int i = 0; i < soLuong; ++i)
+        {
+          kiThi.Add(new()
+          {
+            TenKiThi = RandomUtils.GenerateString(random.Next(10, 20)),
+            ThoiGianLamBaiThi = random.Next(15, 90),
+            ThoiGianVaoLamBai = TimeZoneInfo.ConvertTimeToUtc(RandomUtils.GenerateDate(new DateTime(2000, 1, 1))),
+            IdMonHoc = mh.Id
+          });
+        }
+      }
+      await context.KiThi.AddRangeAsync(kiThi);
+      await context.SaveChangesAsync();
+
+      List<LopHoc> lopHoc = await LopHocController.LayDanhSachLopHoc(context, id);
+      foreach (var lh in lopHoc)
+      {
+        // them lophoc
+
+      }
 
       return Ok(new ResponseFormat
       {

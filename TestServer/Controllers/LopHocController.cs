@@ -18,6 +18,11 @@ public class LopHocController(AppDbContext context) : ControllerBase
   readonly AppDbContext context = context;
   readonly Random random = new();
 
+  public static async Task<List<LopHoc>> LayDanhSachLopHoc(AppDbContext context, int userId)
+  {
+    return await context.LopHoc.Where(i => i.IdGiangVien == userId).ToListAsync();
+  }
+
   [HttpGet]
   public async Task<IActionResult> GetLopHoc()
   {
