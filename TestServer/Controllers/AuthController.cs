@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using DatabaseModels;
 using DatabaseModels.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Utilities;
 
-namespace TestControllers;
+namespace TestServer.Controllers;
 
 [ApiController]
 [Route("test/[controller]")]
@@ -36,6 +37,48 @@ public class AuthController(AppDbContext context, IConfiguration configuration) 
     }
   }
 
+  [HttpGet("giang-vien")]
+  public async Task<IActionResult> GetGiangVien()
+  {
+    try
+    {
+      return Ok(new ResponseFormat
+      {
+        Data = await context.NguoiDung.Select(i => i.LoaiNguoiDung == LoaiNguoiDung.GIANG_VIEN).ToArrayAsync(),
+        Success = true
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Success = false,
+        Data = err
+      });
+    }
+  }
+
+  [HttpGet("hoc-sinh")]
+  public async Task<IActionResult> GetHocSinh()
+  {
+    try
+    {
+      return Ok(new ResponseFormat
+      {
+        Data = await context.NguoiDung.Select(i => i.LoaiNguoiDung == LoaiNguoiDung.HOC_SINH).ToArrayAsync(),
+        Success = true
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Success = false,
+        Data = err
+      });
+    }
+  }
+
   [HttpDelete]
   public async Task<IActionResult> DeleteAllRecord()
   {
@@ -47,6 +90,35 @@ public class AuthController(AppDbContext context, IConfiguration configuration) 
       {
         Success = true
       });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Success = false,
+        Data = err
+      });
+    }
+  }
+
+  [HttpGet("token")]
+  public async Task<IActionResult> GetToken()
+  {
+    try
+    {
+      NguoiDung? nguoiDung = await context.NguoiDung.FirstOrDefaultAsync();
+
+      if (nguoiDung == null) throw new Exception("Phải tạo người dùng trước!");
+
+      return Ok(AuthUtilities.GenerateToken(
+        key: configuration["Jwt:Key"]!,
+        issuer: configuration["Jwt:Issuer"]!,
+        audience: configuration["Jwt:Audience"]!,
+        expireTime: int.Parse(configuration["Jwt:ExpireDays"]!),
+        claims: [
+          new Claim(ClaimTypes.UserData, nguoiDung!.Id.ToString()),
+          new Claim(ClaimTypes.Role, nguoiDung.LoaiNguoiDung.ToString()!)
+      ]));
     }
     catch (Exception err)
     {
@@ -114,7 +186,7 @@ public class AuthController(AppDbContext context, IConfiguration configuration) 
           Email = RandomUtils.GenerateRandomEmail(),
           LoaiNguoiDung = LoaiNguoiDung.GIANG_VIEN,
           MatKhau = AuthUtilities.PasswordHashing("a"),
-          ThoiGianTao = RandomUtils.GenerateDate(DateTime.Now)
+          ThoiGianTao = DateTime.UtcNow
         });
       }
       await context.NguoiDung.AddRangeAsync(nguoiDung);

@@ -100,8 +100,7 @@ public class AuthController(AppDbContext context, IConfiguration configuration, 
         claims: [
           new Claim(ClaimTypes.UserData, nguoiDung.Id.ToString()),
           new Claim(ClaimTypes.Role, nguoiDung.LoaiNguoiDung.ToString()!)
-        ]
-      )
+      ])
     });
   }
 
