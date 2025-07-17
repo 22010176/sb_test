@@ -61,7 +61,7 @@ function Sidebar() {
           <span className="font-medium">Chờ duyệt</span>
         </Link>
 
-        <Link to={`/giang-vien/lop-hoc/${lopId}/thanh-tich`}
+        {/* <Link to={`/giang-vien/lop-hoc/${lopId}/thanh-tich`}
           className={[
             "flex items-center gap-3 p-2 rounded-xl group",
             pathname.includes("thanh-tich") ? 'bg-blue-50 text-blue-800' : "hover:bg-blue-50 hover:text-blue-700 text-gray-700"
@@ -70,7 +70,7 @@ function Sidebar() {
             <UserCheck className="size-6 text-blue-700" />
           </div>
           <span className="font-medium">Thành tích của lớp</span>
-        </Link>
+        </Link> */}
       </nav>
     </div>
   )

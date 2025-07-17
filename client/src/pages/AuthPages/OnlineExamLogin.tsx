@@ -6,6 +6,8 @@ import { Link } from 'react-router';
 import { DangNhapNguoiDung, type DangNhapInput } from '@/api/GiangVien/TaiKhoan';
 import { withNoAccount } from '@/hoc/auth';
 
+
+const role = import.meta.env.VITE_ROLE;
 function Element() {
   const [form] = Form.useForm();
   const [rememberPassword, setRememberPassword] = useState(false);
@@ -19,9 +21,20 @@ function Element() {
     }
     await DangNhapNguoiDung(input).then(res => {
       message.success('Đăng nhập thành công!');
-      localStorage.setItem('token', res.data);
-      form.resetFields();
-      window.location.replace('/giang-vien');
+      // localStorage.setItem('token', res.data);
+      // form.resetFields();
+      console.log(role)
+      console.log(res)
+      if (role == "TEACHER") {
+        console.log("DDDD")
+        return
+        // window.location.replace('/giang-vien');
+      }
+      else if (role == "STUDENT") {
+        console.log("DDDD")
+        return
+        window.location.replace('/hoc-sinh');
+      }
     }).catch(() => {
       message.error('Đăng nhập không thành công. Vui lòng thử lại sau!');
       return;

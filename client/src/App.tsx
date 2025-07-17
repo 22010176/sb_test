@@ -72,7 +72,7 @@ function App() {
         {/* GiangVien Route */}
         {role === "TEACHER" && <>
           <Route path='/giang-vien' element={<TeacherLayout />}>
-            <Route path='/thong-tin-tai-khoan' element={<UserProfileForm />} />
+            {/* <Route path='/thong-tin-tai-khoan' element={<UserProfileForm />} /> */}
 
             <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />

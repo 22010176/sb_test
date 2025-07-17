@@ -163,12 +163,12 @@ function Element() {
               <Space direction="vertical" className="w-full" size="small">
                 <div className="flex items-center text-gray-600">
                   <FileTextOutlined className="mr-2" />
-                  <Text>{item?.questionCount ?? 70} Câu hỏi</Text>
+                  <Text>{item?.questionCount ?? 0} Câu hỏi</Text>
                 </div>
 
                 <div className="flex items-center text-gray-600">
                   <ClockCircleOutlined className="mr-2" />
-                  <Text>{item?.details ?? '20 Dễ, 10 Trung bình, 10 Khó'}</Text>
+                  <Text>{item?.details ?? '0 Dễ, 0 Trung bình, 0 Khó'}</Text>
                 </div>
 
                 <div className="flex items-center text-gray-600">

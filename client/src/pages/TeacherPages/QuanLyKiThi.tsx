@@ -115,7 +115,7 @@ function QuanLyKiThi() {
       {/* Exams Grid */}
       <Row gutter={[16, 16]}>
         {kiThi.map((exam: any) => (
-          <Col span={12} key={exam.id}>
+          <Col span={8} key={exam.id}>
             <Link to={`/giang-vien/ki-thi/${exam.id}`}>
 
               <Card className="hover:shadow-lg transition-all duration-300 border-gray-200 h-full">
@@ -147,7 +147,7 @@ function QuanLyKiThi() {
                     <p className="text-base">{exam.tenMon}</p>
                     <div className="ml-auto flex items-center">
                       <ClockCircleOutlined className="mr-2 text-red-500" />
-                      <p className="text-base font-medium">{exam.thoiGianLamBaiThi}</p>
+                      <p className="text-base font-medium">{exam.thoiGianLamBaiThi} phút</p>
                     </div>
                   </div>
 

@@ -42,18 +42,18 @@ public static class RandomUtils
   public static string GenerateRandomEmail()
   {
     string[] domains = ["gmail.com", "yahoo.com", "outlook.com", "example.com"];
-    string user = GenerateString(6, 10).ToLower();
+    string user = $"{GenerateString(6, 10)}-{Guid.NewGuid().ToString().Substring(5, 10)}";
     string domain = domains[random.Next(domains.Length)];
     return $"{user}@{domain}";
   }
-  public static T? PickRand<T>(ref List<T> itemList)
+  public static T? PickRand<T>(ref List<T> itemList, bool remove = true)
   {
     if (itemList.Count == 0) return default;
 
     int randomIndex = random.Next(itemList.Count);
 
     T pickedItem = itemList[randomIndex];
-    itemList.RemoveAt(randomIndex);
+    if (remove) itemList.RemoveAt(randomIndex);
 
     return pickedItem;
   }
