@@ -7,7 +7,7 @@ const items: MenuProps['items'] = [
   {
     key: '1',
     label: (
-      <Link to="/giang-vien/thong-tin-tai-khoan" className='font-medium ' style={{ color: "#6B406B" }}>
+      <Link to="/thong-tin-tai-khoan" className='font-medium ' style={{ color: "#6B406B" }}>
         Thông tin tài khoản
       </Link>
     ),
@@ -40,9 +40,9 @@ function Header() {
         <h1 className="ml-2 text-xl">Online Exam</h1>
       </Link>
       <div className="flex gap-20">
-        <Link to="/hoc-sinh/lop-hoc" className={["font-medium  px-5 py-1", path.includes('/lop-hoc') && 'border-white border-2 rounded-xl'].join(' ')}>LỚP HỌC</Link>
-        <Link to="/hoc-sinh/ki-thi" className={["font-medium   px-5 py-1", path.includes('/ki-thi') && 'border-white border-2 rounded-xl'].join(' ')}>KỲ THI</Link>
-        <Link to="/hoc-sinh/thong-ke" className={["font-medium   px-5 py-1", path.includes('/ki-thi') && 'border-white border-2 rounded-xl'].join(' ')}>THỐNG KÊ</Link>
+        <Link to="/hoc-sinh/lop-hoc" className={["font-medium px-5 py-1", path?.includes('/lop-hoc') && 'border-white border-2 rounded-xl'].join(' ')}>LỚP HỌC</Link>
+        <Link to="/hoc-sinh/ki-thi" className={["font-medium px-5 py-1", path?.includes('/ki-thi') && 'border-white border-2 rounded-xl'].join(' ')}>KỲ THI</Link>
+        <Link to="/hoc-sinh/thong-ke" className={["font-medium px-5 py-1", path?.includes('/thong-ke') && 'border-white border-2 rounded-xl'].join(' ')}>THỐNG KÊ</Link>
       </div>
       <div className="flex gap-10 items-center">
         <Dropdown menu={{ items }}>

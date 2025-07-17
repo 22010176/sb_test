@@ -7,16 +7,16 @@ import { PageContext } from "@/contexts/PageContext";
 
 export function withGiangVienRole(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
-    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
+    // const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
-    if (pageData.user === 'loading') return ""
-    if (pageData.user === null) {
-      localStorage.removeItem('token')
-      return <Navigate to="/" />
-    }
+    // if (pageData.user === 'loading') return ""
+    // if (pageData.user === null) {
+    //   localStorage.removeItem('token')
+    //   return <Navigate to="/" />
+    // }
 
-    const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 0) return <Navigate to={import.meta.env.VITE_HOCSINH_PAGE} />
+    // const user: UserData = pageData.user as UserData
+    // if (user.loaiNguoiDung !== 0) return <Navigate to={import.meta.env.VITE_HOCSINH_PAGE} />
 
     return <Component {...props} />
   }
@@ -26,14 +26,14 @@ export function withHocSinhRole(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
-    if (pageData.user === 'loading') return ""
-    if (pageData.user === null) {
-      localStorage.removeItem('token')
-      return <Navigate to="/" />
-    }
+    // if (pageData.user === 'loading') return ""
+    // if (pageData.user === null) {
+    //   localStorage.removeItem('token')
+    //   return <Navigate to="/" />
+    // }
 
-    const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 1) return <Navigate to={import.meta.env.VITE_GIANGVIEN_PAGE} />
+    // const user: UserData = pageData.user as UserData
+    // if (user.loaiNguoiDung !== 1) return <Navigate to={import.meta.env.VITE_GIANGVIEN_PAGE} />
 
     return <Component {...props} />
   }
@@ -43,8 +43,8 @@ export function withAccount(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
-    if (pageData.user === 'loading') return ""
-    if (pageData.user === null) return <Navigate to="/" />
+    // if (pageData.user === 'loading') return ""
+    // if (pageData.user === null) return <Navigate to="/" />
 
     return <Component {...props} />
   }
@@ -53,14 +53,15 @@ export function withAccount(Component: FC | string) {
 export function withNoAccount(Component: FC | string) {
   const role = import.meta.env.VITE_ROLE
   return (props: JSX.IntrinsicAttributes) => {
-    const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
+    // const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
-    if (pageData.user === 'loading') return ""
-    if (pageData.user === null) return <Component {...props} />
+    // if (pageData.user === 'loading') return ""
+    // if (pageData.user === null)
+    return <Component {...props} />
 
-    const user = pageData.user as UserData
-    if (user.loaiNguoiDung === 0) return <Navigate to={role === "TEACHER" ? "/giang-vien" : "/hoc-sinh"} />
+    // const user = pageData.user as UserData
+    // if (user.loaiNguoiDung === 0) return <Navigate to={role === "TEACHER" ? "/giang-vien" : "/hoc-sinh"} />
 
-    return <Navigate to="/" />
+    // return <Navigate to="/" />
   }
 }

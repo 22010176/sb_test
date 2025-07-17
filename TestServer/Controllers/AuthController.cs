@@ -65,7 +65,7 @@ public class AuthController(AppDbContext context, IConfiguration configuration) 
     {
       return Ok(new ResponseFormat
       {
-        Data = await context.NguoiDung.Select(i => i.LoaiNguoiDung == LoaiNguoiDung.HOC_SINH).ToArrayAsync(),
+        Data = await context.NguoiDung.Where(i => i.LoaiNguoiDung == LoaiNguoiDung.HOC_SINH).Select(i => i).ToArrayAsync(),
         Success = true
       });
     }

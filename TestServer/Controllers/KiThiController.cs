@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DatabaseModels;
@@ -56,7 +57,7 @@ public class KiThiController(AppDbContext context) : ControllerBase
   }
 
   [HttpPost]
-  public async Task<IActionResult> GenerateKiThi(int soLuong)
+  public async Task<IActionResult> GenerateKiThi(int soLuongKiThi)
   {
     try
     {
@@ -65,10 +66,10 @@ public class KiThiController(AppDbContext context) : ControllerBase
       List<KiThi> kiThi = [];
       List<MonHoc> monHoc = await MonHocController.LayDanhSachMonHoc(context, id);
 
-      // Them lopHoc
+      // Them kiThi
       foreach (var mh in monHoc)
       {
-        for (int i = 0; i < soLuong; ++i)
+        for (int i = 0; i < soLuongKiThi; ++i)
         {
           kiThi.Add(new()
           {
@@ -82,16 +83,43 @@ public class KiThiController(AppDbContext context) : ControllerBase
       await context.KiThi.AddRangeAsync(kiThi);
       await context.SaveChangesAsync();
 
-      List<LopHoc> lopHoc = await LopHocController.LayDanhSachLopHoc(context, id);
-      foreach (var lh in lopHoc)
+      List<CauHinhCauHoiKiThi> cauHinhKiThi = [];
+      foreach (var kt in kiThi)
       {
-        // them lophoc
-
+        double diem = 0;
+        for (int i = 0; i < 3; ++i)
+        {
+          double _diem = i < 2 ? random.NextDouble() * 3.33 : 10.0 - diem;
+          cauHinhKiThi.Add(new()
+          {
+            DoKho = i,
+            IdKiThi = kt.Id,
+            TongDiem = _diem,
+            SoCauHoiTrongDe = random.Next(20)
+          });
+          diem += _diem;
+        }
       }
+      await context.CauHinhCauHoiKiThi.AddRangeAsync(cauHinhKiThi);
+      await context.SaveChangesAsync();
 
       return Ok(new ResponseFormat
       {
-        Data = kiThi,
+        Data = await (
+          from kt in context.KiThi
+          join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
+          where mh.IdGiangVien == id
+          select new
+          {
+            kt,
+            mh,
+            CauHinh = (
+              from ch in context.CauHinhCauHoiKiThi
+              where ch.IdKiThi == kt.Id
+              select ch
+            ).ToList(),
+          }
+        ).ToListAsync(),
         Success = true
       });
     }

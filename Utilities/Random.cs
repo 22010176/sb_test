@@ -46,4 +46,15 @@ public static class RandomUtils
     string domain = domains[random.Next(domains.Length)];
     return $"{user}@{domain}";
   }
+  public static T? PickRand<T>(ref List<T> itemList)
+  {
+    if (itemList.Count == 0) return default;
+
+    int randomIndex = random.Next(itemList.Count);
+
+    T pickedItem = itemList[randomIndex];
+    itemList.RemoveAt(randomIndex);
+
+    return pickedItem;
+  }
 }

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 
 namespace DatabaseModels.Models;
 
@@ -16,6 +15,7 @@ public class KiThi
 
   public List<LopHoc_KiThi>? LopHoc_KiThi { get; set; }
   public List<CauHinhCauHoiKiThi>? CauHinhCauHoiKiThi { get; set; }
+  public List<CauHoiKiThi>? CauHoiKiThi { get; set; }
 }
 
 public class LopHoc_KiThi
@@ -35,8 +35,8 @@ public class CauHinhCauHoiKiThi
   [Key]
   public int Id { get; set; }
   public double DoKho { get; set; }
-  public int SoCau { get; set; }
-  public double SoDiemMotCau { get; set; }
+  public int SoCauHoiTrongDe { get; set; }
+  public double TongDiem { get; set; }
 
   public int IdKiThi { get; set; }
   public KiThi? KiThi { get; set; }
@@ -55,8 +55,8 @@ public class CauHoiKiThi
   public int IdCauHoi { get; set; }
   public CauHoi? CauHoi { get; set; }
 
-  public int IdBoCauHoi { get; set; }
-  public BoCauHoi? BoCauHoi { get; set; }
+  public int IdKiThi { get; set; }
+  public KiThi? KiThi { get; set; }
 
   public List<DapAnCauHoiKiThi>? DapAnCauHoi { get; set; }
 }
@@ -73,16 +73,4 @@ public class DapAnCauHoiKiThi
 
   public int IdCauHoi { get; set; }
   public CauHoiKiThi? CauHoi { get; set; }
-}
-
-public class KiThi_CauHoi
-{
-  [Key]
-  public int Id { get; set; }
-
-  public int IdCauHoi { get; set; }
-  public CauHoiKiThi? CauHoi { get; set; }
-
-  public int IdKiThi { get; set; }
-  public KiThi? KiThi { get; set; }
 }

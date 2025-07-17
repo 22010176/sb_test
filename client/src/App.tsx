@@ -22,17 +22,19 @@ import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
 
+import HocSinh_QuanLiKiThi from './pages/StudentPages/QuanLyKiThi';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
 import ChiTietChoDuyet from './pages/TeacherPages/ChiTietChoDuyet';
 import ChiTietDanhSachLop from './pages/TeacherPages/ChiTietDanhSachLop';
-import { ChiTietKiThi, ChiTietLop } from './pages/TeacherPages/ThongTinChiTiet';
+import ChiTietKiThiCauHoi from './pages/TeacherPages/ChiTietKiThiCauHoi';
+import ChiTietKiThiDanhSachThiSinh from './pages/TeacherPages/ChiTietKiThiDanhSachThiSinh';
+import ChiTietKiThiForm from './pages/TeacherPages/ChiTietKiThiForm';
+import ChiTietKiThiKetQua from './pages/TeacherPages/ChiTietKiThiKetQua';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
-import ChiTietKiThiForm from './pages/TeacherPages/ChiTietKiThiForm';
-import ChiTietKiThiDanhSachThiSinh from './pages/TeacherPages/ChiTietKiThiDanhSachThiSinh';
-import ChiTietKiThiKetQua from './pages/TeacherPages/ChiTietKiThiKetQua';
-import ChiTietKiThiCauHoi from './pages/TeacherPages/ChiTietKiThiCauHoi';
+import { ChiTietKiThi, ChiTietLop } from './pages/TeacherPages/ThongTinChiTiet';
+import LamBaiThi from './pages/StudentPages/LamBaiThi';
 
 const role = import.meta.env.VITE_ROLE;
 
@@ -46,8 +48,8 @@ function App() {
         const user = res.data as UserData
         dispatch({ type: 'SET_USER', payload: user })
 
-        if (user.loaiNguoiDung === 0) { }
-        else if (user.loaiNguoiDung === 1) navigate('/hoc-sinh')
+        // if (user.loaiNguoiDung === 0) { }
+        // else if (user.loaiNguoiDung === 1) navigate('/hoc-sinh')
       }).catch(err => {
         localStorage.removeItem('token')
         dispatch({ type: 'SET_USER', payload: null })
@@ -70,6 +72,8 @@ function App() {
         {/* GiangVien Route */}
         {role === "TEACHER" && <>
           <Route path='/giang-vien' element={<TeacherLayout />}>
+            <Route path='/thong-tin-tai-khoan' element={<UserProfileForm />} />
+
             <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
             <Route path='/giang-vien/lop-hoc' element={<GiangVien_QuanLyLopHoc />} />
@@ -99,8 +103,14 @@ function App() {
 
         {/* HocSinh Route */}
         {role === 'STUDENT' && <Route element={<StudentLayout />}>
+          <Route path='/thong-tin-tai-khoan' element={<UserProfileForm />} />
           <Route path='/hoc-sinh' element={<Navigate to="/hoc-sinh/lop-hoc" />} />
           <Route path='/hoc-sinh/lop-hoc' element={<HocSinh_QuanLyLopHoc />} />
+          {/* <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} /> */}
+          <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} />
+          <Route path='/hoc-sinh/lam-bai' element={<LamBaiThi />} />
+          {/* <Route path='/hoc-sinh/ki-thi' element={<StudentLayout />}>
+          </Route> */}
         </Route>}
       </Routes>
     </PageContext.Provider>

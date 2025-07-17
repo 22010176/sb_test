@@ -21,7 +21,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<CauHinhCauHoiKiThi> CauHinhCauHoiKiThi { get; set; }
   public DbSet<CauHoiKiThi> CauHoiKiThi { get; set; }
   public DbSet<DapAnCauHoiKiThi> DapAnCauHoiKiThi { get; set; }
-  public DbSet<KiThi_CauHoi> KiThi_CauHoi { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

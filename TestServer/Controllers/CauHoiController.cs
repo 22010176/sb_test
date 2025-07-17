@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DatabaseModels;
@@ -10,6 +12,16 @@ using Utilities;
 
 namespace TestServer.Controllers;
 
+public class CauHoiType
+{
+  public int Id { get; set; }
+  public int IdBoCauHoi { get; set; }
+  public double? DoKho { get; set; }
+  public string? NoiDung { get; set; }
+  public LoaiCauHoi LoaiCauHoi { get; set; }
+  public List<DapAnCauHoi>? DapAnCauHoi { get; set; }
+}
+
 [ApiController]
 [Authorize]
 [Route("test/[controller]")]
@@ -17,6 +29,31 @@ public class CauHoiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
   readonly Random random = new();
+
+  public static async Task<List<CauHoiType>> LayDanhSachCauHoi(AppDbContext context, int userId)
+  {
+    var query = (
+      from ch in context.CauHoi
+      join bch in context.BoCauHoi on ch.IdBoCauHoi equals bch.Id
+      join mh in context.MonHoc on bch.IdMonHoc equals mh.Id
+      where mh.IdGiangVien == userId
+      orderby ch.DoKho ascending
+      select new CauHoiType()
+      {
+        Id = ch.Id,
+        IdBoCauHoi = ch.IdBoCauHoi,
+        DoKho = ch.DoKho,
+        NoiDung = ch.NoiDung,
+        LoaiCauHoi = ch.LoaiCauHoi,
+        DapAnCauHoi = (
+          from da in context.DapAnCauHoi
+          where da.IdCauHoi == ch.Id
+          select da
+        ).ToList()
+      }
+    );
+    return await query.ToListAsync();
+  }
 
   [HttpGet]
   public async Task<IActionResult> Get()
@@ -169,3 +206,4 @@ public class CauHoiController(AppDbContext context) : ControllerBase
     }
   }
 }
+
