@@ -1,6 +1,6 @@
 import { GoogleOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Select } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 import { DangNhapNguoiDung, type DangNhapInput } from '@/api/GiangVien/TaiKhoan';
@@ -12,6 +12,14 @@ function Element() {
   const [form] = Form.useForm();
   const [rememberPassword, setRememberPassword] = useState(false);
 
+  useEffect(function () {
+    console.log(role)
+    if (!localStorage.getItem('token')) return
+
+    if (role === "STUDENT") window.location.replace(import.meta.env.VITE_HOCSINH_PAGE)
+    else if (role == "TEACHER") window.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
+  }, [])
+
   const onFinish = async (values: { loaiNguoiDung: number, email: string, matKhau: string }) => {
     const input: DangNhapInput = {
       loaiNguoiDung: values.loaiNguoiDung,
@@ -21,19 +29,19 @@ function Element() {
     }
     await DangNhapNguoiDung(input).then(res => {
       message.success('Đăng nhập thành công!');
-      // localStorage.setItem('token', res.data);
-      // form.resetFields();
+      localStorage.setItem('token', res.data);
+      form.resetFields();
       console.log(role)
       console.log(res)
       if (role == "TEACHER") {
         console.log("DDDD")
-        return
-        // window.location.replace('/giang-vien');
+        // return
+        window.location.replace('/giang-vien');
       }
       else if (role == "STUDENT") {
         console.log("DDDD")
-        return
         window.location.replace('/hoc-sinh');
+        return
       }
     }).catch(() => {
       message.error('Đăng nhập không thành công. Vui lòng thử lại sau!');
