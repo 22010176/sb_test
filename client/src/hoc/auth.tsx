@@ -4,6 +4,8 @@ import { Navigate } from "react-router";
 import type { PageContextData, UserData } from "@/App.types";
 import { PageContext } from "@/contexts/PageContext";
 
+const role = import.meta.env.VITE_ROLE;
+const link = role === "STUDENT" ? import.meta.env.VITE_HOCSINH_PAGE : import.meta.env.VITE_GIANGVIEN_PAGE
 
 export function withGiangVienRole(Component: FC | string) {
   return (props: JSX.IntrinsicAttributes) => {
@@ -51,7 +53,7 @@ export function withAccount(Component: FC | string) {
 }
 
 export function withNoAccount(Component: FC | string) {
-  const role = import.meta.env.VITE_ROLE
+
   return (props: JSX.IntrinsicAttributes) => {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
@@ -59,8 +61,8 @@ export function withNoAccount(Component: FC | string) {
     if (pageData.user === null) return <Component {...props} />
 
     const user = pageData.user as UserData
-    if (user.loaiNguoiDung === 0) return <Navigate to={role === "TEACHER" ? "/giang-vien" : "/hoc-sinh"} />
+    return window.location.replace(link)
 
-    return <Navigate to="/" />
+    // return <Navigate to="/" />
   }
 }

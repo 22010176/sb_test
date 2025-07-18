@@ -1,24 +1,19 @@
 import { GoogleOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 import { DangNhapNguoiDung, type DangNhapInput } from '@/api/GiangVien/TaiKhoan';
 import { withNoAccount } from '@/hoc/auth';
 
 
 const role = import.meta.env.VITE_ROLE;
+const link = role === "STUDENT" ? import.meta.env.VITE_HOCSINH_PAGE : import.meta.env.VITE_GIANGVIEN_PAGE
+
 function Element() {
+
   const [form] = Form.useForm();
   const [rememberPassword, setRememberPassword] = useState(false);
-
-  useEffect(function () {
-    console.log(role)
-    if (!localStorage.getItem('token')) return
-
-    if (role === "STUDENT") window.location.replace(import.meta.env.VITE_HOCSINH_PAGE)
-    else if (role == "TEACHER") window.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
-  }, [])
 
   const onFinish = async (values: { loaiNguoiDung: number, email: string, matKhau: string }) => {
     const input: DangNhapInput = {

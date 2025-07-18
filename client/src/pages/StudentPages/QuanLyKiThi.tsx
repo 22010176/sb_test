@@ -1,8 +1,11 @@
+import { LayDanhSachKiThi } from '@/api/HocSinh/KiThi';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Input, Modal } from 'antd';
+import dayjs from 'dayjs';
 import { Calendar, Clock, FileText, Trophy } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 
 
 const ExamResultDetail = () => {
@@ -47,7 +50,6 @@ const ExamResultDetail = () => {
       difficulty: 'medium'
     }
   ];
-
   const getFilteredQuestions = () => {
     if (selectedFilter === 'correct') {
       return questions.filter(q => q.isCorrect);
@@ -202,26 +204,24 @@ const ExamResultDetail = () => {
 const ExamCard = ({ exam, isCompleted = false }) => (
   <div className={`flex justify-between items-center p-6 rounded-lg border-l-4 ${isCompleted ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-500'}`}>
     <div>
-
-
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{exam.title}</h3>
-      <p className="text-gray-600 mb-4">Môn: {exam.subject}</p>
+      <h3 className="text-lg font-semibold text-gray-800 mb-2">{exam.tenKiThi}</h3>
+      <p className="text-gray-600 mb-4">Môn: {exam.tenMon}</p>
 
       <div className="flex items-center gap-6 text-sm text-gray-600">
         <div className="flex items-center gap-1">
           <Calendar className="w-4 h-4 text-green-600" />
-          <span>{exam.date} {exam.time}</span>
+          <span>{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</span>
         </div>
 
         {!isCompleted && (
           <>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4 text-orange-600" />
-              <span>{exam.duration}</span>
+              <span>{exam.thoiGianLamBaiThi} phút</span>
             </div>
             <div className="flex items-center gap-1">
               <FileText className="w-4 h-4 text-blue-600" />
-              <span>{exam.questions}</span>
+              <span>{10} câu</span>
             </div>
           </>
         )}
@@ -254,7 +254,26 @@ const ExamCard = ({ exam, isCompleted = false }) => (
 );
 
 const HocSinh_QuanLiKiThi = () => {
+  const location = useLocation()
   const [searchQuery, setSearchQuery] = useState('');
+  const [kiThi, setKiThi] = useState<any>([])
+
+  const kiThiDaDienRa = useMemo(function () {
+    return kiThi.filter(i => dayjs(i.thoiGianVaoLamBai).isBefore(dayjs()))
+  }, [kiThi])
+
+  const kiThiSapDienRa = useMemo(function () {
+    return kiThi.filter(i => dayjs(i.thoiGianVaoLamBai).add(i.thoiGianLamBaiThi, 'minutes').isAfter(dayjs(new Date())))
+  }, [kiThi])
+
+  console.log(kiThi)
+  useEffect(function () {
+    LayDanhSachKiThi().then(data => {
+      console.log(data)
+      setKiThi(data.data)
+    })
+  }, [location])
+
 
   const upcomingExams = [
     {
@@ -298,8 +317,6 @@ const HocSinh_QuanLiKiThi = () => {
     }
   ];
 
-
-
   return (
     <div className='p-10'>
       {/* Search Bar */}
@@ -315,7 +332,7 @@ const HocSinh_QuanLiKiThi = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          {upcomingExams.map((exam) => (
+          {kiThiSapDienRa.map((exam) => (
             <ExamCard key={exam.id} exam={exam} />
           ))}
         </div>
@@ -333,7 +350,7 @@ const HocSinh_QuanLiKiThi = () => {
         </div>
 
         <div className="space-y-4">
-          {completedExams.map((exam) => (
+          {kiThiDaDienRa.map((exam) => (
             <ExamCard key={exam.id} exam={exam} isCompleted={true} />
           ))}
         </div>
@@ -347,4 +364,4 @@ const HocSinh_QuanLiKiThi = () => {
   );
 };
 
-export default HocSinh_QuanLiKiThi;
+export default HocSinh_QuanLiKiThi; 

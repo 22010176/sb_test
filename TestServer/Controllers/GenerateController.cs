@@ -155,7 +155,7 @@ public class GenerateController(AppDbContext context) : ControllerBase
       {
         TenKiThi = RandomUtils.GenerateString(random.Next(10, 15)),
         ThoiGianLamBaiThi = random.Next(10, 300),
-        ThoiGianVaoLamBai = TimeZoneInfo.ConvertTimeToUtc(RandomUtils.GenerateDate(new DateTime(2024, 1, 1))),
+        ThoiGianVaoLamBai = TimeZoneInfo.ConvertTimeToUtc(RandomUtils.GenerateDate(new DateTime(2025, 1, 1), new DateTime(2026, 1, 1))),
         IdMonHoc = idMonHoc
       });
     }
