@@ -1,9 +1,9 @@
 import { GetLopHoc } from '@/api/GiangVien/LopHoc';
 import { LayDanhSachLopHoc, ThemDanhSachLopHoc, XoaDanhSachLopHoc } from '@/api/GiangVien/LopHoc_KiThi';
-import { DeleteOutlined, PlusOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Avatar, Button, Collapse, Input, message, Modal, Result, Select, Table, Typography } from 'antd';
+import { Avatar, Button, Collapse, Input, message, Modal, Select, Table, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -226,17 +226,15 @@ function ChiTietKiThiDanhSachThiSinh() {
   const [danhSachLopGV, setDanhLopGV] = useState([])
   const [lopKiThi, setLopKiThi] = useState<any>([])
 
-
-  console.log({ lopKiThi, danhSachLopGV })
   useEffect(function () {
     LayDanhSachLopHoc(+(idKiThi ?? 0)).then(result => {
-      setLopKiThi(result.data)
+      setLopKiThi(result.data[0])
     })
     GetLopHoc().then(Result => {
       setDanhLopGV(Result.data)
     })
   }, [idKiThi])
-
+  console.log(lopKiThi)
   const columns = [
     {
       title: <p className='text-center'>STT</p>, width: 60, className: 'text-center',
@@ -253,11 +251,12 @@ function ChiTietKiThiDanhSachThiSinh() {
     },
     { title: <p className='text-center'>SĐT</p>, dataIndex: 'soDienThoai', key: 'soDienThoai', width: 130 },
     { title: <p className='text-center'>Email</p>, dataIndex: 'email', key: 'email', width: 200, },
-    {
-      title: <p className='text-center'>Thao tác</p>, key: 'action', width: 120, className: 'text-center',
-      render: (_: any, record: any) => <Button variant='solid' color='red' icon={<DeleteOutlined />} />
-    }
+    // {
+    //   title: <p className='text-center'>Thao tác</p>, key: 'action', width: 120, className: 'text-center',
+    //   render: (_: any, record: any) => <Button variant='solid' color='red' icon={<DeleteOutlined />} />
+    // }
   ];
+  console.log(danhSachLopGV)
 
   return (
     <div className="m-10">
@@ -277,7 +276,7 @@ function ChiTietKiThiDanhSachThiSinh() {
 
       {/* Search and Stats */}
       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-5">
-        <Text>Tổng số lớp: <span className="font-semibold text-gray-800">{lopKiThi[0]?.lopHoc?.length}</span></Text>
+        <Text>Tổng số lớp: <span className="font-semibold text-gray-800">{lopKiThi?.lopHoc?.length}</span></Text>
         <Text>Tổng số học sinh: <span className="font-semibold text-gray-800">105</span></Text>
       </div>
 
@@ -286,16 +285,16 @@ function ChiTietKiThiDanhSachThiSinh() {
         <Collapse
           accordion
           bordered={false}
-          items={lopKiThi[0]?.lopHoc?.map((i: any, j: number) => ({
+          items={lopKiThi?.lopHoc?.map((i: any, j: number) => ({
             key: j,
             label: <p className='font-semibold'>{i.tenLop}</p>,
-            children: <Table columns={columns} />,
+            children: <Table columns={columns} dataSource={i.hocSinh} />,
             extra: <Button variant='text' color='red' icon={<FontAwesomeIcon icon={faTrash} />}
               onClick={async e => {
                 e.stopPropagation()
                 console.log(i)
                 await XoaDanhSachLopHoc(i.id).then(a => {
-                  setLopKiThi(a.data)
+                  setLopKiThi(a.data[0])
                 }).catch(err => {
                   message.error("Xóa thất bại!")
                 })
@@ -304,7 +303,7 @@ function ChiTietKiThiDanhSachThiSinh() {
       </div>
 
       {/* No results message */}
-      {lopKiThi[0]?.lopHoc?.length === 0 && (
+      {lopKiThi?.lopHoc?.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">
             <SearchOutlined />
@@ -317,6 +316,7 @@ function ChiTietKiThiDanhSachThiSinh() {
           </Text>
         </div>
       )}
+
       <Modal open={themLopModal} title="THÊM LỚP" okText="Xác nhận" cancelText="Hủy"
         onCancel={() => {
           setThemLop(false)
@@ -329,7 +329,7 @@ function ChiTietKiThiDanhSachThiSinh() {
             idLopHoc: i
           }))
           await ThemDanhSachLopHoc(kiThi, input).then(result => {
-            setLopKiThi(result.data)
+            setLopKiThi(result.data[0])
           }).catch(err => {
             message.error("Them that bai!")
           })
@@ -340,7 +340,7 @@ function ChiTietKiThiDanhSachThiSinh() {
           value={lopChon}
           onChange={value => setLopChon(value)}
           options={danhSachLopGV
-            .filter((i: any) => !lopKiThi[0]?.lopHoc.some((j: any) => j.maLop === i.maLop))
+            .filter((i: any) => !lopKiThi?.lopHoc?.some((j: any) => j.id === i.id))
             .map((i: any) => ({
               label: i.tenLop,
               value: i.id

@@ -36,6 +36,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     var dapAnCauHoi = modelBuilder.Entity<DapAnCauHoi>();
 
     var lopHoc_kiThi = modelBuilder.Entity<LopHoc_KiThi>();
+    var CauHoiKiThi = modelBuilder.Entity<CauHoiKiThi>();
+
     lopHoc_kiThi.HasIndex(t => new { t.IdKiThi, t.IdLopHoc }).IsUnique(true);
 
     nguoiDung.HasIndex(t => t.Email).IsUnique(true);
@@ -72,5 +74,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     .Property(t => t.ThoiGianCapNhatCuoi)
     .HasDefaultValueSql("CURRENT_TIMESTAMP")
     .ValueGeneratedOnAddOrUpdate();
+
+    CauHoiKiThi.HasIndex(i => new { i.IdCauHoi, i.IdKiThi }).IsUnique(true);
   }
 }

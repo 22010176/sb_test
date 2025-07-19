@@ -102,6 +102,71 @@ public class KiThiController(AppDbContext context) : ControllerBase
     }
   }
 
+  [HttpPost("{idKiThi}")]
+  public async Task<IActionResult> ThemCauHoi(int idKiThi, CauHoiKiThiInput input)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      List<CauHoi> cauHoi = await (
+        from ch in context.CauHoi
+        where input.DanhSachCauHoi!.Contains(ch.Id)
+        select ch
+      ).ToListAsync();
+
+      List<CauHoiKiThi> cauHoiKiThi = [];
+      foreach (var ch in cauHoi)
+      {
+        cauHoiKiThi.Add(new()
+        {
+          NoiDung = ch.NoiDung,
+          DoKho = ch.DoKho,
+          LoaiCauHoi = ch.LoaiCauHoi,
+          ThoiGianCapNhatCuoi = DateTime.UtcNow,
+          IdCauHoi = ch.Id,
+          IdKiThi = idKiThi
+        });
+      }
+      await context.CauHoiKiThi.AddRangeAsync(cauHoiKiThi);
+      await context.SaveChangesAsync();
+
+      List<DapAnCauHoiKiThi> dapAnCauHoi = [];
+      foreach (var d in cauHoiKiThi)
+      {
+        List<DapAnCauHoi> _dapAnCauHoi = await (
+          from da in context.DapAnCauHoi
+          where da.IdCauHoi == d.IdCauHoi
+          select da
+        ).ToListAsync();
+        foreach (var i in _dapAnCauHoi) dapAnCauHoi.Add(new()
+        {
+          NoiDung = i.NoiDung,
+          DungSai = i.DungSai,
+          IdDapAnCauHoi = i.Id,
+          IdCauHoi = d.Id
+        });
+      }
+      await context.DapAnCauHoiKiThi.AddRangeAsync(dapAnCauHoi);
+      await context.SaveChangesAsync();
+
+      return Ok(new ResponseFormat
+      {
+        Data = cauHoi,
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Data = err,
+        Success = false,
+        Message = ""
+      });
+    }
+  }
+
   [HttpPost]
   [Authorize(Roles = "GIANG_VIEN")]
   public async Task<IActionResult> TaoKiThi(KiThiInput input)
@@ -208,4 +273,9 @@ public record KiThiInput
   public DateTime ThoiGianVaoLamBai { get; set; }
 
   public int IdMonHoc { get; set; }
+}
+
+public record CauHoiKiThiInput
+{
+  public List<int>? DanhSachCauHoi { get; set; }
 }

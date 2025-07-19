@@ -9,6 +9,10 @@ export type KiThiInput = {
   idMonHoc: number
 }
 
+export type CauHoiKiThi = {
+  danhSachCauHoi: number[]
+}
+
 export async function LayDanhSachKiThi() {
   const result = await axios.get(url, {
     headers: {
@@ -34,7 +38,15 @@ export async function CapNhatKiThi(kithiId: number, kiThi: KiThiInput) {
     }
   })
   return result.data
+}
 
+export async function ThemCauHoiKiThi(idKiThi: number, danhSachCauHoi: CauHoiKiThi) {
+  const result = await axios.post(`${url}/${idKiThi}`, danhSachCauHoi, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
 }
 
 export async function XoaKiThi(idKiThi: number) {

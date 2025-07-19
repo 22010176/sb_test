@@ -9,7 +9,7 @@ export default function ExamDetailsLayout() {
       <TeacherHeader />
 
       <div className='flex flex-col grow overflow-auto'>
-        <div className='w-screen h-full grid grid-cols-[auto_1fr]'>
+        <div className='w-screen h-full grid grid-cols-[auto_1fr]  overflow-x-hidden'>
           <Sidebar />
 
           <Outlet />

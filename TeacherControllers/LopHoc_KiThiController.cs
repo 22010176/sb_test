@@ -38,7 +38,25 @@ public class LopHoc_KiThiController(AppDbContext context) : ControllerBase
             kt_lh.Id,
             lh.MaLop,
             lh.TenLop,
-            lh.MoTa
+            lh.MoTa,
+            HocSinh = (
+              from mm in context.MaMoiLopHoc
+              join lh_nd in context.LopHoc_NguoiDung on mm.Id equals lh_nd.IdMaMoi
+              join hs in context.NguoiDung on lh_nd.IdNguoiDung equals hs.Id
+              where
+                mm.IdLopHoc == lh.Id
+                && lh_nd.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
+              orderby hs.HoTen ascending
+              select new
+              {
+                hs.Id,
+                hs.HoTen,
+                GioiTinh = hs.GioiTinh.ToString(),
+                hs.Email,
+                hs.SoDienThoai,
+                hs.NgaySinh,
+              }
+            ).ToList()
           }
         ).ToList()
       };

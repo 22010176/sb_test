@@ -1,14 +1,13 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { useEffect, useState } from 'react';
-
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Typography } from 'antd';
+import { Button, Card, Checkbox, Form, Input, InputNumber, message, Modal, Result, Select, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { LayKiThiChiTiet } from '@/api/GiangVien/KiThi';
+
 import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
+import { GetCauHoi } from '@/api/GiangVien/CauHoi';
+import { LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -17,6 +16,11 @@ function ChiTietKiThiCauHoi() {
   const { idKiThi } = useParams()
   console.log({ idKiThi })
   const [kiThi, setKiThi] = useState({})
+  const [boCauHoi, setBoCauHoi] = useState([])
+  const [bch, setBCH] = useState()
+  const [cauHoi, setCauHoi] = useState([])
+
+  const [cauHoiForm, setCauHoiForm] = useState([])
 
   const [addQuestionModal, setAddQuestionModal] = useState(false)
 
@@ -48,10 +52,18 @@ function ChiTietKiThiCauHoi() {
   useEffect(function () {
     if (!kiThi.idMonHoc) return;
     GetBoCauHoi(+(kiThi as any).idMonHoc).then(function (result) {
-      console.log(result)
+      setBoCauHoi(result.data)
     })
   }, [kiThi])
-  console.log(kiThi)
+
+  useEffect(function () {
+    if (bch == null) return
+    GetCauHoi(bch).then(result => {
+      console.log(result)
+      setCauHoi(result.data)
+    })
+  }, [bch])
+
   const handleEditSet = (set: any) => {
     setEditingSet(set);
     form.setFieldsValue(set);
@@ -110,7 +122,7 @@ function ChiTietKiThiCauHoi() {
             Thêm câu hỏi
           </Button>
           <Button variant='solid' color='green' icon={<FontAwesomeIcon icon={faPen} />}
-            onClick={() => setAddQuestionModal(true)}>
+            onClick={() => { }}>
             Sửa cấu hình
           </Button>
         </div>
@@ -126,9 +138,7 @@ function ChiTietKiThiCauHoi() {
                   {set.title}
                 </h3>
                 <div className="flex gap-2 ml-4">
-                  <Button variant='text' color='blue' icon={<EyeOutlined />} onClick={() => {
-
-                  }} />
+                  <Button variant='text' color='blue' icon={<EyeOutlined />} onClick={() => { }} />
                   <Button variant='text' color='green' icon={<EditOutlined />} onClick={() => handleEditSet(set)} />
                   <Button variant='text' color='red' icon={<DeleteOutlined />} onClick={() => handleDeleteSet(set.id)} />
                 </div>
@@ -183,121 +193,89 @@ function ChiTietKiThiCauHoi() {
         </Form>
       </Modal>
 
-      <Modal open={addQuestionModal} width={1000}
+      <Modal open={addQuestionModal} width={1000} footer={[]}
         onCancel={() => setAddQuestionModal(false)}
         title={<p className='text-lg font-bold uppercase'>Thêm câu hỏi</p>}>
         <div className="mb-6">
           <Text strong className="block mb-2">
             Chọn bộ câu hỏi <span className="text-red-500">*</span>
           </Text>
-          <Select placeholder="Chọn bộ câu hỏi" className="w-full">
-            <Option value="set1">Bộ câu hỏi 1</Option>
-            <Option value="set2">Bộ câu hỏi 2</Option>
-            <Option value="set3">Bộ câu hỏi 3</Option>
-          </Select>
+          <Select placeholder="Chọn bộ câu hỏi" className="w-full"
+            value={bch}
+            onChange={value => setBCH(value)}
+            options={boCauHoi.map((i: any) => ({ value: i.id, label: i.tenBoCauHoi }))} />
         </div>
         <hr className="my-6 border-gray-200" />
         <div className='flex flex-col gap-5'>
           {/* Câu hỏi 1 */}
-          <Card>
-            <div className="flex items-center mb-4 gap-3">
-              <Text strong className="text-lg">I. Lý thuyết tổ hợp</Text>
-              <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">
-                DỄ
-              </span>
-              <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
-                CHỌN ĐÁP ÁN ĐÚNG NHẤT
-              </span>
+          <div className='flex gap-5 items-center'>
+            <div className='flex gap-2'>
+              <p>Chọn tất cả</p>
+              <Checkbox checked={cauHoiForm.length === cauHoi.length} value={true}
+                onChange={(e: any) => {
+                  setCauHoiForm(e.target.value ? cauHoi.map(i => i.id) : [])
+                }} />
             </div>
+            <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}
+              onClick={async e => {
+                const result = await ThemCauHoiKiThi(idKiThi, { danhSachCauHoi: cauHoiForm })
+                  .then(e => {
+                    setAddQuestionModal(false)
+                  })
+                console.log(result.data)
 
-            <div className="mb-4">
-              <Text strong className="text-base">
-                Câu 1: Cho 2 tập A, B với |A|=13,|B|=19,|A∩B|=1. |A∪B| là:
-              </Text>
-            </div>
+              }}>
+              Lưu
+            </Button>
+          </div>
+          {cauHoi.map((i: any, j: number) => (
+            <Card >
+              <div className='grid grid-cols-[auto_1fr] gap-5'>
+                <Checkbox checked={cauHoiForm.includes(i.id)} value={i.id} onChange={e => {
+                  const value = e.target.value as number
+                  setCauHoiForm(e => {
+                    if (e.includes(value)) return e.filter(i => i != value)
+                    return [...e, value];
+                  })
+                  console.log(value)
+                }} />
+                <div>
+                  <div className="flex items-center mb-4 gap-3">
+                    <Text strong className="text-lg">{boCauHoi.find(i => i.id === bch)?.tenBoCauHoi}</Text>
+                    <span className={[
+                      "px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700",
+                      i.doKho === 0 ? "bg-green-100 text-green-700" : i.doKho === 1 ? "bg-orange-100 text-orange-700" : "bg-red-100 text-red-700"
+                    ].join(' ')}>
+                      {i.doKho === 0 ? "DỄ" : i.doKho === 1 ? "TRUNG BÌNH" : "KHÓ"}
+                    </span>
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                      {i.loaiCauHoi === 0 ? "CHỌN ĐÁP ÁN ĐÚNG NHẤT" : "CHỌN NHIỀU ĐÁP ÁN"}
+                    </span>
+                  </div>
 
-            <div className="space-y-2">
-              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
-                <div className="flex items-center gap-2">
-                  <Text strong>A.</Text>
-                  <Text>12</Text>
+                  <div className="mb-4">
+                    <Text strong className="text-base">
+                      Câu {j + 1}: {i.noiDung}
+                    </Text>
+                  </div>
+
+                  <div className="space-y-2">
+                    {i.dapAn.map((_i: any, _j: any) => (
+                      <div className={[
+                        "w-full text-left p-3 rounded border",
+                        _i.dungSai ? "bg-green-100 border-green-500 text-green-700" : "bg-gray-50 border-gray-300"
+                      ].join(' ')}>
+                        <div className="flex items-center gap-2">
+                          <Text strong>{"ABCDEF"[_j]}.</Text>
+                          <Text>{_i.noiDung}</Text>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
-                <div className="flex items-center gap-2">
-                  <Text strong>B.</Text>
-                  <Text>32</Text>
-                </div>
-              </div>
-
-              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
-                <div className="flex items-center gap-2">
-                  <CheckCircleOutlined className="text-green-500" />
-                  <Text strong>C.</Text>
-                  <Text>31</Text>
-                </div>
-              </div>
-
-              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
-                <div className="flex items-center gap-2">
-                  <Text strong>D.</Text>
-                  <Text>18</Text>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Câu hỏi 2 */}
-          {/* <Card>
-            <div className="flex items-center mb-4 gap-3">
-              <Text strong className="text-lg">I. Lý thuyết tổ hợp</Text>
-              <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
-                TRUNG BÌNH
-              </span>
-              <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">
-                CHỌN NHIỀU ĐÁP ÁN
-              </span>
-            </div>
-
-            <div className="mb-4">
-              <Text strong className="text-base">
-                Câu 2: Một nhóm có 5 bạn: An, Bình, Cường, Duyên và Hoa. Người ta cần chọn ra 2 bạn để tham gia một trò chơi. Trong các phương án sau, đâu là phát biểu đúng về cách chọn?
-              </Text>
-            </div>
-
-            <div className="space-y-2">
-              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
-                <div className="flex items-center gap-2">
-                  <CheckCircleOutlined className="text-green-500" />
-                  <Text strong>A.</Text>
-                  <Text>Nếu chọn An rồi Bình là một cách, chọn Bình rồi An là một cách khác.</Text>
-                </div>
-              </div>
-
-              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
-                <div className="flex items-center gap-2">
-                  <Text strong>B.</Text>
-                  <Text>Nếu chọn An rồi Bình là một cách, chọn Bình rồi An là một cách khác.</Text>
-                </div>
-              </div>
-
-              <div className="w-full text-left p-3 rounded border bg-green-100 border-green-500 text-green-700">
-                <div className="flex items-center gap-2">
-                  <CheckCircleOutlined className="text-green-500" />
-                  <Text strong>C.</Text>
-                  <Text>Việc chọn 2 bạn để tham gia trò chơi là tổ hợp, không quan tâm đến thứ tự.</Text>
-                </div>
-              </div>
-
-              <div className="w-full text-left p-3 rounded border bg-gray-50 border-gray-300 hover:bg-gray-100 transition-all duration-200">
-                <div className="flex items-center gap-2">
-                  <Text strong>D.</Text>
-                  <Text>Có 20 cách để chọn 2 bạn từ nhóm trên.</Text>
-                </div>
-              </div>
-            </div>
-          </Card> */}
+            </Card>
+          ))}
         </div>
       </Modal >
     </div >
