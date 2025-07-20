@@ -373,7 +373,7 @@ public class GenerateController(AppDbContext context) : ControllerBase
     foreach (var mon in monHoc)
     {
       boCauHoi.AddRange(await TaoBoCauHoi(scale * 3, mon.Id));
-      kiThi.AddRange(await TaoKiThi(scale * 3, mon.Id));
+      kiThi.AddRange(await TaoKiThi(scale * 10, mon.Id));
     }
     await DatabaseUtilities.BulkInsertAsync(context, boCauHoi);
     await DatabaseUtilities.BulkInsertAsync(context, kiThi);

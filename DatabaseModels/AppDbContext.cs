@@ -22,6 +22,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<CauHoiKiThi> CauHoiKiThi { get; set; }
   public DbSet<DapAnCauHoiKiThi> DapAnCauHoiKiThi { get; set; }
 
+  public DbSet<CauHoiThiSinh> CauHoiThiSinh { get; set; }
+  public DbSet<DapAnThiSinh> DapAnThiSinh { get; set; }
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
@@ -37,6 +40,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     var lopHoc_kiThi = modelBuilder.Entity<LopHoc_KiThi>();
     var CauHoiKiThi = modelBuilder.Entity<CauHoiKiThi>();
+
+    var dapAnCauHoiKiThi = modelBuilder.Entity<DapAnCauHoiKiThi>();
+
+    var cauHoiThiSinh = modelBuilder.Entity<CauHoiThiSinh>();
+    var dapAnThiSinh = modelBuilder.Entity<DapAnThiSinh>();
+
+
+    cauHoiThiSinh.HasIndex(t => new { t.IdCauHoi, t.IdThiSinh }).IsUnique(true);
+    dapAnThiSinh.HasIndex(t => new { t.IdCauHoiThiSinh, t.IdDapAn }).IsUnique(true);
 
     lopHoc_kiThi.HasIndex(t => new { t.IdKiThi, t.IdLopHoc }).IsUnique(true);
 

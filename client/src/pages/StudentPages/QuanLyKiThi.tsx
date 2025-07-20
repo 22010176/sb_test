@@ -1,4 +1,4 @@
-import { LayDanhSachKiThi } from '@/api/HocSinh/KiThi';
+import { LayDanhSachKiThi, ThamGiaKiThi } from '@/api/HocSinh/KiThi';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Input, Modal } from 'antd';
@@ -72,7 +72,7 @@ const ExamResultDetail = () => {
 
   const stats = getQuestionStats();
 
-  const QuestionCard = ({ question, index }) => (
+  const QuestionCard = ({ question, index }: { question: any, index: any }) => (
     <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-white">
       <div className="flex items-start gap-3">
         <div className="w-1 bg-blue-500 rounded-full flex-shrink-0 mt-1 mb-1 self-stretch"></div>
@@ -201,61 +201,62 @@ const ExamResultDetail = () => {
   );
 };
 
-const ExamCard = ({ exam, isCompleted = false }) => (
-  <div className={`flex justify-between items-center p-6 rounded-lg border-l-4 ${isCompleted ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-500'}`}>
-    <div>
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{exam.tenKiThi}</h3>
-      <p className="text-gray-600 mb-4">Môn: {exam.tenMon}</p>
+const ExamCard = ({ exam, isCompleted = false }: { exam: any, isCompleted: boolean }) => {
+  return (
+    <div className={`flex justify-between items-center p-6 rounded-lg border-l-4 ${isCompleted ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-500'}`}>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">{exam.tenKiThi}</h3>
+        <p className="text-gray-600 mb-4">Môn: {exam.tenMon}</p>
 
-      <div className="flex items-center gap-6 text-sm text-gray-600">
-        <div className="flex items-center gap-1">
-          <Calendar className="w-4 h-4 text-green-600" />
-          <span>{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</span>
+        <div className="flex items-center gap-6 text-sm text-gray-600">
+          <div className="flex items-center gap-1">
+            <Calendar className="w-4 h-4 text-green-600" />
+            <span>{dayjs(exam.thoiGianVaoLamBai).format("DD/MM/YYYY HH:mm")}</span>
+          </div>
+
+          {!isCompleted && (
+            <>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4 text-orange-600" />
+                <span>{exam.thoiGianLamBaiThi} phút</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <FileText className="w-4 h-4 text-blue-600" />
+                <span>{10} câu</span>
+              </div>
+            </>
+          )}
+
+          {isCompleted && (
+            <>
+              <div className="flex items-center gap-1">
+                <Trophy className="w-4 h-4 text-yellow-600" />
+                <span>{exam.score}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-blue-600">{exam.rank}</span>
+              </div>
+            </>
+          )}
         </div>
-
-        {!isCompleted && (
-          <>
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4 text-orange-600" />
-              <span>{exam.thoiGianLamBaiThi} phút</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <FileText className="w-4 h-4 text-blue-600" />
-              <span>{10} câu</span>
-            </div>
-          </>
-        )}
-
-        {isCompleted && (
-          <>
-            <div className="flex items-center gap-1">
-              <Trophy className="w-4 h-4 text-yellow-600" />
-              <span>{exam.score}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-blue-600">{exam.rank}</span>
-            </div>
-          </>
-        )}
       </div>
-    </div>
-    {isCompleted && (
-      <Button icon={<FontAwesomeIcon icon={faEye} />}>
-        Xem kết quả
-      </Button>
-    )}
+      {isCompleted && (
+        <Button icon={<FontAwesomeIcon icon={faEye} />}>
+          Xem kết quả
+        </Button>
+      )}
 
-    {!isCompleted && (
-      <Button variant='solid' color='purple'>
-        Vào thi
-      </Button>
-    )}
-  </div>
-);
+      {!isCompleted && dayjs(exam.thoiGianVaoLamBai).isBefore(dayjs()) && (
+        <Button variant='solid' color='purple' onClick={() => ThamGiaKiThi(exam.id)}>
+          Vào thi
+        </Button>
+      )}
+    </div>
+  );
+}
 
 const HocSinh_QuanLiKiThi = () => {
   const location = useLocation()
-  const [searchQuery, setSearchQuery] = useState('');
   const [kiThi, setKiThi] = useState<any>([])
 
   const kiThiDaDienRa = useMemo(function () {
@@ -263,59 +264,16 @@ const HocSinh_QuanLiKiThi = () => {
   }, [kiThi])
 
   const kiThiSapDienRa = useMemo(function () {
-    return kiThi.filter(i => dayjs(i.thoiGianVaoLamBai).add(i.thoiGianLamBaiThi, 'minutes').isAfter(dayjs(new Date())))
+    return kiThi.filter(i => dayjs(i.thoiGianVaoLamBai).add(i.thoiGianLamBaiThi, 'minutes').isAfter(dayjs()))
   }, [kiThi])
 
-  console.log(kiThi)
   useEffect(function () {
     LayDanhSachKiThi().then(data => {
-      console.log(data)
-      setKiThi(data.data)
+      setKiThi(data.data.sort((a, b) => {
+        return dayjs(a.thoiGianVaoLamBai).isBefore(dayjs(b.thoiGianVaoLamBai)) ? -1 : 1
+      }))
     })
   }, [location])
-
-
-  const upcomingExams = [
-    {
-      id: 1,
-      title: 'Thi giữa kỳ môn Toán rời rạc',
-      subject: 'Toán rời rạc',
-      date: '24/06/2025',
-      time: '8:00',
-      duration: '90 phút',
-      questions: '60 câu'
-    },
-    {
-      id: 2,
-      title: 'Thi giữa kỳ Tiếng Nhật JLPT N3',
-      subject: 'Tiếng Nhật',
-      date: '24/06/2025',
-      time: '10:00',
-      duration: '90 phút',
-      questions: '60 câu'
-    }
-  ];
-
-  const completedExams = [
-    {
-      id: 1,
-      title: 'Kiểm tra chương 4 Lý thuyết xác suất thống kê',
-      subject: 'Lý thuyết xác suất thống kê',
-      date: '24/06/2025',
-      time: '8:00',
-      score: '8.5/10 điểm',
-      rank: 'Hạng: 15/60'
-    },
-    {
-      id: 2,
-      title: 'Kiểm tra lập trình cơ bản',
-      subject: 'Nhập môn Công nghệ thông tin',
-      date: '24/06/2025',
-      time: '8:00',
-      score: '9.0/10 điểm',
-      rank: 'Hạng: 12/60'
-    }
-  ];
 
   return (
     <div className='p-10'>
@@ -332,7 +290,7 @@ const HocSinh_QuanLiKiThi = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          {kiThiSapDienRa.map((exam) => (
+          {kiThiSapDienRa.map((exam: any) => (
             <ExamCard key={exam.id} exam={exam} />
           ))}
         </div>
@@ -350,7 +308,7 @@ const HocSinh_QuanLiKiThi = () => {
         </div>
 
         <div className="space-y-4">
-          {kiThiDaDienRa.map((exam) => (
+          {kiThiDaDienRa.map((exam: any) => (
             <ExamCard key={exam.id} exam={exam} isCompleted={true} />
           ))}
         </div>

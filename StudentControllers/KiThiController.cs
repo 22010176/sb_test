@@ -15,6 +15,74 @@ public class KiThiController(AppDbContext context) : ControllerBase
 {
   readonly AppDbContext context = context;
 
+  [HttpPost("{idKiThi}/tham-gia")]
+  public async Task<IActionResult> ThamGiaKiThi(int idKiThi)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      var kiThi = await context.KiThi.FindAsync(idKiThi);
+      if (kiThi == null) throw new Exception("Kỳ thi không tồn tại.");
+
+      if (kiThi.ThoiGianVaoLamBai > DateTime.Now) throw new Exception("Chưa đến thời gian vào làm bài thi.");
+
+      List<CauHoiKiThi> cauHoiKiThi = await context.CauHoiKiThi
+        .Where(ch => ch.IdKiThi == idKiThi)
+        .Include(ch => ch.DapAnCauHoi)
+        .ToListAsync();
+
+      List<CauHinhCauHoiKiThi> cauHinhCauHoiKiThi = await context.CauHinhCauHoiKiThi
+        .Where(ch => ch.IdKiThi == idKiThi)
+        .ToListAsync();
+
+
+      int totalCauHoi = cauHinhCauHoiKiThi.Sum(ch => ch.SoCauHoiTrongDe);
+      var danhSachCauHoi = await (
+        from chts in context.CauHoiThiSinh
+        join ch in context.CauHoiKiThi on chts.IdCauHoi equals ch.Id
+        where chts.IdThiSinh == userId && ch.IdKiThi == idKiThi
+        select chts
+      ).ToListAsync();
+      if (danhSachCauHoi.Count >= 0) throw new Exception("Bạn đã tham gia kỳ thi này rồi.");
+
+      List<CauHoiThiSinh> cauHoiThiSinh = [];
+      int _i = 0;
+      foreach (var cauHinh in cauHinhCauHoiKiThi)
+      {
+        List<CauHoiKiThi> cauHoiTheoDoKho = [.. cauHoiKiThi.Where(ch => ch.DoKho == cauHinh.DoKho)];
+        for (int i = 0; i < cauHinh.SoCauHoiTrongDe; i++)
+        {
+          var cauHoi = RandomUtils.PickRand(ref cauHoiTheoDoKho);
+          if (cauHoi == null) continue;
+
+          cauHoiThiSinh.Add(new CauHoiThiSinh
+          {
+            IdCauHoi = cauHoi.Id,
+            SoThutu = ++_i,
+            IdThiSinh = userId
+          });
+        }
+      }
+      await context.CauHoiThiSinh.AddRangeAsync(cauHoiThiSinh);
+      await context.SaveChangesAsync();
+
+      return Ok(new
+      {
+        Success = true,
+        Message = "Tham gia kỳ thi thành công."
+      });
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Success = false,
+        Message = "",
+        Data = ex
+      });
+    }
+  }
+
   [HttpGet]
   public async Task<IActionResult> LayDanhSachKiThi()
   {

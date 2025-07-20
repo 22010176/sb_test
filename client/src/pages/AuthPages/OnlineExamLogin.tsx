@@ -22,12 +22,11 @@ function Element() {
       soDienThoai: values.email, // Assuming email is used as phone number
       matKhau: values.matKhau,
     }
+    console.log(input)
     await DangNhapNguoiDung(input).then(res => {
       message.success('Đăng nhập thành công!');
       localStorage.setItem('token', res.data);
       form.resetFields();
-      console.log(role)
-      console.log(res)
       if (role == "TEACHER") {
         console.log("DDDD")
         // return
