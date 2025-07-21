@@ -27,16 +27,16 @@ function Element() {
       message.success('Đăng nhập thành công!');
       localStorage.setItem('token', res.data);
       form.resetFields();
-      if (role == "TEACHER") {
-        console.log("DDDD")
-        // return
-        window.location.replace('/giang-vien');
-      }
-      else if (role == "STUDENT") {
-        console.log("DDDD")
-        window.location.replace('/hoc-sinh');
-        return
-      }
+      // if (role == "TEACHER") {
+      //   console.log("DDDD")
+      //   // return
+      //   window.location.replace('/giang-vien');
+      // }
+      // else if (role == "STUDENT") {
+      //   console.log("DDDD")
+      //   window.location.replace('/hoc-sinh');
+      //   return
+      // }
     }).catch(() => {
       message.error('Đăng nhập không thành công. Vui lòng thử lại sau!');
       return;

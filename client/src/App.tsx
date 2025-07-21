@@ -22,6 +22,7 @@ import { PageContext, PageReducer } from '@/contexts/PageContext';
 import type { UserData } from './App.types';
 
 
+import LamBaiThi from './pages/StudentPages/LamBaiThi';
 import HocSinh_QuanLiKiThi from './pages/StudentPages/QuanLyKiThi';
 import HocSinh_QuanLyLopHoc from './pages/StudentPages/QuanLyLopHoc';
 import GiangVien_ChiTietBoCauHoi from './pages/TeacherPages/ChiTietBoCauHoi';
@@ -34,12 +35,10 @@ import ChiTietKiThiKetQua from './pages/TeacherPages/ChiTietKiThiKetQua';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
 import { ChiTietKiThi, ChiTietLop } from './pages/TeacherPages/ThongTinChiTiet';
-import LamBaiThi from './pages/StudentPages/LamBaiThi';
 
 const role = import.meta.env.VITE_ROLE;
 
 function App() {
-  const navigate = useNavigate()
   const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
 
   useEffect(function () {
@@ -108,7 +107,7 @@ function App() {
           <Route path='/hoc-sinh/lop-hoc' element={<HocSinh_QuanLyLopHoc />} />
           {/* <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} /> */}
           <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} />
-          <Route path='/hoc-sinh/lam-bai' element={<LamBaiThi />} />
+          <Route path='/hoc-sinh/ki-thi/:idKiThi' element={<LamBaiThi />} />
           {/* <Route path='/hoc-sinh/ki-thi' element={<StudentLayout />}>
           </Route> */}
         </Route>}

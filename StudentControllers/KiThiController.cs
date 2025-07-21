@@ -21,7 +21,7 @@ public class KiThiController(AppDbContext context) : ControllerBase
     try
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
-      var kiThi = await context.KiThi.FindAsync(idKiThi);
+      var kiThi = await context.KiThi.FirstOrDefaultAsync(i => i.Id == idKiThi);
       if (kiThi == null) throw new Exception("Kỳ thi không tồn tại.");
 
       if (kiThi.ThoiGianVaoLamBai > DateTime.Now) throw new Exception("Chưa đến thời gian vào làm bài thi.");
@@ -35,15 +35,36 @@ public class KiThiController(AppDbContext context) : ControllerBase
         .Where(ch => ch.IdKiThi == idKiThi)
         .ToListAsync();
 
-
       int totalCauHoi = cauHinhCauHoiKiThi.Sum(ch => ch.SoCauHoiTrongDe);
+
       var danhSachCauHoi = await (
         from chts in context.CauHoiThiSinh
         join ch in context.CauHoiKiThi on chts.IdCauHoi equals ch.Id
         where chts.IdThiSinh == userId && ch.IdKiThi == idKiThi
-        select chts
+        select new
+        {
+          chts.Id,
+          chts.SoThutu,
+          TrangThai = chts.TrangThai.ToString(),
+          ch.NoiDung,
+          ch.DoKho,
+          ch.IdCauHoi,
+          DapAn = (
+            from da in context.DapAnCauHoi
+            where da.IdCauHoi == ch.Id
+            select new
+            {
+              da.Id,
+              da.NoiDung
+            }
+          ).ToList(),
+        }
       ).ToListAsync();
-      if (danhSachCauHoi.Count >= 0) throw new Exception("Bạn đã tham gia kỳ thi này rồi.");
+      if (danhSachCauHoi.Count > 0) return Ok(new
+      {
+        Success = true,
+        Data = danhSachCauHoi,
+      });
 
       List<CauHoiThiSinh> cauHoiThiSinh = [];
       int _i = 0;
@@ -79,6 +100,52 @@ public class KiThiController(AppDbContext context) : ControllerBase
         Success = false,
         Message = "",
         Data = ex
+      });
+    }
+  }
+
+  [HttpGet("{idKiThi}/danh-sach-cau-hoi")]
+  public async Task<IActionResult> LayDanhSachCauHoi(int idKiThi)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      var danhSachCauHoi = await (
+        from chts in context.CauHoiThiSinh
+        join ch in context.CauHoiKiThi on chts.IdCauHoi equals ch.Id
+        where chts.IdThiSinh == userId && ch.IdKiThi == idKiThi
+        select new
+        {
+          chts.Id,
+          chts.SoThutu,
+          TrangThai = chts.TrangThai.ToString(),
+          ch.NoiDung,
+          ch.DoKho,
+          ch.IdCauHoi,
+          DapAn = (
+            from da in context.DapAnCauHoiKiThi
+            where da.IdCauHoi == ch.Id
+            select new
+            {
+              da.Id,
+              da.NoiDung
+            }
+          ).ToList(),
+        }
+      ).ToListAsync();
+
+      return Ok(new ResponseFormat
+      {
+        Data = danhSachCauHoi,
+        Success = true
+      });
+    }
+    catch (Exception err)
+    {
+      return Ok(new ResponseFormat
+      {
+        Data = err,
+        Success = false
       });
     }
   }

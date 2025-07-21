@@ -1,11 +1,12 @@
 import { LayDanhSachKiThi, ThamGiaKiThi } from '@/api/HocSinh/KiThi';
+
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Input, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { Calendar, Clock, FileText, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 
 const ExamResultDetail = () => {
@@ -202,6 +203,7 @@ const ExamResultDetail = () => {
 };
 
 const ExamCard = ({ exam, isCompleted = false }: { exam: any, isCompleted: boolean }) => {
+  const navigate = useNavigate();
   return (
     <div className={`flex justify-between items-center p-6 rounded-lg border-l-4 ${isCompleted ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-500'}`}>
       <div>
@@ -247,7 +249,7 @@ const ExamCard = ({ exam, isCompleted = false }: { exam: any, isCompleted: boole
       )}
 
       {!isCompleted && dayjs(exam.thoiGianVaoLamBai).isBefore(dayjs()) && (
-        <Button variant='solid' color='purple' onClick={() => ThamGiaKiThi(exam.id)}>
+        <Button variant='solid' color='purple' onClick={() => navigate(`/hoc-sinh/ki-thi/${exam.id}`)}>
           Vào thi
         </Button>
       )}

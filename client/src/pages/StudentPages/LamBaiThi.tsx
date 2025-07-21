@@ -1,20 +1,26 @@
+import { ThamGiaKiThi } from '@/api/HocSinh/KiThi';
 import { Book, ChevronLeft, ChevronRight, Clock, FileText, Flag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 
-const LamBaiThi = () => {
+function LamBaiThi() {
+  const { idKiThi } = useParams();
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('A');
   const [timeLeft, setTimeLeft] = useState(3910); // 1:05:10 in seconds
-  const [answers, setAnswers] = useState({});
 
   // Timer countdown
   useEffect(() => {
+    ThamGiaKiThi(+(idKiThi ?? 0)).then(res => {
+      console.log(res)
+    })
     // const timer = setInterval(() => {
     //   setTimeLeft(prev => prev > 0 ? prev - 1 : 0);
     // }, 1000);
 
     // return () => clearInterval(timer);
-  }, []);
+  }, [idKiThi]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
