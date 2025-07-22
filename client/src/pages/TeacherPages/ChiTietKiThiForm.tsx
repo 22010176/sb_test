@@ -14,13 +14,15 @@ const ChiTietKiThiForm = () => {
   const [kiThi, setKiThi] = useState<any>({})
   const [monHoc, setMonHoc] = useState([])
 
+  const [mode, setMode] = useState<'view' | 'edit'>('view')
+
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   useEffect(function () {
     LayKiThiChiTiet(+(idKiThi ?? 0)).then(result => {
       const input = result.data
-      setKiThi(input)
+      // setKiThi(input)
       form.setFieldsValue({
         tenKiThi: input.tenKiThi,
         idMonHoc: input.idMonHoc,
@@ -47,7 +49,7 @@ const ChiTietKiThiForm = () => {
         console.log(data)
         LayKiThiChiTiet(+(idKiThi ?? 0)).then(result => {
           const input = result.data
-          setKiThi(input)
+          // setKiThi(input)
           form.setFieldsValue({
             tenKiThi: input.tenKiThi,
             idMonHoc: input.idMonHoc,
@@ -69,10 +71,7 @@ const ChiTietKiThiForm = () => {
   const onEdit = () => {
     // Handle edit action
     console.log('Edit clicked');
-  };
 
-  const handleSave = () => {
-    form.submit();
   };
 
   return (
@@ -85,7 +84,7 @@ const ChiTietKiThiForm = () => {
             rules={[
               { required: true, message: 'Vui lòng nhập tên kì thi!' }
             ]}>
-            <Input placeholder="Nhập tên kì thi" />
+            <Input disabled={mode === 'view'} placeholder="Nhập tên kì thi" />
           </Form.Item>
 
           <Form.Item name="idMonHoc"
@@ -93,6 +92,7 @@ const ChiTietKiThiForm = () => {
             rules={[{ required: true, message: 'Vui lòng chọn môn thi!' }]}>
             <Select
               placeholder="Chọn môn thi"
+              disabled={mode === 'view'}
               options={monHoc.map((i: any) => ({ value: i.id, label: i.tenMon }))} />
           </Form.Item>
 
@@ -100,7 +100,7 @@ const ChiTietKiThiForm = () => {
             label={<span className="text-gray-700 font-medium">Thời gian làm bài thi (phút) <span className="text-red-500">*</span></span>}
             name="thoiGianLamBaiThi"
             rules={[{ required: true, message: 'Vui lòng nhập thời gian làm bài!' },]}>
-            <InputNumber className='w-20' placeholder="Nhập thời gian (phút)" />
+            <InputNumber disabled={mode === 'view'} className='w-20' placeholder="Nhập thời gian (phút)" />
           </Form.Item>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -110,7 +110,7 @@ const ChiTietKiThiForm = () => {
               rules={[
                 { required: true, message: 'Vui lòng chọn thời gian bắt đầu!' }
               ]}>
-              <DatePicker showTime className='w-full' format="DD/MM/YYYY HH:mm" placeholder="Chọn thời gian bắt đầu" />
+              <DatePicker showTime className='w-full' format="DD/MM/YYYY HH:mm" placeholder="Chọn thời gian bắt đầu" disabled={mode === 'view'} />
             </Form.Item>
 
             <Form.Item
@@ -131,17 +131,16 @@ const ChiTietKiThiForm = () => {
         </div>
 
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-          <Button type="default" icon={<EditOutlined />} onClick={onEdit}>
-            Chỉnh sửa
+          <Button type="default" icon={<EditOutlined />}
+            onClick={() => { setMode(mode === 'view' ? 'edit' : 'view'); }}>
+            {mode === 'view' ? "Chỉnh sửa" : "Hủy"}
           </Button>
-          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={loading}>
+          <Button disabled={mode === 'view'} type="primary" icon={<SaveOutlined />} onClick={() => form.submit()} loading={loading}>
             Lưu
           </Button>
         </div>
       </Form>
-
     </div>
-    // </div>
   );
 };
 

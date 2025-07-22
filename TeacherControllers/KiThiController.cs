@@ -21,6 +21,7 @@ public class KiThiController(AppDbContext context) : ControllerBase
       from kt in context.KiThi
       join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
       where mh.IdGiangVien == userId
+      orderby kt.ThoiGianVaoLamBai descending
       select new
       {
         kt.Id,

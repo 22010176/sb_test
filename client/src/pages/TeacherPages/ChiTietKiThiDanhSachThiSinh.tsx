@@ -229,12 +229,13 @@ function ChiTietKiThiDanhSachThiSinh() {
   useEffect(function () {
     LayDanhSachLopHoc(+(idKiThi ?? 0)).then(result => {
       setLopKiThi(result.data[0])
+      console.log(result.data[0])
     })
     GetLopHoc().then(Result => {
       setDanhLopGV(Result.data)
     })
   }, [idKiThi])
-  console.log(lopKiThi)
+
   const columns = [
     {
       title: <p className='text-center'>STT</p>, width: 60, className: 'text-center',
@@ -277,7 +278,7 @@ function ChiTietKiThiDanhSachThiSinh() {
       {/* Search and Stats */}
       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-5">
         <Text>Tổng số lớp: <span className="font-semibold text-gray-800">{lopKiThi?.lopHoc?.length}</span></Text>
-        <Text>Tổng số học sinh: <span className="font-semibold text-gray-800">105</span></Text>
+        <Text>Tổng số học sinh: <span className="font-semibold text-gray-800">{lopKiThi?.lopHoc?.reduce((acc, i) => acc + i.hocSinh.length, 0)}</span></Text>
       </div>
 
       {/* Class List */}

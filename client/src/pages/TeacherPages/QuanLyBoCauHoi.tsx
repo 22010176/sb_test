@@ -23,7 +23,10 @@ type MonHoc = {
 type BoCauHoi = {
   id: number,
   tenBoCauHoi: string,
-  thoiGianCapNhatCuoi: string
+  thoiGianCapNhatCuoi: string,
+  cauHoiDe: number,
+  cauHoiTrungBinh: number,
+  cauHoiKho: number,
 }
 
 function Element() {
@@ -44,13 +47,13 @@ function Element() {
     })
 
     GetBoCauHoi(+monHocId).then(result => {
-      console.log(result)
+
       setBoCauHoi(result.data)
     }).catch(err => {
       throw err
     })
   }, [monHocId])
-
+  console.log(boCauHoi)
   // console.log(monHoc, boCauHoi)
   const handleOk = async () => {
     form.validateFields().then(async values => {
@@ -95,22 +98,26 @@ function Element() {
         <Row gutter={16} className="mb-6">
           <Col span={6}>
             <Card className="text-center bg-blue-50 border-blue-200">
-              <Statistic title="Tổng số câu hỏi" value={0} valueStyle={{ color: '#1890ff', fontSize: '2rem', fontWeight: 'bold' }} />
+              <Statistic title="Tổng số câu hỏi" valueStyle={{ color: '#1890ff', fontSize: '2rem', fontWeight: 'bold' }}
+                value={boCauHoi.reduce((acc, i) => acc + i.cauHoiDe + i.cauHoiTrungBinh + i.cauHoiKho, 0)} />
             </Card>
           </Col>
           <Col span={6}>
             <Card className="text-center bg-green-50 border-green-200">
-              <Statistic title="Câu hỏi dễ" value={0} valueStyle={{ color: '#52c41a', fontSize: '2rem', fontWeight: 'bold' }} />
+              <Statistic title="Câu hỏi dễ" valueStyle={{ color: '#52c41a', fontSize: '2rem', fontWeight: 'bold' }}
+                value={boCauHoi.reduce((acc, i) => acc + i.cauHoiDe, 0)} />
             </Card>
           </Col>
           <Col span={6}>
             <Card className="text-center bg-orange-50 border-orange-200">
-              <Statistic title="Câu hỏi trung bình" value={0} valueStyle={{ color: '#fa8c16', fontSize: '2rem', fontWeight: 'bold' }} />
+              <Statistic title="Câu hỏi trung bình" valueStyle={{ color: '#fa8c16', fontSize: '2rem', fontWeight: 'bold' }}
+                value={boCauHoi.reduce((acc, i) => acc + i.cauHoiTrungBinh, 0)} />
             </Card>
           </Col>
           <Col span={6}>
             <Card className="text-center bg-red-50 border-red-200">
-              <Statistic title="Câu hỏi khó" value={0} valueStyle={{ color: '#f5222d', fontSize: '2rem', fontWeight: 'bold' }} />
+              <Statistic title="Câu hỏi khó" valueStyle={{ color: '#f5222d', fontSize: '2rem', fontWeight: 'bold' }}
+                value={boCauHoi.reduce((acc, i) => acc + i.cauHoiKho, 0)} />
             </Card>
           </Col>
         </Row>
@@ -133,7 +140,7 @@ function Element() {
 
       {/* Question Sets */}
       <Row gutter={[16, 16]}>
-        {boCauHoi.map((item) => (
+        {boCauHoi.map((item: BoCauHoi) => (
           <Col span={12} key={item.id}>
             <Card className="hover:shadow-lg transition-shadow duration-300 border-gray-200">
               <div className="flex justify-between items-center mb-4">
@@ -163,12 +170,12 @@ function Element() {
               <Space direction="vertical" className="w-full" size="small">
                 <div className="flex items-center text-gray-600">
                   <FileTextOutlined className="mr-2" />
-                  <Text>{item?.questionCount ?? 0} Câu hỏi</Text>
+                  <Text>{(item.cauHoiDe + item.cauHoiTrungBinh + item.cauHoiKho) ?? 0} Câu hỏi</Text>
                 </div>
 
                 <div className="flex items-center text-gray-600">
                   <ClockCircleOutlined className="mr-2" />
-                  <Text>{item?.details ?? '0 Dễ, 0 Trung bình, 0 Khó'}</Text>
+                  <Text>{`${item.cauHoiDe} Dễ, ${item.cauHoiTrungBinh} Trung bình, ${item.cauHoiKho} Khó`}</Text>
                 </div>
 
                 <div className="flex items-center text-gray-600">
@@ -189,6 +196,10 @@ function Element() {
         }
         open={formModal.length > 0}
         onOk={handleOk}
+        onCancel={() => {
+          setFormModal('')
+          form.resetFields()
+        }}
         cancelText="Hủy"
         width={500}
         className="rounded-xl overflow-hidden">

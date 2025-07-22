@@ -16,16 +16,47 @@ public partial class BoCauHoiController(AppDbContext context) : ControllerBase
 
   async Task<List<object>> GetBoCauHoi(int idMonHoc)
   {
-    var query =
-      from lh in context.BoCauHoi
-      where lh.IdMonHoc == idMonHoc
-      orderby lh.ThoiGianCapNhatCuoi descending
+    var query = (
+  from bch in context.BoCauHoi
+  join mh in context.MonHoc on bch.IdMonHoc equals mh.Id
+  where bch.IdMonHoc == idMonHoc
+  orderby bch.ThoiGianCapNhatCuoi descending
+  select new
+  {
+    bch.Id,
+    bch.TenBoCauHoi,
+    bch.IdMonHoc,
+    bch.ThoiGianCapNhatCuoi,
+    mh.TenMon,
+    CauHoiDe = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 0
       select new
       {
-        lh.Id,
-        lh.TenBoCauHoi,
-        lh.ThoiGianCapNhatCuoi
-      };
+        ch.Id,
+        ch.NoiDung,
+      }
+    ).Count(),
+    CauHoiTrungBinh = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 1
+      select new
+      {
+        ch.Id,
+        ch.NoiDung,
+      }
+    ).Count(),
+    CauHoiKho = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 2
+      select new
+      {
+        ch.Id,
+        ch.NoiDung,
+      }
+    ).Count(),
+  }
+);
 
     return [.. await query.ToListAsync()];
   }

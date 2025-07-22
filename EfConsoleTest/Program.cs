@@ -15,51 +15,42 @@ context.Database.EnsureCreated();
 
 
 var a = (
-  from kt in context.KiThi
-  join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
-  where kt.Id == 501
+  from bch in context.BoCauHoi
+  join mh in context.MonHoc on bch.IdMonHoc equals mh.Id
   select new
   {
-    kt.Id,
-    kt.TenKiThi,
-    IdMonHoc = mh.Id,
-    BoCauHoi = (
-      from bch in context.BoCauHoi
-      where bch.IdMonHoc == mh.Id
-      orderby bch.Id
+    bch.Id,
+    bch.TenBoCauHoi,
+    bch.IdMonHoc,
+    bch.ThoiGianCapNhatCuoi,
+    mh.TenMon,
+    CauHoiDe = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 0
       select new
       {
-        bch.Id,
-        bch.TenBoCauHoi,
-        CauHoi = (
-          from chkt in context.CauHoiKiThi
-          join ch in context.CauHoi on chkt.IdCauHoi equals ch.Id
-          where
-            chkt.IdKiThi == kt.Id
-            && ch.IdBoCauHoi == bch.Id
-          orderby chkt.Id
-          select new
-          {
-            chkt.Id,
-            chkt.NoiDung,
-            LoaiCauHoi = chkt.LoaiCauHoi.ToString(),
-            chkt.DoKho,
-            ch.ThoiGianCapNhatCuoi,
-            DapAn = (
-              from da in context.DapAnCauHoiKiThi
-              where da.IdCauHoi == chkt.Id
-              orderby da.Id
-              select new
-              {
-                da.Id,
-                da.NoiDung,
-                da.DungSai
-              }
-            ).ToList()
-          }
-        ).ToList(),
+        ch.Id,
+        ch.NoiDung,
       }
-    ).ToList()
+    ).Count(),
+    CauHoiTrungBinh = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 1
+      select new
+      {
+        ch.Id,
+        ch.NoiDung,
+      }
+    ).Count(),
+    CauHoiKho = (
+      from ch in context.CauHoi
+      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 2
+      select new
+      {
+        ch.Id,
+        ch.NoiDung,
+      }
+    ).Count(),
   }
 ).ToList();
 string json = JsonSerializer.Serialize(a,

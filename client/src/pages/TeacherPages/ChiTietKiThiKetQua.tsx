@@ -1,6 +1,43 @@
 import { Select } from 'antd';
 import { Award, Medal, Trophy } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
+const data = [
+  { range: '0-2', count: 0 },
+  { range: '2-4', count: 0 },
+  { range: '4-5', count: 0 },
+  { range: '5-6.5', count: 5 },
+  { range: '6.5-8', count: 7 },
+  { range: '8-10', count: 12 }
+];
+
+const ScoreDistributionChart = () => {
+  return (
+    <div className="w-full bg-white shadow rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-blue-500 text-white p-4 ">
+        <h1 className="text-2xl font-bold">Phổ Điểm Số</h1>
+      </div>
+
+      {/* Chart Container */}
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }} barCategoryGap="10%">
+          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <XAxis dataKey="range" axisLine={false} tickLine={false} tick={{ fontSize: 14, fill: '#666' }} />
+          <YAxis domain={[0, 12]} ticks={[0, 3, 6, 9, 12]} axisLine={false} tickLine={false} tick={{ fontSize: 14, fill: '#666' }} />
+          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.count === 0 ? '#d1d5db' : '#3b82f6'} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+
+    </div>
+  );
+};
+
+// export default ScoreDistributionChart;
 export default function ChiTietKiThiKetQua() {
   const topStudents = [
     { name: "Vũ Mai Quỳnh", class: "Lớp: Toán rời rạc N03", score: 9.8, rank: 1 },
@@ -91,31 +128,7 @@ export default function ChiTietKiThiKetQua() {
 
         {/* Score Distribution Chart */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="bg-blue-500 text-white p-4 rounded-t-lg">
-              <span className="font-semibold">Phổ Điểm Số</span>
-            </div>
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">Khoảng điểm: 5-6.5</div>
-                <div className="text-sm text-blue-600">Số học sinh: 5</div>
-              </div>
-              <div className="flex items-end gap-2 h-64">
-                {scoreDistribution.map((item, index) => (
-                  <div key={index} className="flex-1 flex flex-col items-center">
-                    <div
-                      className={`w-full ${item.color} rounded-t`}
-                      style={{ height: `${(item.count / maxCount) * 100}%` }}
-                    ></div>
-                    <div className="text-xs text-gray-600 mt-2 text-center">
-                      <div>{item.range}</div>
-                      <div className="font-semibold">{item.count}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ScoreDistributionChart />
         </div>
       </div>
 
