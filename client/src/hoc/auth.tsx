@@ -35,7 +35,7 @@ export function withHocSinhRole(Component: FC | string) {
     }
 
     const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 1) return <Navigate to={import.meta.env.VITE_GIANGVIEN_PAGE} />
+    if (user.loaiNguoiDung !== 1) return document.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
 
     return <Component {...props} />
   }

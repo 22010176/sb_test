@@ -1,47 +1,52 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Card, Checkbox, Form, Input, InputNumber, message, Modal, Result, Select, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import { Button, Card, Checkbox, Form, InputNumber, message, Modal, Select, Slider, Typography, type SliderSingleProps } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
 import { GetCauHoi } from '@/api/GiangVien/CauHoi';
-import { LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
+import { LayDanhSachCauHoi, LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
 
 const { Text } = Typography;
-const { Option } = Select;
+
+const marks: SliderSingleProps['marks'] = { 0: '0.0', 1: '1.0', 2: '2.0', 3: '3.0', 4: '4.0', 5: '5.0', 6: '6.0', 7: '7.0', 8: '8.0', 9: '9.0', 10: '10.0' };
+
 
 function ChiTietKiThiCauHoi() {
   const { idKiThi } = useParams()
-  console.log({ idKiThi })
+  // console.log({ idKiThi })
   const [kiThi, setKiThi] = useState({})
+
   const [boCauHoi, setBoCauHoi] = useState([])
   const [bch, setBCH] = useState()
+
   const [cauHoi, setCauHoi] = useState([])
 
   const [cauHoiForm, setCauHoiForm] = useState([])
 
   const [addQuestionModal, setAddQuestionModal] = useState(false)
+  const [cauHinhModal, setCauHinhModal] = useState(false);
+  const [questionSets, setQuestionSets] = useState([]);
+  const [value, setValue] = useState([5, 8]);
 
-  const [questionSets, setQuestionSets] = useState([
-    { id: 1, title: 'I. Lý thuyết tổ hợp', easy: 15, medium: 10, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-    { id: 2, title: 'II. Lý thuyết đồ thị', easy: 15, medium: 5, hard: 5 },
-  ]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const tongSoCau = useMemo(function () {
+    const result = {
+      soCauDe: 0,
+      soCauTB: 0,
+      soCauKho: 0
+    }
+    for (const i of questionSets) {
+      result.soCauDe += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 0 ? 1 : 0), 0)
+      result.soCauTB += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 1 ? 1 : 0), 0)
+      result.soCauKho += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 2 ? 1 : 0), 0)
+    }
+    return result
+  }, [questionSets])
+
   const [editingSet, setEditingSet] = useState(null);
   const [form] = Form.useForm();
-
-  const totalQuestions = questionSets.reduce((sum, set) => sum + set.easy + set.medium + set.hard, 0);
 
   useEffect(function () {
     LayKiThiChiTiet(+(idKiThi ?? 0)).then(async function (result) {
@@ -54,6 +59,11 @@ function ChiTietKiThiCauHoi() {
     GetBoCauHoi(+(kiThi as any).idMonHoc).then(function (result) {
       setBoCauHoi(result.data)
     })
+
+    LayDanhSachCauHoi(+(kiThi as any).id).then(function (result) {
+      console.log(result.data[0])
+      setQuestionSets(result.data[0].boCauHoi)
+    })
   }, [kiThi])
 
   useEffect(function () {
@@ -65,9 +75,8 @@ function ChiTietKiThiCauHoi() {
   }, [bch])
 
   const handleEditSet = (set: any) => {
-    setEditingSet(set);
+    // setEditingSet(set);
     form.setFieldsValue(set);
-    setIsModalVisible(true);
   };
 
   const handleDeleteSet = (id: any) => {
@@ -86,27 +95,20 @@ function ChiTietKiThiCauHoi() {
 
   const handleModalOk = () => {
     form.validateFields().then(values => {
-      if (editingSet) {
-        setQuestionSets(questionSets.map(set =>
-          set.id === editingSet.id ? { ...set, ...values } : set
-        ));
-        message.success('Đã cập nhật bộ đề thành công');
-      } else {
-        const newSet = {
-          id: Math.max(...questionSets.map(s => s.id)) + 1,
-          ...values
-        };
-        setQuestionSets([...questionSets, newSet]);
-        message.success('Đã thêm bộ đề thành công');
-      }
-      setIsModalVisible(false);
+      console.log(values);
+      // if (editingSet) {
+      //   setQuestionSets(questionSets?.map((set: any) => set.id === editingSet.id ? { ...set, ...values } : set));
+      //   message.success('Đã cập nhật bộ đề thành công');
+      // } else {
+      //   const newSet = {
+      //     id: Math.max(...questionSets.map(s => s.id)) + 1,
+      //     ...values
+      //   };
+      //   setQuestionSets([...questionSets, newSet]);
+      //   message.success('Đã thêm bộ đề thành công');
+      // }
       form.resetFields();
     });
-  };
-
-  const handleModalCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
   };
 
   return (
@@ -114,7 +116,7 @@ function ChiTietKiThiCauHoi() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
-          Tổng số lượng câu hỏi: {totalQuestions}
+          Tổng số lượng câu hỏi: {tongSoCau.soCauDe + tongSoCau.soCauTB + tongSoCau.soCauKho} câu
         </h1>
         <div className='flex items-center gap-2'>
           <Button variant='solid' color='blue' icon={<PlusOutlined />}
@@ -122,20 +124,20 @@ function ChiTietKiThiCauHoi() {
             Thêm câu hỏi
           </Button>
           <Button variant='solid' color='green' icon={<FontAwesomeIcon icon={faPen} />}
-            onClick={() => { }}>
+            onClick={() => setCauHinhModal(true)}>
             Sửa cấu hình
           </Button>
         </div>
       </div>
 
       <div className="flex flex-col gap-5 space-y-4">
-        {questionSets.map((set) => (
+        {questionSets.map((set: any, j: number) => (
           <Card key={set.id} className="shadow-sm">
             <div className="flex flex-col justify-between items-start">
 
               <div className='flex justify-between w-full items-center'>
                 <h3 className="text-lg font-semibold mb-3 text-gray-800">
-                  {set.title}
+                  {set.tenBoCauHoi}
                 </h3>
                 <div className="flex gap-2 ml-4">
                   <Button variant='text' color='blue' icon={<EyeOutlined />} onClick={() => { }} />
@@ -146,15 +148,15 @@ function ChiTietKiThiCauHoi() {
               <div className="grid grid-cols-3 gap-4 w-full">
                 <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
                   <div className="text-sm text-green-600 font-medium">Dễ</div>
-                  <div className="text-lg font-bold text-green-700">{set.easy} Câu</div>
+                  <div className="text-lg font-bold text-green-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 0 ? 1 : 0), 0)} Câu</div>
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
                   <div className="text-sm text-yellow-600 font-medium">Trung bình</div>
-                  <div className="text-lg font-bold text-yellow-700">{set.medium} câu</div>
+                  <div className="text-lg font-bold text-yellow-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 1 ? 1 : 0), 0)} câu</div>
                 </div>
                 <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
                   <div className="text-sm text-red-600 font-medium">Khó</div>
-                  <div className="text-lg font-bold text-red-700">{set.hard} câu</div>
+                  <div className="text-lg font-bold text-red-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 2 ? 1 : 0), 0)} câu</div>
                 </div>
               </div>
             </div>
@@ -162,32 +164,36 @@ function ChiTietKiThiCauHoi() {
         ))}
       </div>
 
-      <Modal cancelText="Hủy" className="top-20"
-        title={editingSet ? 'Chỉnh sửa bộ đề' : 'Thêm bộ đề mới'}
-        open={isModalVisible}
+      <Modal cancelText="Hủy" width={800}
+        title={"Cập nhật cấu hình đề thi"}
+        open={cauHinhModal}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onCancel={() => setCauHinhModal(false)}
         okText={editingSet ? 'Cập nhật' : 'Thêm'}>
         <Form form={form} layout="vertical" className="mt-4">
-          <Form.Item label="Tiêu đề bộ đề" name="title"
-            rules={[{ required: true, message: 'Vui lòng nhập tiêu đề bộ đề!' }]}>
-            <Input placeholder="Nhập tiêu đề bộ đề" />
-          </Form.Item>
-
           <div className="grid grid-cols-3 gap-4">
-            <Form.Item label="Số câu dễ" name="easy"
+            <Form.Item label={`Số câu dễ (${tongSoCau.soCauDe} câu)`} name="easy"
               rules={[{ required: true, message: 'Vui lòng nhập số câu dễ!' }]}>
-              <InputNumber min={0} placeholder="0" className="w-full" />
+              <InputNumber min={tongSoCau.soCauDe == 0 ? 0 : 1} max={tongSoCau.soCauDe} placeholder={tongSoCau.soCauDe + ""} className="w-full" />
             </Form.Item>
 
-            <Form.Item label="Số câu trung bình" name="medium"
+            <Form.Item label={`Số câu trung bình (${tongSoCau.soCauTB} câu)`} name="medium"
               rules={[{ required: true, message: 'Vui lòng nhập số câu trung bình!' }]}>
-              <InputNumber min={0} placeholder="0" className="w-full" />
+              <InputNumber min={tongSoCau.soCauTB == 0 ? 0 : 1} max={tongSoCau.soCauTB} placeholder={tongSoCau.soCauTB + ""} className="w-full" />
             </Form.Item>
 
-            <Form.Item label="Số câu khó" name="hard"
+            <Form.Item label={`Số câu khó (${tongSoCau.soCauKho} câu)`} name="hard"
               rules={[{ required: true, message: 'Vui lòng nhập số câu khó!' }]}>
-              <InputNumber min={0} placeholder="0" className="w-full" />
+              <InputNumber min={tongSoCau.soCauKho == 0 ? 0 : 1} max={tongSoCau.soCauKho} placeholder={tongSoCau.soCauKho + ""} className="w-full" />
+            </Form.Item>
+
+            <Form.Item label="Phổ điểm (dễ - trung bình - khó)" name="point" className='col-span-3'>
+              <Slider range defaultValue={[5, 7.5]} step={0.25} marks={marks} min={0} max={10}
+                value={value}
+                onChange={value => {
+
+                  setValue(value)
+                }} />
             </Form.Item>
           </div>
         </Form>
@@ -219,11 +225,8 @@ function ChiTietKiThiCauHoi() {
             <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}
               onClick={async e => {
                 const result = await ThemCauHoiKiThi(idKiThi, { danhSachCauHoi: cauHoiForm })
-                  .then(e => {
-                    setAddQuestionModal(false)
-                  })
+                  .then(e => setAddQuestionModal(false))
                 console.log(result.data)
-
               }}>
               Lưu
             </Button>
@@ -233,7 +236,7 @@ function ChiTietKiThiCauHoi() {
               <div className='grid grid-cols-[auto_1fr] gap-5'>
                 <Checkbox checked={cauHoiForm.includes(i.id)} value={i.id} onChange={e => {
                   const value = e.target.value as number
-                  setCauHoiForm(e => {
+                  setCauHoiForm((e: any) => {
                     if (e.includes(value)) return e.filter(i => i != value)
                     return [...e, value];
                   })

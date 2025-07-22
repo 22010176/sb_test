@@ -4,9 +4,7 @@ namespace DatabaseModels.Models;
 
 public enum TrangThaiBaiLam
 {
-  DaTraLoi,
-  ChuaTraLoi,
-  DanhDau
+  DaTraLoi, ChuaTraLoi, DanhDau
 }
 
 public class CauHoiThiSinh

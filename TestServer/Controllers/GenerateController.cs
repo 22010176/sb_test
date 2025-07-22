@@ -289,6 +289,8 @@ public class GenerateController(AppDbContext context) : ControllerBase
     List<DapAnCauHoi> dapAnCauHoi = await (
       from chkt in context.CauHoiKiThi
       join dach in context.DapAnCauHoi on chkt.IdCauHoi equals dach.IdCauHoi
+      where chkt.Id == idCauHoiKiThi
+      orderby dach.Id
       select dach
     ).ToListAsync();
     List<DapAnCauHoiKiThi> dapAnCauHoiKiThi = [];
@@ -372,7 +374,7 @@ public class GenerateController(AppDbContext context) : ControllerBase
     List<KiThi> kiThi = [];
     foreach (var mon in monHoc)
     {
-      boCauHoi.AddRange(await TaoBoCauHoi(scale * 3, mon.Id));
+      boCauHoi.AddRange(await TaoBoCauHoi(scale * 5, mon.Id));
       kiThi.AddRange(await TaoKiThi(scale * 10, mon.Id));
     }
     await DatabaseUtilities.BulkInsertAsync(context, boCauHoi);
@@ -380,7 +382,7 @@ public class GenerateController(AppDbContext context) : ControllerBase
 
     // Cau hoi
     List<CauHoi> cauHoi = [];
-    foreach (var bch in boCauHoi) cauHoi.AddRange(await TaoCauHoi(scale * 20, bch.Id));
+    foreach (var bch in boCauHoi) cauHoi.AddRange(await TaoCauHoi(scale * 50, bch.Id));
     await DatabaseUtilities.BulkInsertAsync(context, cauHoi);
 
     List<DapAnCauHoi> dapAnCauHoi = [];
@@ -392,8 +394,14 @@ public class GenerateController(AppDbContext context) : ControllerBase
     List<CauHoiKiThi> cauHoiKiThi = [];
     foreach (var i in kiThi)
     {
+      var idMonHoc = i.IdMonHoc;
       cauHinhCauHoiKiThi.AddRange(await TaoCauHinh(i.Id));
-      cauHoiKiThi.AddRange(await TaoCauHoiChoKiThi(20 * scale, i.Id, cauHoi));
+      cauHoiKiThi.AddRange(await TaoCauHoiChoKiThi(30 * scale, i.Id, [..
+        from ch in cauHoi
+        join bch in boCauHoi on ch.IdBoCauHoi equals bch.Id
+        where bch.IdMonHoc == idMonHoc
+        select ch
+      ]));
     }
     await DatabaseUtilities.BulkInsertAsync(context, cauHinhCauHoiKiThi);
     await DatabaseUtilities.BulkInsertAsync(context, cauHoiKiThi);

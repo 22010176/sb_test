@@ -66,3 +66,35 @@ export async function LayKiThiChiTiet(idKiThi: number) {
   })
   return result.data
 }
+
+export async function LayDanhSachCauHoi(idKiThi: number) {
+  const result = await axios.get(`${url}/${idKiThi}/danh-sach`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+
+
+export type CauHinhCauHoi = {
+  doKho: number,
+  soCauHoiTrongDe: number,
+  tongDiem: number,
+}
+export async function TaoCauHinhDethi(idKiThi: number, cauHinh: CauHinhCauHoi[]) {
+  const result = await axios.post(`${url}/${idKiThi}/cau-hinh`, cauHinh, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
+export async function LayCauHinhCauHoi(idKiThi: number) {
+  const result = await axios.get(`${url}/${idKiThi}/cau-hinh`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data;
+}
