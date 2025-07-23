@@ -251,6 +251,7 @@ public class KiThiController(AppDbContext context) : ControllerBase
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
       var cauHinh = await context.CauHinhCauHoiKiThi
         .Where(i => i.IdKiThi == idKiThi)
+        .OrderBy(i => i.DoKho)
         .Select(i => new
         {
           i.Id,

@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 
 import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
 import { GetCauHoi } from '@/api/GiangVien/CauHoi';
-import { LayCauHinhCauHoi, LayDanhSachCauHoi, LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
+import { LayCauHinhCauHoi, LayDanhSachCauHoi, LayKiThiChiTiet, TaoCauHinhDethi, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
 
 const { Text } = Typography;
 
@@ -58,7 +58,6 @@ function ChiTietKiThiCauHoi() {
         pointTB: result.data[1].tongDiem,
         pointKho: result.data[2].tongDiem
       })
-
     })
   }, [idKiThi])
 
@@ -104,6 +103,35 @@ function ChiTietKiThiCauHoi() {
   const handleModalOk = () => {
     form.validateFields().then(values => {
       console.log(values, phoDiem);
+      const soCauHoi = Object.values(values)
+      const _phoDiem = Object.values(phoDiem)
+      console.log(soCauHoi, _phoDiem)
+
+      let input = []
+      for (let i = 0; i < soCauHoi.length; i++) {
+        input.push({
+          doKho: i,
+          soCauHoiTrongDe: soCauHoi[i],
+          tongDiem: _phoDiem[i]
+        })
+      }
+      TaoCauHinhDethi(+(idKiThi ?? 0), input).then(function (result) {
+        console.log(result)
+        message.success('Đã cập nhật cấu hình đề thi thành công');
+        setCauHinhModal(false)
+
+        LayCauHinhCauHoi(+(idKiThi ?? 0)).then(function (result) {
+          setCauHinh({
+            soCauDe: result.data[0].soCauHoiTrongDe,
+            soCauTB: result.data[1].soCauHoiTrongDe,
+            soCauKho: result.data[2].soCauHoiTrongDe,
+            pointDe: result.data[0].tongDiem,
+            pointTB: result.data[1].tongDiem,
+            pointKho: result.data[2].tongDiem
+          })
+        })
+      })
+      console.log(input)
       // if (editingSet) {
       //   setQuestionSets(questionSets?.map((set: any) => set.id === editingSet.id ? { ...set, ...values } : set));
       //   message.success('Đã cập nhật bộ đề thành công');
@@ -212,24 +240,72 @@ function ChiTietKiThiCauHoi() {
             </Form.Item>
 
             <Form.Item label="Phổ điểm dễ" className='col-span-3'>
-              <Slider step={0.25} marks={marks} min={0} max={10}
+              <Slider step={1} marks={marks} min={0} max={10}
                 value={phoDiem.pointDe}
                 onChange={value => {
-                  setPhoDiem(val => ({ ...val, pointDe: value }))
+                  if (value + phoDiem.pointTB + phoDiem.pointKho == 10)
+                    return setPhoDiem(val => ({ ...val, pointDe: value }))
+
+                  let _pointKho = 10 - value - phoDiem.pointTB
+                  if (_pointKho < 0) _pointKho = 0
+
+                  let _pointTB = _pointKho == 0 ? 10 - value - _pointKho : phoDiem.pointTB
+                  if (_pointTB < 0) {
+                    _pointTB = 0
+                    value = 10
+                  }
+
+                  setPhoDiem({
+                    pointDe: value,
+                    pointTB: _pointTB,
+                    pointKho: _pointKho
+                  })
                 }} />
             </Form.Item>
             <Form.Item label="Phổ điểm trung bình" className='col-span-3'>
-              <Slider step={0.25} marks={marks} min={0} max={10}
+              <Slider step={1} marks={marks} min={0} max={10}
                 value={phoDiem.pointTB}
                 onChange={value => {
-                  setPhoDiem(val => ({ ...val, pointTB: value }))
+                  if (value + phoDiem.pointDe + phoDiem.pointKho == 10)
+                    return setPhoDiem(val => ({ ...val, pointTB: value }))
+
+                  let _pointKho = 10 - value - phoDiem.pointDe
+                  if (_pointKho < 0) _pointKho = 0
+
+                  let _pointDe = _pointKho == 0 ? 10 - value - _pointKho : phoDiem.pointDe
+                  if (_pointDe < 0) {
+                    _pointDe = 0
+                    value = 10
+                  }
+
+                  setPhoDiem({
+                    pointDe: _pointDe,
+                    pointTB: value,
+                    pointKho: _pointKho
+                  })
                 }} />
             </Form.Item>
             <Form.Item label="Phổ điểm khó" className='col-span-3'>
-              <Slider step={0.25} marks={marks} min={0} max={10}
+              <Slider step={1} marks={marks} min={0} max={10}
                 value={phoDiem.pointKho}
                 onChange={value => {
-                  setPhoDiem(val => ({ ...val, pointKho: value }))
+                  if (value + phoDiem.pointDe + phoDiem.pointTB == 10)
+                    return setPhoDiem(val => ({ ...val, pointKho: value }))
+
+                  let _pointDe = 10 - value - phoDiem.pointTB
+                  if (_pointDe < 0) _pointDe = 0
+
+                  let _pointTB = _pointDe == 0 ? 10 - value - _pointDe : phoDiem.pointTB
+                  if (_pointTB < 0) {
+                    _pointTB = 0
+                    value = 10
+                  }
+
+                  setPhoDiem({
+                    pointDe: _pointDe,
+                    pointTB: _pointTB,
+                    pointKho: value
+                  })
                 }} />
             </Form.Item>
           </div>
@@ -256,7 +332,7 @@ function ChiTietKiThiCauHoi() {
               <p>Chọn tất cả</p>
               <Checkbox checked={cauHoiForm.length === cauHoi.length} value={true}
                 onChange={(e: any) => {
-                  setCauHoiForm(e.target.value ? cauHoi.map((i: any) => i.id) : [])
+                  setCauHoiForm(e.target?.value ? cauHoi.map((i: any) => i.id) : [])
                 }} />
             </div>
             <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}

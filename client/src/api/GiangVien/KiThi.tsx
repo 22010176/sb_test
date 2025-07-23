@@ -76,14 +76,13 @@ export async function LayDanhSachCauHoi(idKiThi: number) {
   return result.data
 }
 
-
 export type CauHinhCauHoi = {
   doKho: number,
   soCauHoiTrongDe: number,
   tongDiem: number,
 }
 export async function TaoCauHinhDethi(idKiThi: number, cauHinh: CauHinhCauHoi[]) {
-  const result = await axios.post(`${url}/${idKiThi}/cau-hinh`, cauHinh, {
+  const result = await axios.post(`${url}/${idKiThi}/cauHinhCauHoi`, cauHinh, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }
