@@ -64,6 +64,7 @@ function Element() {
 
   useEffect(function () {
     GetLopHoc().then(result => {
+      console.log(result.data)
       setLopHoc(result.data as LopHoc[])
     }).catch(err => {
       message.error(err.message)
@@ -113,9 +114,9 @@ function Element() {
     {
       width: 150, align: 'center',
       title: <span className="font-semibold text-gray-700">Sĩ số lớp</span>,
-      render: () => (
+      render: (entry: any) => (
         <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold">
-          {0}
+          {entry.soLuongSinhVien}
         </span>
       ),
     },
@@ -172,9 +173,11 @@ function Element() {
 
           {/* Table */}
           <div className="p-6">
-            <Table size='small' columns={columns} dataSource={lopHoc} rowKey="id" pagination={{ pageSize: 10, }}
+            <Table size='small' rowKey="id" pagination={{ pageSize: 10, }}
               className="bg-white rounded-lg overflow-hidden"
-              rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`} />
+              rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`}
+              columns={columns}
+              dataSource={lopHoc.filter(i => i.tenLop.includes(searchText))} />
           </div>
         </div>
 

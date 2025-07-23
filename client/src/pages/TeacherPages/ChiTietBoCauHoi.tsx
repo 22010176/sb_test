@@ -175,7 +175,6 @@ function CauHoiForm({ tenBoCauHoi, formValue, setFormValue, onSubmit, onCancel }
                   .map((_, idx) => idx !== index ? _ : { ..._, xoa: true })
               }))} />
           </div>
-
         ))}
       </div>
 
@@ -212,6 +211,8 @@ function Element() {
   const [cauHoi, setCauHoi] = useState<CauHoi[]>([])
 
   const [searchText, setSearchText] = useState('');
+  const [loaiCauHoi, setLoaiCauHoi] = useState<number>(-1);
+  const [doKho, setDoKho] = useState<number>(-1);
 
   useEffect(function () {
     GetMonHocById(+monHocId).then(result => {
@@ -222,6 +223,7 @@ function Element() {
     })
 
     GetCauHoi(+boCauHoiId).then(result => {
+      console.log(result.data)
       setCauHoi(result.data)
     })
   }, [boCauHoiId, monHocId])
@@ -255,22 +257,25 @@ function Element() {
           <Row gutter={16} className="mb-6">
             <Col span={6}>
               <Card className="text-center bg-blue-50 border-blue-200">
-                <Statistic title="Tổng số câu hỏi" value={70} valueStyle={{ color: '#1890ff', fontSize: '2rem', fontWeight: 'bold' }} />
+                <Statistic title="Tổng số câu hỏi" value={cauHoi.length} valueStyle={{ color: '#1890ff', fontSize: '2rem', fontWeight: 'bold' }} />
               </Card>
             </Col>
             <Col span={6}>
               <Card className="text-center bg-green-50 border-green-200">
-                <Statistic title="Câu hỏi dễ" value={30} valueStyle={{ color: '#52c41a', fontSize: '2rem', fontWeight: 'bold' }} />
+                <Statistic title="Câu hỏi dễ" valueStyle={{ color: '#52c41a', fontSize: '2rem', fontWeight: 'bold' }}
+                  value={cauHoi.filter(item => item.doKho == 0).length} />
               </Card>
             </Col>
             <Col span={6}>
               <Card className="text-center bg-orange-50 border-orange-200">
-                <Statistic title="Câu hỏi trung bình" value={30} valueStyle={{ color: '#fa8c16', fontSize: '2rem', fontWeight: 'bold' }} />
+                <Statistic title="Câu hỏi trung bình" valueStyle={{ color: '#fa8c16', fontSize: '2rem', fontWeight: 'bold' }}
+                  value={cauHoi.filter(item => item.doKho == 1).length} />
               </Card>
             </Col>
             <Col span={6}>
               <Card className="text-center bg-red-50 border-red-200">
-                <Statistic title="Câu hỏi khó" value={10} valueStyle={{ color: '#f5222d', fontSize: '2rem', fontWeight: 'bold' }} />
+                <Statistic title="Câu hỏi khó" valueStyle={{ color: '#f5222d', fontSize: '2rem', fontWeight: 'bold' }}
+                  value={cauHoi.filter(item => item.doKho == 2).length} />
               </Card>
             </Col>
           </Row>
@@ -286,14 +291,20 @@ function Element() {
             </Col>
             <Col span={8}>
               <Select className="w-full" placeholder="Tất cả loại câu hỏi"
+                value={loaiCauHoi}
+                onChange={(value) => setLoaiCauHoi(value)}
                 options={[
-                  { value: 'multiple', label: 'Chọn nhiều đáp án' },
-                  { value: 'single', label: 'Chọn đáp án đúng nhất' },
+                  { value: -1, label: 'Tất cả' },
+                  { value: 0, label: 'Chọn đáp án đúng nhất' },
+                  { value: 1, label: 'Chọn nhiều đáp án' },
                 ]} />
             </Col>
             <Col span={8}>
               <Select className="w-full" placeholder="Tất cả mức độ"
+                value={doKho}
+                onChange={(value) => setDoKho(value)}
                 options={[
+                  { value: -1, label: 'Tất cả' },
                   { value: 0, label: 'Dễ' },
                   { value: 1, label: 'Trung bình' },
                   { value: 2, label: 'Khó' }
@@ -313,60 +324,66 @@ function Element() {
 
         {/* Questions List */}
         <div className="space-y-4 flex flex-col gap-3">
-          {cauHoi?.map((question, index) => (
-            <Card key={question.id} className="shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center space-x-3">
-                  <Text strong className="text-blue-600">{boCauHoi?.tenBoCauHoi}</Text>
-                  <Tag color={getDifficultyColor(question.doKho)}>
-                    {question.doKho === 0 ? 'Dễ' : question.doKho === 1 ? 'Trung bình' : 'Khó'}
-                  </Tag>
-                  <Tag color={question.loaiCauHoi === 0 ? "blue" : "gold"}>
-                    {question.loaiCauHoi === 0 ? "Chọn đáp án đúng nhất" : "Chọn nhiều đáp án"}
-                  </Tag>
-                </div>
-                <div className="flex space-x-1">
-                  <Button type="text" icon={<EditOutlined />} size="small"
-                    onClick={() => {
-                      setEditForm({
-                        id: question.id,
-                        noiDung: question.noiDung,
-                        doKho: question.doKho,
-                        dapAn: question.dapAn,
-                        loaiCauHoi: question.loaiCauHoi
-                      })
-                      setModal('update')
-                    }} />
-                  <Button type="text" icon={<DeleteOutlined />} size="small" danger
-                    onClick={async () => {
-                      await XoaCauHoi(+boCauHoiId, question.id as number).then(result => {
-                        setCauHoi(result.data)
-                        message.success('Xóa câu hỏi thành công!')
-                      }).catch(err => message.error(err.message))
-                    }} />
-                </div>
-              </div>
-
-              <p className="block mb-3 font-bold">
-                Câu {index + 1}: {question.noiDung}
-              </p>
-
-              <div className="space-y-2">
-                {question.dapAn?.map((option, i) => (
-                  <div key={i}
-                    className={[
-                      `p-3 rounded-lg border`,
-                      option.dungSai ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-400'
-                    ].join(' ')}>
-                    <p>
-                      <span className="font-medium mr-2">{"ABCDE"[i]}.</span>
-                      {option.noiDung}
-                    </p>
+          {cauHoi
+            ?.filter(item =>
+              (item.noiDung.toLowerCase().includes(searchText.toLowerCase())
+                || item.dapAn.some(dapAn => dapAn.noiDung.toLowerCase().includes(searchText.toLowerCase())))
+              && (loaiCauHoi == -1 || item.loaiCauHoi == loaiCauHoi)
+              && (doKho == -1 || item.doKho == doKho))
+            ?.map((question, index) => (
+              <Card key={question.id} className="shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center space-x-3">
+                    <Text strong className="text-blue-600">{boCauHoi?.tenBoCauHoi}</Text>
+                    <Tag color={getDifficultyColor(question.doKho)}>
+                      {question.doKho === 0 ? 'Dễ' : question.doKho === 1 ? 'Trung bình' : 'Khó'}
+                    </Tag>
+                    <Tag color={question.loaiCauHoi === 0 ? "blue" : "gold"}>
+                      {question.loaiCauHoi === 0 ? "Chọn đáp án đúng nhất" : "Chọn nhiều đáp án"}
+                    </Tag>
                   </div>
-                ))}
-              </div>
-            </Card>
-          ))}
+                  <div className="flex space-x-1">
+                    <Button type="text" icon={<EditOutlined />} size="small"
+                      onClick={() => {
+                        setEditForm({
+                          id: question.id,
+                          noiDung: question.noiDung,
+                          doKho: question.doKho,
+                          dapAn: question.dapAn,
+                          loaiCauHoi: question.loaiCauHoi
+                        })
+                        setModal('update')
+                      }} />
+                    <Button type="text" icon={<DeleteOutlined />} size="small" danger
+                      onClick={async () => {
+                        await XoaCauHoi(+boCauHoiId, question.id as number).then(result => {
+                          setCauHoi(result.data)
+                          message.success('Xóa câu hỏi thành công!')
+                        }).catch(err => message.error(err.message))
+                      }} />
+                  </div>
+                </div>
+
+                <p className="block mb-3 font-bold">
+                  Câu {index + 1}: {question.noiDung}
+                </p>
+
+                <div className="space-y-2">
+                  {question.dapAn?.map((option, i) => (
+                    <div key={i}
+                      className={[
+                        `p-3 rounded-lg border`,
+                        option.dungSai ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-400'
+                      ].join(' ')}>
+                      <p>
+                        <span className="font-medium mr-2">{"ABCDE"[i]}.</span>
+                        {option.noiDung}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ))}
         </div>
       </div>
 

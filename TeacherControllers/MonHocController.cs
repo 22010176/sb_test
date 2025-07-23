@@ -25,7 +25,13 @@ public class MonHocController(AppDbContext context) : ControllerBase
         lh.Id,
         lh.MaMon,
         lh.TenMon,
-        lh.ThoiGianCapNhatCuoi
+        lh.ThoiGianCapNhatCuoi,
+        SoLuongCauHoi = (
+          from bch in context.BoCauHoi
+          join ch in context.CauHoi on bch.Id equals ch.IdBoCauHoi
+          where bch.IdMonHoc == lh.Id
+          select ch
+        ).Count()
       };
 
     return [.. await query.ToListAsync()];

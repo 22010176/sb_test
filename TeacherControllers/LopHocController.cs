@@ -19,7 +19,7 @@ public class LopHocController(AppDbContext context) : ControllerBase
   {
     var query =
       from lh in context.LopHoc
-      where lh.IdGiangVien == userId
+      where lh.IdGiangVien == 605
       orderby lh.ThoiGianTao descending
       select new
       {
@@ -27,7 +27,16 @@ public class LopHocController(AppDbContext context) : ControllerBase
         lh.MaLop,
         lh.TenLop,
         lh.MoTa,
-        lh.ThoiGianTao
+        lh.ThoiGianTao,
+        lh.IdGiangVien,
+        SoLuongSinhVien = (
+          from mm in context.MaMoiLopHoc
+          join lh_nd in context.LopHoc_NguoiDung on mm.Id equals lh_nd.IdMaMoi
+          where
+            mm.IdLopHoc == lh.Id
+            && lh_nd.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
+          select lh_nd
+        ).Count()
       };
 
     return await query.ToListAsync();

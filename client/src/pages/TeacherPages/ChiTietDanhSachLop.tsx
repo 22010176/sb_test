@@ -27,7 +27,7 @@ function ChiTietDanhSachLop() {
       render: (_: any, __: any, i: number) => i + 1
     },
     {
-      title: <p className='text-center'>Họ và tên</p>, dataIndex: 'hoTen', key: 'hoTen', width: 180, filteredValue: searchText ? [searchText] : null,
+      title: <p className='text-center'>Họ và tên</p>, dataIndex: 'hoTen', key: 'hoTen', width: 180,
       onFilter: (value: any, record: any) => record.name.toLowerCase().includes(value.toLowerCase())
     },
     { title: <p className='text-center'>Giới tính</p>, dataIndex: 'gioiTinh', key: 'gioiTinh', width: 100, className: 'text-center' },
@@ -67,13 +67,13 @@ function ChiTietDanhSachLop() {
           <Input placeholder="Tìm kiếm học sinh" prefix={<SearchOutlined />} className="w-100"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)} />
-          <Select placeholder="Sắp xếp..." className="w-32"
+          {/* <Select placeholder="Sắp xếp..." className="w-50"
             value={sortOrder}
             onChange={setSortOrder}
             options={[
               { value: "asc", label: "Tăng dần" },
               { value: "desc", label: "Giảm dần" },
-            ]} />
+            ]} /> */}
         </div>
         <Button type="primary" icon={<PlusOutlined />}
           onClick={() => {
@@ -84,7 +84,13 @@ function ChiTietDanhSachLop() {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={students} bordered size="small" />
+      <Table bordered size="small"
+        columns={columns}
+        dataSource={students.filter((student: any) =>
+          student.hoTen.toLowerCase().includes(searchText.toLowerCase())
+          || student.soDienThoai.includes(searchText)
+          || student.email.toLowerCase().includes(searchText.toLowerCase()))}
+      />
 
       <Modal okText='Tham gia' cancelText="Hủy" open={inviteModal}
         title={<span className="text-lg font-semibold text-gray-800">Thêm học sinh bằng số điện thoại</span>}

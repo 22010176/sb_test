@@ -15,42 +15,25 @@ context.Database.EnsureCreated();
 
 
 var a = (
-  from bch in context.BoCauHoi
-  join mh in context.MonHoc on bch.IdMonHoc equals mh.Id
+  from lh in context.LopHoc
+  where lh.IdGiangVien == 605
+  orderby lh.ThoiGianTao descending
   select new
   {
-    bch.Id,
-    bch.TenBoCauHoi,
-    bch.IdMonHoc,
-    bch.ThoiGianCapNhatCuoi,
-    mh.TenMon,
-    CauHoiDe = (
-      from ch in context.CauHoi
-      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 0
-      select new
-      {
-        ch.Id,
-        ch.NoiDung,
-      }
-    ).Count(),
-    CauHoiTrungBinh = (
-      from ch in context.CauHoi
-      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 1
-      select new
-      {
-        ch.Id,
-        ch.NoiDung,
-      }
-    ).Count(),
-    CauHoiKho = (
-      from ch in context.CauHoi
-      where ch.IdBoCauHoi == bch.Id && ch.DoKho == 2
-      select new
-      {
-        ch.Id,
-        ch.NoiDung,
-      }
-    ).Count(),
+    lh.Id,
+    lh.MaLop,
+    lh.TenLop,
+    lh.MoTa,
+    lh.ThoiGianTao,
+    lh.IdGiangVien,
+    SoLuongSinhVien = (
+      from mm in context.MaMoiLopHoc
+      join lh_nd in context.LopHoc_NguoiDung on mm.Id equals lh_nd.IdMaMoi
+      where
+        mm.IdLopHoc == lh.Id
+        && lh_nd.TrangThaiMaMoi == TrangThaiMaMoi.DONG_Y
+      select lh_nd
+    ).Count()
   }
 ).ToList();
 string json = JsonSerializer.Serialize(a,

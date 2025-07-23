@@ -1,6 +1,6 @@
 import { ArrowRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Modal, Popconfirm, Select, Space, Table } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { CapNhatMonHoc, GetMonHoc, ThemMoc, XoaMonHoc } from '@/api/GiangVien/MonHoc';
@@ -16,6 +16,20 @@ function Element() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [form] = Form.useForm();
+
+  const [sort, setSort] = useState('name');
+
+  const dataTable = useMemo(() => {
+    return courses.filter((course: any) =>
+      course.tenMon.toLowerCase().includes(searchText.toLowerCase()) ||
+      course.maMon.toLowerCase().includes(searchText.toLowerCase())
+    ).sort((a: any, b: any) => {
+      if (sort === 'name') return a.tenMon?.localeCompare(b?.tenMon);
+      if (sort === 'code') return a.maMon?.localeCompare(b?.maMon);
+      if (sort === 'questions') return (b?.questionCount || 0) - (a?.questionCount || 0);
+      return 0;
+    });
+  }, [courses, searchText, sort]);
 
   useEffect(() => {
     GetMonHoc().then(result => {
@@ -59,7 +73,6 @@ function Element() {
       setCourses(result.data)
       message.success('Xóa môn học thành công!');
     }).catch(err => message.error(err.message));
-
   };
 
   const columns = [
@@ -75,7 +88,7 @@ function Element() {
       title: <span className="font-semibold text-gray-700">Mã môn học</span>,
       render: (text: string) => (
         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-mono text-sm">
-          {text}
+          {text || 'Chưa có mã'}
         </span>
       ),
     },
@@ -88,8 +101,8 @@ function Element() {
     },
     {
       title: <span className="font-semibold text-gray-700">Số lượng câu hỏi</span>,
-      dataIndex: 'questionCount',
-      key: 'questionCount',
+      dataIndex: 'soLuongCauHoi',
+      key: 'soLuongCauHoi',
       width: 150,
       align: 'center',
       render: (count: number) => (
@@ -136,11 +149,14 @@ function Element() {
               <Search allowClear className="max-w-md" placeholder="Tìm kiếm theo mã môn học hoặc tên môn học" enterButton={<Button icon={<SearchOutlined />} />}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)} />
-              <Select placeholder="Sắp xếp..." className="w-40" options={[
-                { value: 'name', label: 'Theo tên' },
-                { value: 'code', label: 'Theo mã' },
-                { value: 'questions', label: 'Theo số câu hỏi' },
-              ]} />
+              <Select placeholder="Sắp xếp..." className="w-40"
+                value={sort}
+                onChange={(value) => setSort(value)}
+                options={[
+                  { value: 'name', label: 'Theo tên' },
+                  { value: 'code', label: 'Theo mã' },
+                  { value: 'questions', label: 'Theo số câu hỏi' },
+                ]} />
             </div>
 
             <Button type="primary" icon={<PlusOutlined />}
@@ -156,9 +172,9 @@ function Element() {
           <Table
             size='small'
             columns={columns}
-            dataSource={courses}
+            dataSource={dataTable}
             rowKey="id"
-            pagination={{ pageSize: 10, }}
+            pagination={{ pageSize: 10 }}
             className="bg-white rounded-lg overflow-hidden"
             rowClassName={(record, index) => `hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`} />
         </div>
