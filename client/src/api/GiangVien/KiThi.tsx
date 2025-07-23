@@ -91,7 +91,7 @@ export async function TaoCauHinhDethi(idKiThi: number, cauHinh: CauHinhCauHoi[])
   return result.data
 }
 export async function LayCauHinhCauHoi(idKiThi: number) {
-  const result = await axios.get(`${url}/${idKiThi}/cau-hinh`, {
+  const result = await axios.get(`${url}/${idKiThi}/cauHinhCauHoi`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }

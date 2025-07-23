@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 
 import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
 import { GetCauHoi } from '@/api/GiangVien/CauHoi';
-import { LayDanhSachCauHoi, LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
+import { LayCauHinhCauHoi, LayDanhSachCauHoi, LayKiThiChiTiet, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
 
 const { Text } = Typography;
 
@@ -16,41 +16,49 @@ const marks: SliderSingleProps['marks'] = { 0: '0.0', 1: '1.0', 2: '2.0', 3: '3.
 
 function ChiTietKiThiCauHoi() {
   const { idKiThi } = useParams()
-  // console.log({ idKiThi })
+
   const [kiThi, setKiThi] = useState({})
 
   const [boCauHoi, setBoCauHoi] = useState([])
   const [bch, setBCH] = useState()
 
   const [cauHoi, setCauHoi] = useState([])
-
   const [cauHoiForm, setCauHoiForm] = useState([])
 
   const [addQuestionModal, setAddQuestionModal] = useState(false)
   const [cauHinhModal, setCauHinhModal] = useState(false);
   const [questionSets, setQuestionSets] = useState([]);
-  const [value, setValue] = useState([5, 8]);
+
+  const [cauHinh, setCauHinh] = useState({ soCauDe: 0, soCauTB: 0, soCauKho: 0, pointDe: 0, pointTB: 0, pointKho: 0 })
+  const [phoDiem, setPhoDiem] = useState({ pointDe: 0, pointTB: 0, pointKho: 0 });
 
   const tongSoCau = useMemo(function () {
-    const result = {
-      soCauDe: 0,
-      soCauTB: 0,
-      soCauKho: 0
-    }
-    for (const i of questionSets) {
-      result.soCauDe += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 0 ? 1 : 0), 0)
-      result.soCauTB += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 1 ? 1 : 0), 0)
-      result.soCauKho += i.cauHoi.reduce((acc, j) => acc + (j.doKho === 2 ? 1 : 0), 0)
+    const result = { soCauDe: 0, soCauTB: 0, soCauKho: 0 }
+    for (const i of questionSets as any) {
+      result.soCauDe += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 0 ? 1 : 0), 0)
+      result.soCauTB += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 1 ? 1 : 0), 0)
+      result.soCauKho += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 2 ? 1 : 0), 0)
     }
     return result
   }, [questionSets])
 
-  const [editingSet, setEditingSet] = useState(null);
   const [form] = Form.useForm();
 
   useEffect(function () {
     LayKiThiChiTiet(+(idKiThi ?? 0)).then(async function (result) {
       setKiThi(result.data)
+    })
+
+    LayCauHinhCauHoi(+(idKiThi ?? 0)).then(function (result) {
+      setCauHinh({
+        soCauDe: result.data[0].soCauHoiTrongDe,
+        soCauTB: result.data[1].soCauHoiTrongDe,
+        soCauKho: result.data[2].soCauHoiTrongDe,
+        pointDe: result.data[0].tongDiem,
+        pointTB: result.data[1].tongDiem,
+        pointKho: result.data[2].tongDiem
+      })
+
     })
   }, [idKiThi])
 
@@ -95,7 +103,7 @@ function ChiTietKiThiCauHoi() {
 
   const handleModalOk = () => {
     form.validateFields().then(values => {
-      console.log(values);
+      console.log(values, phoDiem);
       // if (editingSet) {
       //   setQuestionSets(questionSets?.map((set: any) => set.id === editingSet.id ? { ...set, ...values } : set));
       //   message.success('Đã cập nhật bộ đề thành công');
@@ -124,7 +132,19 @@ function ChiTietKiThiCauHoi() {
             Thêm câu hỏi
           </Button>
           <Button variant='solid' color='green' icon={<FontAwesomeIcon icon={faPen} />}
-            onClick={() => setCauHinhModal(true)}>
+            onClick={() => {
+              setCauHinhModal(true)
+              setPhoDiem({
+                pointDe: cauHinh.pointDe,
+                pointTB: cauHinh.pointTB,
+                pointKho: cauHinh.pointKho
+              })
+              form.setFieldsValue({
+                soCauDe: Math.min(cauHinh.soCauDe, tongSoCau.soCauDe),
+                soCauTB: Math.min(cauHinh.soCauTB, tongSoCau.soCauTB),
+                soCauKho: Math.min(cauHinh.soCauKho, tongSoCau.soCauKho)
+              })
+            }}>
             Sửa cấu hình
           </Button>
         </div>
@@ -165,34 +185,51 @@ function ChiTietKiThiCauHoi() {
       </div>
 
       <Modal cancelText="Hủy" width={800}
-        title={"Cập nhật cấu hình đề thi"}
+        okText='Cập nhật'
+        title="Cập nhật cấu hình đề thi"
         open={cauHinhModal}
         onOk={handleModalOk}
-        onCancel={() => setCauHinhModal(false)}
-        okText={editingSet ? 'Cập nhật' : 'Thêm'}>
+        onCancel={() => {
+          setCauHinhModal(false)
+          form.resetFields()
+          setPhoDiem({ pointDe: 0, pointTB: 0, pointKho: 0 })
+        }}>
         <Form form={form} layout="vertical" className="mt-4">
           <div className="grid grid-cols-3 gap-4">
-            <Form.Item label={`Số câu dễ (${tongSoCau.soCauDe} câu)`} name="easy"
+            <Form.Item label={`Số câu dễ (${tongSoCau.soCauDe} câu)`} name="soCauDe"
               rules={[{ required: true, message: 'Vui lòng nhập số câu dễ!' }]}>
               <InputNumber min={tongSoCau.soCauDe == 0 ? 0 : 1} max={tongSoCau.soCauDe} placeholder={tongSoCau.soCauDe + ""} className="w-full" />
             </Form.Item>
 
-            <Form.Item label={`Số câu trung bình (${tongSoCau.soCauTB} câu)`} name="medium"
+            <Form.Item label={`Số câu trung bình (${tongSoCau.soCauTB} câu)`} name="soCauTB"
               rules={[{ required: true, message: 'Vui lòng nhập số câu trung bình!' }]}>
               <InputNumber min={tongSoCau.soCauTB == 0 ? 0 : 1} max={tongSoCau.soCauTB} placeholder={tongSoCau.soCauTB + ""} className="w-full" />
             </Form.Item>
 
-            <Form.Item label={`Số câu khó (${tongSoCau.soCauKho} câu)`} name="hard"
+            <Form.Item label={`Số câu khó (${tongSoCau.soCauKho} câu)`} name="soCauKho"
               rules={[{ required: true, message: 'Vui lòng nhập số câu khó!' }]}>
               <InputNumber min={tongSoCau.soCauKho == 0 ? 0 : 1} max={tongSoCau.soCauKho} placeholder={tongSoCau.soCauKho + ""} className="w-full" />
             </Form.Item>
 
-            <Form.Item label="Phổ điểm (dễ - trung bình - khó)" name="point" className='col-span-3'>
-              <Slider range defaultValue={[5, 7.5]} step={0.25} marks={marks} min={0} max={10}
-                value={value}
+            <Form.Item label="Phổ điểm dễ" className='col-span-3'>
+              <Slider step={0.25} marks={marks} min={0} max={10}
+                value={phoDiem.pointDe}
                 onChange={value => {
-
-                  setValue(value)
+                  setPhoDiem(val => ({ ...val, pointDe: value }))
+                }} />
+            </Form.Item>
+            <Form.Item label="Phổ điểm trung bình" className='col-span-3'>
+              <Slider step={0.25} marks={marks} min={0} max={10}
+                value={phoDiem.pointTB}
+                onChange={value => {
+                  setPhoDiem(val => ({ ...val, pointTB: value }))
+                }} />
+            </Form.Item>
+            <Form.Item label="Phổ điểm khó" className='col-span-3'>
+              <Slider step={0.25} marks={marks} min={0} max={10}
+                value={phoDiem.pointKho}
+                onChange={value => {
+                  setPhoDiem(val => ({ ...val, pointKho: value }))
                 }} />
             </Form.Item>
           </div>
@@ -219,7 +256,7 @@ function ChiTietKiThiCauHoi() {
               <p>Chọn tất cả</p>
               <Checkbox checked={cauHoiForm.length === cauHoi.length} value={true}
                 onChange={(e: any) => {
-                  setCauHoiForm(e.target.value ? cauHoi.map(i => i.id) : [])
+                  setCauHoiForm(e.target.value ? cauHoi.map((i: any) => i.id) : [])
                 }} />
             </div>
             <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}
