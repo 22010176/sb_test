@@ -2,12 +2,13 @@ import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-de
 import { faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card, Checkbox, Form, InputNumber, message, Modal, Select, Slider, Typography, type SliderSingleProps } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { GetBoCauHoi } from '@/api/GiangVien/BoCauHoi';
 import { GetCauHoi } from '@/api/GiangVien/CauHoi';
-import { LayCauHinhCauHoi, LayDanhSachCauHoi, LayKiThiChiTiet, TaoCauHinhDethi, ThemCauHoiKiThi } from '@/api/GiangVien/KiThi';
+import { LayCauHinhCauHoi, LayDanhSachCauHoi, LayKiThiChiTiet, TaoCauHinhDethi, ThemCauHoiKiThi, XoaBoCauHoi } from '@/api/GiangVien/KiThi';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 
 const { Text } = Typography;
 
@@ -16,10 +17,14 @@ const marks: SliderSingleProps['marks'] = { 0: '0.0', 1: '1.0', 2: '2.0', 3: '3.
 
 function ChiTietKiThiCauHoi() {
   const { idKiThi } = useParams()
+  const addQuestionModalRef = useRef(null)
+  const editBCHRef = useRef(null)
 
   const [kiThi, setKiThi] = useState({})
 
+
   const [boCauHoi, setBoCauHoi] = useState([])
+  const [editBCH, setEditBCH] = useState(null)
   const [bch, setBCH] = useState()
 
   const [cauHoi, setCauHoi] = useState([])
@@ -35,9 +40,15 @@ function ChiTietKiThiCauHoi() {
   const tongSoCau = useMemo(function () {
     const result = { soCauDe: 0, soCauTB: 0, soCauKho: 0 }
     for (const i of questionSets as any) {
-      result.soCauDe += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 0 ? 1 : 0), 0)
-      result.soCauTB += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 1 ? 1 : 0), 0)
-      result.soCauKho += i.cauHoi?.reduce((acc: number, j: any) => acc + (j.doKho === 2 ? 1 : 0), 0)
+      result.soCauDe += i.cauHoi
+        ?.filter((j: any) => j.coTrongDe === true && j.doKho === 0)
+        .reduce((acc: number, j: any) => acc + 1, 0)
+      result.soCauTB += i.cauHoi
+        ?.filter((j: any) => j.coTrongDe === true && j.doKho === 1)
+        .reduce((acc: number, j: any) => acc + 1, 0)
+      result.soCauKho += i.cauHoi
+        ?.filter((j: any) => j.coTrongDe === true && j.doKho === 2)
+        .reduce((acc: number, j: any) => acc + 1, 0)
     }
     return result
   }, [questionSets])
@@ -64,11 +75,12 @@ function ChiTietKiThiCauHoi() {
   useEffect(function () {
     if (!kiThi.idMonHoc) return;
     GetBoCauHoi(+(kiThi as any).idMonHoc).then(function (result) {
+      // console.log(result.data)
       setBoCauHoi(result.data)
     })
 
     LayDanhSachCauHoi(+(kiThi as any).id).then(function (result) {
-      console.log(result.data[0])
+      console.log('dddddddd', result.data)
       setQuestionSets(result.data[0].boCauHoi)
     })
   }, [kiThi])
@@ -81,31 +93,10 @@ function ChiTietKiThiCauHoi() {
     })
   }, [bch])
 
-  const handleEditSet = (set: any) => {
-    // setEditingSet(set);
-    form.setFieldsValue(set);
-  };
-
-  const handleDeleteSet = (id: any) => {
-    Modal.confirm({
-      title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa bộ đề này không?',
-      okText: 'Xóa',
-      okType: 'danger',
-      cancelText: 'Hủy',
-      onOk: () => {
-        setQuestionSets(questionSets.filter(set => set.id !== id));
-        message.success('Đã xóa bộ đề thành công');
-      }
-    });
-  };
-
   const handleModalOk = () => {
     form.validateFields().then(values => {
-      console.log(values, phoDiem);
       const soCauHoi = Object.values(values)
       const _phoDiem = Object.values(phoDiem)
-      console.log(soCauHoi, _phoDiem)
 
       let input = []
       for (let i = 0; i < soCauHoi.length; i++) {
@@ -116,7 +107,6 @@ function ChiTietKiThiCauHoi() {
         })
       }
       TaoCauHinhDethi(+(idKiThi ?? 0), input).then(function (result) {
-        console.log(result)
         message.success('Đã cập nhật cấu hình đề thi thành công');
         setCauHinhModal(false)
 
@@ -131,18 +121,6 @@ function ChiTietKiThiCauHoi() {
           })
         })
       })
-      console.log(input)
-      // if (editingSet) {
-      //   setQuestionSets(questionSets?.map((set: any) => set.id === editingSet.id ? { ...set, ...values } : set));
-      //   message.success('Đã cập nhật bộ đề thành công');
-      // } else {
-      //   const newSet = {
-      //     id: Math.max(...questionSets.map(s => s.id)) + 1,
-      //     ...values
-      //   };
-      //   setQuestionSets([...questionSets, newSet]);
-      //   message.success('Đã thêm bộ đề thành công');
-      // }
       form.resetFields();
     });
   };
@@ -179,37 +157,64 @@ function ChiTietKiThiCauHoi() {
       </div>
 
       <div className="flex flex-col gap-5 space-y-4">
-        {questionSets.map((set: any, j: number) => (
-          <Card key={set.id} className="shadow-sm">
-            <div className="flex flex-col justify-between items-start">
+        {questionSets
+          .filter((i: any) => i.cauHoi.some((j: any) => j.coTrongDe === true))
+          .map((set: any, j: number) => (
+            <Card key={set.id} className="shadow-sm">
+              <div className="flex flex-col justify-between items-start">
 
-              <div className='flex justify-between w-full items-center'>
-                <h3 className="text-lg font-semibold mb-3 text-gray-800">
-                  {set.tenBoCauHoi}
-                </h3>
-                <div className="flex gap-2 ml-4">
-                  <Button variant='text' color='blue' icon={<EyeOutlined />} onClick={() => { }} />
-                  <Button variant='text' color='green' icon={<EditOutlined />} onClick={() => handleEditSet(set)} />
-                  <Button variant='text' color='red' icon={<DeleteOutlined />} onClick={() => handleDeleteSet(set.id)} />
+                <div className='flex justify-between w-full items-center'>
+                  <h3 className="text-lg font-semibold mb-3 text-gray-800">
+                    {set.tenBoCauHoi}
+                  </h3>
+                  <div className="flex gap-2 ml-4">
+                    <Button variant='text' color='blue' icon={<EyeOutlined />} onClick={() => { }} />
+                    <Button variant='text' color='green' icon={<EditOutlined />}
+                      onClick={() => {
+                        setEditBCH(set)
+                        console.log(set)
+                      }} />
+                    <Button variant='text' color='red' icon={<DeleteOutlined />}
+                      onClick={async () => {
+                        await XoaBoCauHoi(+(idKiThi ?? 0), set.cauHoi.map((i: any) => i.id)).then(function (result) {
+                          message.success('Đã xóa bộ đề thành công');
+                        })
+                        LayDanhSachCauHoi(+(kiThi as any).id).then(function (result) {
+                          console.log('dddddddd', result.data)
+                          setQuestionSets(result.data[0].boCauHoi)
+                        })
+                      }} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 w-full">
+                  <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
+                    <div className="text-sm text-green-600 font-medium">Dễ</div>
+                    <div className="text-lg font-bold text-green-700">
+                      {set.cauHoi
+                        .filter((i: any) => i.coTrongDe === true && i.doKho === 0)
+                        .reduce((acc: number, i: any) => acc + 1, 0)} Câu
+                    </div>
+                  </div>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
+                    <div className="text-sm text-yellow-600 font-medium">Trung bình</div>
+                    <div className="text-lg font-bold text-yellow-700">
+                      {set.cauHoi
+                        .filter((i: any) => i.coTrongDe === true && i.doKho === 1)
+                        .reduce((acc: number, i: any) => acc + 1, 0)} Câu
+                    </div>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
+                    <div className="text-sm text-red-600 font-medium">Khó</div>
+                    <div className="text-lg font-bold text-red-700">
+                      {set.cauHoi
+                        .filter((i: any) => i.coTrongDe === true && i.doKho === 2)
+                        .reduce((acc: number, i: any) => acc + 1, 0)} Câu
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4 w-full">
-                <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
-                  <div className="text-sm text-green-600 font-medium">Dễ</div>
-                  <div className="text-lg font-bold text-green-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 0 ? 1 : 0), 0)} Câu</div>
-                </div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
-                  <div className="text-sm text-yellow-600 font-medium">Trung bình</div>
-                  <div className="text-lg font-bold text-yellow-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 1 ? 1 : 0), 0)} câu</div>
-                </div>
-                <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-center min-w-[120px]">
-                  <div className="text-sm text-red-600 font-medium">Khó</div>
-                  <div className="text-lg font-bold text-red-700">{set.cauHoi.reduce((acc, i) => acc + (i.doKho === 2 ? 1 : 0), 0)} câu</div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
       </div>
 
       <Modal cancelText="Hủy" width={800}
@@ -313,8 +318,12 @@ function ChiTietKiThiCauHoi() {
       </Modal>
 
       <Modal open={addQuestionModal} width={1000} footer={[]}
-        onCancel={() => setAddQuestionModal(false)}
-        title={<p className='text-lg font-bold uppercase'>Thêm câu hỏi</p>}>
+        onCancel={() => {
+          setAddQuestionModal(false)
+          setCauHoiForm([])
+          setBCH(undefined)
+        }}
+        title={<p ref={addQuestionModalRef} className='text-lg font-bold uppercase'>Thêm câu hỏi</p>}>
         <div className="mb-6">
           <Text strong className="block mb-2">
             Chọn bộ câu hỏi <span className="text-red-500">*</span>
@@ -322,7 +331,9 @@ function ChiTietKiThiCauHoi() {
           <Select placeholder="Chọn bộ câu hỏi" className="w-full"
             value={bch}
             onChange={value => setBCH(value)}
-            options={boCauHoi.map((i: any) => ({ value: i.id, label: i.tenBoCauHoi }))} />
+            options={questionSets
+              .filter((i: any) => i.cauHoi.every((j: any) => j.coTrongDe === false))
+              .map((i: any) => ({ value: i.id, label: i.tenBoCauHoi }))} />
         </div>
         <hr className="my-6 border-gray-200" />
         <div className='flex flex-col gap-5'>
@@ -337,9 +348,15 @@ function ChiTietKiThiCauHoi() {
             </div>
             <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}
               onClick={async e => {
-                const result = await ThemCauHoiKiThi(idKiThi, { danhSachCauHoi: cauHoiForm })
-                  .then(e => setAddQuestionModal(false))
-                console.log(result.data)
+                await ThemCauHoiKiThi(+(idKiThi ?? 0), { danhSachCauHoi: cauHoiForm })
+                  .then(e => {
+                    setAddQuestionModal(false)
+                    message.success('Đã thêm câu hỏi thành công')
+                  })
+
+                LayDanhSachCauHoi(+(kiThi as any).id).then(function (result) {
+                  setQuestionSets(result.data[0].boCauHoi)
+                })
               }}>
               Lưu
             </Button>
@@ -393,7 +410,86 @@ function ChiTietKiThiCauHoi() {
             </Card>
           ))}
         </div>
+        <ScrollToTopButton targetRef={addQuestionModalRef} />
       </Modal >
+
+      <Modal open={editBCH !== null} width={1000} footer={[]}
+        onCancel={() => setEditBCH(null)}
+        title={<p ref={editBCHRef} className='text-lg font-bold uppercase'>Sửa bộ câu hỏi {editBCH?.tenBoCauHoi}</p>}>
+        <div className='flex flex-col gap-5'>
+          {/* Câu hỏi 1 */}
+          <div className='flex gap-5 items-center'>
+            <div className='flex gap-2'>
+              <p>Chọn tất cả</p>
+              <Checkbox checked={editBCH?.cauHoi?.every((i: any) => i.coTrongDe === true)} value={true}
+                onChange={(e: any) => {
+                  setCauHoiForm(e.target?.value ? editBCH.cauHoi.map((i: any) => i.id) : [])
+                }} />
+            </div>
+            <Button variant='solid' color='blue' icon={<FontAwesomeIcon icon={faSave} />}
+              onClick={async e => {
+                await ThemCauHoiKiThi(+(idKiThi ?? 0), { danhSachCauHoi: cauHoiForm })
+                  .then(e => {
+                    setAddQuestionModal(false)
+                    message.success('Đã thêm câu hỏi thành công')
+                  })
+
+                LayDanhSachCauHoi(+(kiThi as any).id).then(function (result) {
+                  setQuestionSets(result.data[0].boCauHoi)
+                })
+              }}>
+              Lưu
+            </Button>
+          </div>
+          {editBCH?.cauHoi
+            ?.sort((a: any, b: any) => a.coTrongDe ? -1 : 1)
+            ?.map((i: any, j: number) => (
+              <Card >
+                <div className='grid grid-cols-[auto_1fr] gap-5'>
+
+                  <Checkbox checked={i.coTrongDe} value={i.id} />
+                  <div>
+                    <div className="flex items-center mb-4 gap-3">
+                      <Text strong className="text-lg">{boCauHoi.find(i => i.id === bch)?.tenBoCauHoi}</Text>
+                      <span className={[
+                        "px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700",
+                        i.doKho === 0 ? "bg-green-100 text-green-700" : i.doKho === 1 ? "bg-orange-100 text-orange-700" : "bg-red-100 text-red-700"
+                      ].join(' ')}>
+                        {i.doKho === 0 ? "DỄ" : i.doKho === 1 ? "TRUNG BÌNH" : "KHÓ"}
+                      </span>
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                        {i.loaiCauHoi === 0 ? "CHỌN ĐÁP ÁN ĐÚNG NHẤT" : "CHỌN NHIỀU ĐÁP ÁN"}
+                      </span>
+                    </div>
+
+                    <div className="mb-4">
+                      <Text strong className="text-base">
+                        Câu {j + 1}: {i.noiDung}
+                      </Text>
+                    </div>
+
+                    <div className="space-y-2">
+                      {i.dapAn.map((_i: any, _j: any) => (
+                        <div className={[
+                          "w-full text-left p-3 rounded border",
+                          _i.dungSai ? "bg-green-100 border-green-500 text-green-700" : "bg-gray-50 border-gray-300"
+                        ].join(' ')}>
+                          <div className="flex items-center gap-2">
+                            <Text strong>{"ABCDEF"[_j]}.</Text>
+                            <Text>{_i.noiDung}</Text>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+        </div>
+        <ScrollToTopButton targetRef={editBCHRef} />
+      </Modal >
+
+
     </div >
   );
 };

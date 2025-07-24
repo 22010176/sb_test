@@ -85,54 +85,53 @@ public class KiThiController(AppDbContext context) : ControllerBase
     {
       int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
       var cauHoiKiThi = await (
-        from kt in context.KiThi
-        join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
-        where
-          kt.Id == idKiThi
-          && mh.IdGiangVien == userId
-        select new
-        {
-          kt.Id,
-          kt.TenKiThi,
-          IdMonHoc = mh.Id,
-          BoCauHoi = (
-            from bch in context.BoCauHoi
-            where bch.IdMonHoc == mh.Id
-            orderby bch.Id
-            select new
-            {
-              bch.Id,
-              bch.TenBoCauHoi,
-              CauHoi = (
-                from chkt in context.CauHoiKiThi
-                join ch in context.CauHoi on chkt.IdCauHoi equals ch.Id
+                from kt in context.KiThi
+                join mh in context.MonHoc on kt.IdMonHoc equals mh.Id
                 where
-                  chkt.IdKiThi == kt.Id
-                  && ch.IdBoCauHoi == bch.Id
-                orderby chkt.Id
+                  kt.Id == idKiThi
+                  && mh.IdGiangVien == userId
                 select new
                 {
-                  chkt.Id,
-                  chkt.NoiDung,
-                  LoaiCauHoi = chkt.LoaiCauHoi.ToString(),
-                  chkt.DoKho,
-                  ch.ThoiGianCapNhatCuoi,
-                  DapAn = (
-                    from da in context.DapAnCauHoiKiThi
-                    where da.IdCauHoi == chkt.Id
-                    orderby da.Id
+                  kt.Id,
+                  kt.TenKiThi,
+                  IdMonHoc = mh.Id,
+                  BoCauHoi = (
+                    from bch in context.BoCauHoi
+                    where bch.IdMonHoc == mh.Id
+                    orderby bch.Id
                     select new
                     {
-                      da.Id,
-                      da.NoiDung,
-                      da.DungSai
+                      bch.Id,
+                      bch.TenBoCauHoi,
+                      CauHoi = (
+                        from ch in context.CauHoi
+                        join chkt in context.CauHoiKiThi on ch.Id equals chkt.IdCauHoi
+                        where ch.IdBoCauHoi == bch.Id
+                        orderby chkt.Id
+                        select new
+                        {
+                          chkt.Id,
+                          chkt.NoiDung,
+                          CoTrongDe = chkt.IdKiThi == kt.Id,
+                          LoaiCauHoi = chkt.LoaiCauHoi.ToString(),
+                          chkt.DoKho,
+                          ch.ThoiGianCapNhatCuoi,
+                          DapAn = (
+                            from da in context.DapAnCauHoiKiThi
+                            where da.IdCauHoi == chkt.Id
+                            orderby da.Id
+                            select new
+                            {
+                              da.Id,
+                              da.NoiDung,
+                              da.DungSai
+                            }
+                          ).ToList()
+                        }
+                      ).ToList(),
                     }
                   ).ToList()
                 }
-              ).ToList(),
-            }
-          ).ToList()
-        }
       ).ToListAsync();
 
       return Ok(new ResponseFormat
@@ -432,6 +431,44 @@ public class KiThiController(AppDbContext context) : ControllerBase
       });
     }
   }
+
+  [HttpDelete("{idKiThi}/bo-cau-hoi")]
+  public async Task<IActionResult> XoaBoCauHoi(int idKiThi, XoaBoCauHoiInput input)
+  {
+    try
+    {
+      int userId = int.Parse(User.FindFirst(ClaimTypes.UserData)!.Value);
+      List<CauHoiKiThi> cauHoi = await (
+        from ch in context.CauHoiKiThi
+        where input.DanhSachCauHoi!.Contains(ch.Id)
+        select ch
+      ).ToListAsync();
+
+      context.CauHoiKiThi.RemoveRange(cauHoi);
+      await context.SaveChangesAsync();
+
+      return Ok(new ResponseFormat
+      {
+        Data = "",
+        Success = true,
+        Message = ""
+      });
+    }
+    catch (Exception err)
+    {
+      return BadRequest(new ResponseFormat
+      {
+        Data = err,
+        Success = false,
+        Message = ""
+      });
+    }
+  }
+}
+
+public record XoaBoCauHoiInput
+{
+  public List<int>? DanhSachCauHoi { get; set; }
 }
 
 public record KiThiInput

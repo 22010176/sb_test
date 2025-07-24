@@ -14,7 +14,7 @@ export function withGiangVienRole(Component: FC | string) {
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) {
       localStorage.removeItem('token')
-      return <Navigate to="/" />
+      return window.location.replace(link)
     }
 
     const user: UserData = pageData.user as UserData
@@ -31,7 +31,7 @@ export function withHocSinhRole(Component: FC | string) {
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) {
       localStorage.removeItem('token')
-      return <Navigate to="/" />
+      return window.location.replace(link)
     }
 
     const user: UserData = pageData.user as UserData
@@ -46,7 +46,7 @@ export function withAccount(Component: FC | string) {
     const [pageData,]: PageContextData = useContext(PageContext) as PageContextData
 
     if (pageData.user === 'loading') return ""
-    if (pageData.user === null) return <Navigate to="/" />
+    if (pageData.user === null) return window.location.replace(link)
 
     return <Component {...props} />
   }

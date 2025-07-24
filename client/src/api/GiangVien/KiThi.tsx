@@ -97,3 +97,15 @@ export async function LayCauHinhCauHoi(idKiThi: number) {
   })
   return result.data;
 }
+
+export async function XoaBoCauHoi(idKiThi: number, danhSachCauHoi: number[]) {
+  const result = await axios.delete(`${url}/${idKiThi}/bo-cau-hoi`, {
+    data: {
+      danhSachCauHoi
+    },
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  })
+  return result.data
+}
