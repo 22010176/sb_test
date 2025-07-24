@@ -35,12 +35,18 @@ import ChiTietKiThiKetQua from './pages/TeacherPages/ChiTietKiThiKetQua';
 import GiangVien_QuanLyBoCauHoi from './pages/TeacherPages/QuanLyBoCauHoi';
 import QuanLyKiThi from './pages/TeacherPages/QuanLyKiThi';
 import { ChiTietKiThi, ChiTietLop } from './pages/TeacherPages/ThongTinChiTiet';
+import ThongKeKetQua from './pages/StudentPages/ThongKeKetQua';
 
 const role = import.meta.env.VITE_ROLE;
 
+function RedirectToLogin() {
+  if (localStorage.getItem('token')) return <Navigate to="/giang-vien/lop-hoc" />
+  else return <Navigate to="/" />
+}
+
 function App() {
   const [state, dispatch] = useReducer(PageReducer, { user: 'loading' })
-
+  // localStorage.clear()
   useEffect(function () {
     if (localStorage.getItem('token')) GetNguoiDung()
       .then(res => {
@@ -73,7 +79,7 @@ function App() {
           <Route path='/giang-vien' element={<TeacherLayout />}>
             {/* <Route path='/thong-tin-tai-khoan' element={<UserProfileForm />} /> */}
 
-            <Route path='/giang-vien' element={<Navigate to="/giang-vien/lop-hoc" />} />
+            <Route path='/giang-vien' element={<RedirectToLogin />} />
             <Route path='/giang-vien/thong-tin-tai-khoan' element={<UserProfileForm />} />
             <Route path='/giang-vien/lop-hoc' element={<GiangVien_QuanLyLopHoc />} />
 
@@ -108,6 +114,7 @@ function App() {
           {/* <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} /> */}
           <Route path='/hoc-sinh/ki-thi' element={<HocSinh_QuanLiKiThi />} />
           <Route path='/hoc-sinh/ki-thi/:idKiThi' element={<LamBaiThi />} />
+          <Route path='/hoc-sinh/thong-ke' element={<ThongKeKetQua />} />
           {/* <Route path='/hoc-sinh/ki-thi' element={<StudentLayout />}>
           </Route> */}
         </Route>}

@@ -19,7 +19,7 @@ public class LopHocController(AppDbContext context) : ControllerBase
   {
     var query =
       from lh in context.LopHoc
-      where lh.IdGiangVien == 605
+      where lh.IdGiangVien == userId
       orderby lh.ThoiGianTao descending
       select new
       {

@@ -14,7 +14,7 @@ export function withGiangVienRole(Component: FC | string) {
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) {
       localStorage.removeItem('token')
-      return window.location.replace(link)
+      return <Navigate to="/" />
     }
 
     const user: UserData = pageData.user as UserData
@@ -31,11 +31,11 @@ export function withHocSinhRole(Component: FC | string) {
     if (pageData.user === 'loading') return ""
     if (pageData.user === null) {
       localStorage.removeItem('token')
-      return window.location.replace(link)
+      return <Navigate to="/" />
     }
 
     const user: UserData = pageData.user as UserData
-    if (user.loaiNguoiDung !== 1) return document.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
+    // if (user.loaiNguoiDung !== 1) return window.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
 
     return <Component {...props} />
   }
