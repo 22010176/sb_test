@@ -26,7 +26,7 @@ const items: MenuProps['items'] = [
       <Link to="#" className='font-medium ' style={{ color: "#6B406B" }}
         onClick={() => {
           localStorage.removeItem('token')
-          window.location.replace(import.meta.env.VITE_GIANGVIEN_PAGE)
+          window.location.replace('/')
         }}>
         Đăng xuất
       </Link>

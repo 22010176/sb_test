@@ -23,7 +23,11 @@ const items: MenuProps['items'] = [
   {
     key: '3',
     label: (
-      <Link to="#" className='font-medium ' style={{ color: "#6B406B" }}>
+      <Link to="#" className='font-medium ' style={{ color: "#6B406B" }}
+        onClick={() => {
+          localStorage.removeItem('token')
+          window.location.replace('/')
+        }}>
         Đăng xuất
       </Link>
     ),
